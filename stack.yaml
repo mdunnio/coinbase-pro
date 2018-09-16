@@ -1,0 +1,9 @@
+resolver: lts-12.5
+
+packages:
+- .
+
+system-ghc: false
+
+extra-include-dirs: ["/usr/local/opt/openssl/include"]
+extra-lib-dirs: ["/usr/local/opt/openssl/lib"]

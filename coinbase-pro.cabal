@@ -1,0 +1,65 @@
+name:           coinbase-pro
+version:        0.1.0.0
+description:    API to coinbase-pro
+homepage:       https://github.com/michaelsdunn1/coinbase-pro#readme
+bug-reports:    https://github.com/michaelsdunn1/coinbase-pro/issues
+author:         Michael Dunn <michaelsdunn1@gmail.com>
+maintainer:     Michael Dunn <michaelsdunn1@gmail.com>
+copyright:      2018 Michael Dunn <michaelsdunn1@gmail.com>
+license:        BSD3
+license-file:   LICENSE
+build-type:     Simple
+cabal-version:  >= 1.10
+
+extra-source-files:
+    README.md
+
+source-repository head
+  type: git
+  location: https://github.com/michaelsdunn1/coinbase-pro
+
+library
+  hs-source-dirs:   src/lib/
+  default-language: Haskell2010
+  ghc-options:      -Wall -fwarn-tabs -O2 -funbox-strict-fields
+  exposed-modules: CoinbasePro.Accounts
+                 , CoinbasePro.Headers
+                 , CoinbasePro.MarketData
+                 , CoinbasePro.MarketData.AggregateOrderBook
+                 , CoinbasePro.MarketData.OrderBook
+                 , CoinbasePro.MarketData.Types
+                 , CoinbasePro.Request
+                 , CoinbasePro.Request.Authenticated
+                 , CoinbasePro.Types
+                 , CoinbasePro.WebSocketFeed
+                 , CoinbasePro.WebSocketFeed.Channel
+                 , CoinbasePro.WebSocketFeed.Channel.Full.Activate
+                 , CoinbasePro.WebSocketFeed.Channel.Full.Change
+                 , CoinbasePro.WebSocketFeed.Channel.Full.Done
+                 , CoinbasePro.WebSocketFeed.Channel.Full.Match
+                 , CoinbasePro.WebSocketFeed.Channel.Full.Open
+                 , CoinbasePro.WebSocketFeed.Channel.Full.Received
+                 , CoinbasePro.WebSocketFeed.Channel.Heartbeat
+                 , CoinbasePro.WebSocketFeed.Channel.Level2
+                 , CoinbasePro.WebSocketFeed.Channel.Ticker
+                 , CoinbasePro.WebSocketFeed.Request
+                 , CoinbasePro.WebSocketFeed.Response
+
+  build-depends: base              >= 4.7  && < 5
+               , HsOpenSSL         >= 0.11 && < 0.12
+               , aeson             >= 1.2  && < 1.4
+               , async             >= 2.1  && < 2.3
+               , base64-bytestring >= 1.0  && < 1.1
+               , binary            >= 0.8  && < 0.9
+               , bytestring        >= 0.10 && < 0.11
+               , containers        >= 0.5  && < 0.6
+               , cryptonite        >= 0.24 && < 0.26
+               , http-streams      >= 0.8  && < 0.9
+               , io-streams        >= 1.5  && < 1.6
+               , memory            >= 0.14 && < 0.15
+               , network           >= 2.6  && < 2.7
+               , text              >= 1.2  && < 1.3
+               , time              >= 1.8  && < 1.9
+               , transformers      >= 0.5  && < 0.6
+               , vector            >= 0.12 && < 0.13
+               , websockets        >= 0.12 && < 0.13
