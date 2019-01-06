@@ -54,3 +54,4 @@ instance FromJSON ChannelMessage where
           "snapshot"      -> L2SnapshotMessage <$> parseJSON (Object o)
           "subscriptions" -> SubscriptionMessage <$> parseJSON (Object o)
           "ticker"        -> TickerMessage <$> parseJSON (Object o)
+          _               -> fail "Unable to parse channel message"

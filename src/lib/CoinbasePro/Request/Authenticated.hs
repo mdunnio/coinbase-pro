@@ -1,110 +1,206 @@
-{-# LANGUAGE GeneralizedNewtypeDeriving #-}
-{-# LANGUAGE OverloadedStrings          #-}
+{-# LANGUAGE DataKinds     #-}
+{-# LANGUAGE TypeOperators #-}
 
 module CoinbasePro.Request.Authenticated
-    ( CBAuth (..)
-    , CBAuthT (..)
-    , runCBAuthT
-    , authRequest
-    ) where
+  ( accounts
+  , account
+  , listOrders
+  , fills
+  , placeOrder
+  , cancelOrder
+  , cancelAll
+  ) where
 
 
-import           Control.Monad.IO.Class     (MonadIO, liftIO)
-import           Control.Monad.Trans.Class  (MonadTrans)
-import           Control.Monad.Trans.Reader (ReaderT (..), asks)
-import           Crypto.Hash.Algorithms     (SHA256)
-import qualified Crypto.MAC.HMAC            as HMAC
-import           Data.Aeson                 (FromJSON)
-import qualified Data.Aeson                 as A
-import           Data.Binary.Builder        (fromByteString)
-import           Data.ByteArray.Encoding    (Base (Base64), convertToBase)
-import           Data.ByteString            (ByteString)
-import           Data.ByteString.Base64     (decode)
-import           Data.Monoid                ((<>))
-import           Data.Text                  (Text, pack)
-import           Data.Text.Encoding         (encodeUtf8)
-import           Data.Time.Clock            (getCurrentTime)
-import           Data.Time.Format           (defaultTimeLocale, formatTime)
-import           Network.Http.Client        (Hostname, Method (..), Request,
-                                             baselineContextSSL, buildRequest1,
-                                             concatHandler, http,
-                                             openConnectionSSL, receiveResponse,
-                                             sendRequest, setAccept,
-                                             setContentType, setHeader,
-                                             setHostname)
-import qualified System.IO.Streams          as Streams
+import           Control.Monad                              (void)
+import           Control.Monad.IO.Class                     (MonadIO)
+import           Data.Aeson                                 (encode)
+import qualified Data.ByteString.Char8                      as C8
+import qualified Data.ByteString.Lazy.Char8                 as LC8
+import           Data.Maybe                                 (fromMaybe)
+import           Data.Proxy                                 (Proxy (..))
+import qualified Data.Set                                   as S
+import           Data.Text                                  (Text, pack,
+                                                             toLower, unpack)
+import           Network.HTTP.Types                         (SimpleQuery,
+                                                             SimpleQueryItem,
+                                                             methodDelete,
+                                                             methodGet,
+                                                             methodPost,
+                                                             renderQuery,
+                                                             simpleQueryToQuery)
+import           Servant.API
+import           Servant.Client
 
-import           CoinbasePro.Headers        (CBAccessKey (..),
-                                             CBAccessPassphrase (..),
-                                             CBAccessSign (..),
-                                             CBAccessTimeStamp (..))
-import           CoinbasePro.Request        (Connection (..))
-
-
-data CBAuth = CBAuth
-    { connection         :: Connection
-    , cbAccessKey        :: CBAccessKey
-    , cbAccessPassphrase :: CBAccessPassphrase
-    }
-
-newtype CBAuthT m a = CBAuthT { unCBAuth :: ReaderT CBAuth m a }
-    deriving ( Functor, Applicative, Monad, MonadTrans, MonadIO )
-
-
-runCBAuthT :: CBAuth -> CBAuthT m a -> m a
-runCBAuthT ga = flip runReaderT ga . unCBAuth
+import           CoinbasePro.Headers                        (CBAccessKey (..), CBAccessPassphrase (..),
+                                                             CBAccessSign (..),
+                                                             CBAccessTimeStamp (..))
+import           CoinbasePro.Request                        (CBAuthT,
+                                                             RequestPath,
+                                                             authRequest)
+import           CoinbasePro.Request.Authenticated.Accounts (Account,
+                                                             AccountId (..))
+import           CoinbasePro.Request.Authenticated.Fills    (Fill)
+import           CoinbasePro.Request.Authenticated.Orders   (Order,
+                                                             PlaceOrderBody (..),
+                                                             STP, Status (..),
+                                                             Statuses (..),
+                                                             TimeInForce,
+                                                             statuses)
+import           CoinbasePro.Types                          (OrderId (..),
+                                                             OrderType, Price,
+                                                             ProductId (..),
+                                                             RequiredHeader,
+                                                             Side, Size,
+                                                             UserAgent)
 
 
-authRequest :: (MonadIO m, FromJSON a) => Text -> Text -> CBAuthT m (Maybe a)
-authRequest endpoint body = do
-    ctx   <- liftIO baselineContextSSL
-    host' <- CBAuthT $ asks (host . connection)
-    port' <- CBAuthT $ asks (port . connection)
-    cbak  <- CBAuthT $ asks cbAccessKey
-    cbp   <- CBAuthT $ asks cbAccessPassphrase
-    c     <- liftIO $ openConnectionSSL ctx host' port'
-    t     <- liftIO $ formatTime defaultTimeLocale "%s" <$> getCurrentTime
-    decodedApiKey <- liftIO $ decodeApiKey $ unCBAccessKey cbak
-    let ts         = CBAccessTimeStamp t
-        msg        = mkMessage ts GET endpoint body
-        accessSign = CBAccessSign . convertToBase Base64 $ HMAC.hmacGetDigest (HMAC.hmac decodedApiKey msg :: HMAC.HMAC SHA256)
-        aReq       = mkAuthRequest GET (encodeUtf8 endpoint) host' cbak cbp ts accessSign
-    liftIO $ sendRequest c aReq $ Streams.write (Just . fromByteString $ encodeUtf8 body)
-    res <- liftIO $ receiveResponse c concatHandler
-    liftIO $ print res
-    either fail return $ A.eitherDecodeStrict res
+type API = "accounts"
+    :> RequiredHeader "CB-ACCESS-KEY" CBAccessKey
+    :> RequiredHeader "CB-ACCESS-SIGN" CBAccessSign
+    :> RequiredHeader "CB-ACCESS-TIMESTAMP" CBAccessTimeStamp
+    :> RequiredHeader "CB-ACCESS-PASSPHRASE" CBAccessPassphrase
+    :> RequiredHeader "User-Agent" UserAgent
+    :> Get '[JSON] [Account]
+    :<|> "accounts" :> Capture "account-id" AccountId
+    :> RequiredHeader "CB-ACCESS-KEY" CBAccessKey
+    :> RequiredHeader "CB-ACCESS-SIGN" CBAccessSign
+    :> RequiredHeader "CB-ACCESS-TIMESTAMP" CBAccessTimeStamp
+    :> RequiredHeader "CB-ACCESS-PASSPHRASE" CBAccessPassphrase
+    :> RequiredHeader "User-Agent" UserAgent
+    :> Get '[JSON] Account
+    :<|> "orders"
+    :> QueryParams "status" Status
+    :> QueryParam "product_id" ProductId
+    :> RequiredHeader "CB-ACCESS-KEY" CBAccessKey
+    :> RequiredHeader "CB-ACCESS-SIGN" CBAccessSign
+    :> RequiredHeader "CB-ACCESS-TIMESTAMP" CBAccessTimeStamp
+    :> RequiredHeader "CB-ACCESS-PASSPHRASE" CBAccessPassphrase
+    :> RequiredHeader "User-Agent" UserAgent
+    :> Get '[JSON] [Order]
+    :<|> "orders"
+    :> ReqBody '[JSON] PlaceOrderBody
+    :> RequiredHeader "CB-ACCESS-KEY" CBAccessKey
+    :> RequiredHeader "CB-ACCESS-SIGN" CBAccessSign
+    :> RequiredHeader "CB-ACCESS-TIMESTAMP" CBAccessTimeStamp
+    :> RequiredHeader "CB-ACCESS-PASSPHRASE" CBAccessPassphrase
+    :> RequiredHeader "User-Agent" UserAgent
+    :> Post '[JSON] Order
+    :<|> "orders" :> Capture "order_id" OrderId
+    :> RequiredHeader "CB-ACCESS-KEY" CBAccessKey
+    :> RequiredHeader "CB-ACCESS-SIGN" CBAccessSign
+    :> RequiredHeader "CB-ACCESS-TIMESTAMP" CBAccessTimeStamp
+    :> RequiredHeader "CB-ACCESS-PASSPHRASE" CBAccessPassphrase
+    :> RequiredHeader "User-Agent" UserAgent
+    :> Delete '[JSON] NoContent
+    :<|> "orders"
+    :> QueryParam "product_id" ProductId
+    :> RequiredHeader "CB-ACCESS-KEY" CBAccessKey
+    :> RequiredHeader "CB-ACCESS-SIGN" CBAccessSign
+    :> RequiredHeader "CB-ACCESS-TIMESTAMP" CBAccessTimeStamp
+    :> RequiredHeader "CB-ACCESS-PASSPHRASE" CBAccessPassphrase
+    :> RequiredHeader "User-Agent" UserAgent
+    :> Delete '[JSON] [OrderId]
+    :<|> "fills"
+    :> QueryParam "product_id" ProductId
+    :> QueryParam "order_id" OrderId
+    :> RequiredHeader "CB-ACCESS-KEY" CBAccessKey
+    :> RequiredHeader "CB-ACCESS-SIGN" CBAccessSign
+    :> RequiredHeader "CB-ACCESS-TIMESTAMP" CBAccessTimeStamp
+    :> RequiredHeader "CB-ACCESS-PASSPHRASE" CBAccessPassphrase
+    :> RequiredHeader "User-Agent" UserAgent
+    :> Get '[JSON] [Fill]
 
 
-mkAuthRequest :: Method
-              -> ByteString
-              -> Hostname
-              -> CBAccessKey
-              -> CBAccessPassphrase
-              -> CBAccessTimeStamp
-              -> CBAccessSign
-              -> Request
-mkAuthRequest m endpoint host' key pass ts sign = buildRequest1 $ do
-    http m endpoint
-    setContentType contentType
-    setHostname host' 80
-    setAccept contentType
-    setHeader "User-Agent" "coinbase-pro/0.1"
-    setHeader "CB-ACCESS-KEY" $ unCBAccessKey key
-    setHeader "CB-ACCESS-PASSPHRASE" $ unCBAccessPassphrase pass
-    setHeader "CB-ACCESS-TIMESTAMP" . encodeUtf8 . pack $ unCBAccessTimestamp ts
-    setHeader "CB-ACCESS-SIGN" $ unCBAccessSign sign
+api :: Proxy API
+api = Proxy
+
+
+accountsAPI :: CBAccessKey -> CBAccessSign -> CBAccessTimeStamp -> CBAccessPassphrase -> UserAgent -> ClientM [Account]
+singleAccountAPI :: AccountId -> CBAccessKey -> CBAccessSign -> CBAccessTimeStamp -> CBAccessPassphrase -> UserAgent -> ClientM Account
+listOrdersAPI :: [Status] -> Maybe ProductId -> CBAccessKey -> CBAccessSign -> CBAccessTimeStamp -> CBAccessPassphrase -> UserAgent -> ClientM [Order]
+placeOrderAPI :: PlaceOrderBody
+              -> CBAccessKey -> CBAccessSign -> CBAccessTimeStamp -> CBAccessPassphrase -> UserAgent
+              -> ClientM Order
+cancelOrderAPI :: OrderId -> CBAccessKey -> CBAccessSign -> CBAccessTimeStamp -> CBAccessPassphrase -> UserAgent -> ClientM NoContent
+cancelAllAPI :: Maybe ProductId -> CBAccessKey -> CBAccessSign -> CBAccessTimeStamp -> CBAccessPassphrase -> UserAgent -> ClientM [OrderId]
+fillsAPI :: Maybe ProductId -> Maybe OrderId -> CBAccessKey -> CBAccessSign -> CBAccessTimeStamp -> CBAccessPassphrase -> UserAgent -> ClientM [Fill]
+accountsAPI :<|> singleAccountAPI :<|> listOrdersAPI :<|> placeOrderAPI :<|> cancelOrderAPI :<|> cancelAllAPI :<|> fillsAPI = client api
+
+
+-- | https://docs.pro.coinbase.com/?javascript#accounts
+accounts :: MonadIO m => CBAuthT m [Account]
+accounts = authRequest methodGet "/accounts" "" accountsAPI
+
+
+-- | https://docs.pro.coinbase.com/?javascript#get-an-account
+account :: MonadIO m => AccountId -> CBAuthT m Account
+account aid@(AccountId t) = authRequest methodGet requestPath "" $ singleAccountAPI aid
   where
-    contentType = "application/json"
+    requestPath = "/accounts/" ++ unpack t
 
 
-mkMessage :: CBAccessTimeStamp -> Method -> Text -> Text -> ByteString
-mkMessage t m reqPath body = t' <> m' <> reqPath' <> body'
+-- | https://docs.pro.coinbase.com/?javascript#list-orders
+listOrders :: MonadIO m => Maybe [Status] -> Maybe ProductId -> CBAuthT m [Order]
+listOrders st prid = authRequest methodGet (mkRequestPath "/orders") "" $ listOrdersAPI (defaultStatus st) prid
   where
-    t'       = encodeUtf8 . pack . show $ unCBAccessTimestamp t
-    m'       = encodeUtf8 . pack . show $ m
-    reqPath' = encodeUtf8 reqPath
-    body'    = encodeUtf8 body
+    mkRequestPath :: RequestPath -> RequestPath
+    mkRequestPath rp = rp ++ (C8.unpack . renderQuery True . simpleQueryToQuery $ mkOrderQuery st prid)
+
+    mkOrderQuery :: Maybe [Status] -> Maybe ProductId -> SimpleQuery
+    mkOrderQuery ss p = mkStatusQuery ss <> mkProductQuery p
+
+    mkStatusQuery :: Maybe [Status] -> [SimpleQueryItem]
+    mkStatusQuery ss = mkSimpleQueryItem "status" . toLower . pack . show <$> S.toList (unStatuses . statuses $ defaultStatus ss)
+
+    defaultStatus :: Maybe [Status] -> [Status]
+    defaultStatus = fromMaybe [All]
 
 
-decodeApiKey :: ByteString -> IO ByteString
-decodeApiKey = either fail return . decode
+-- | https://docs.pro.coinbase.com/?javascript#place-a-new-order
+placeOrder :: MonadIO m => ProductId -> Side -> Size -> Price -> Bool -> Maybe OrderType -> Maybe STP -> Maybe TimeInForce -> CBAuthT m Order
+placeOrder prid sd sz price po ot stp tif =
+    authRequest methodPost "/orders" (LC8.unpack $ encode body) $ placeOrderAPI body
+  where
+    body = PlaceOrderBody prid sd sz price po ot stp tif
+
+
+-- | https://docs.pro.coinbase.com/?javascript#cancel-an-order
+cancelOrder :: MonadIO m => OrderId -> CBAuthT m ()
+cancelOrder oid = void . authRequest methodDelete (mkRequestPath "/orders") "" $ cancelOrderAPI oid
+  where
+    mkRequestPath :: RequestPath -> RequestPath
+    mkRequestPath rp = rp ++ "/" ++ unpack (unOrderId oid)
+
+
+-- | https://docs.pro.coinbase.com/?javascript#cancel-all
+cancelAll :: MonadIO m => Maybe ProductId -> CBAuthT m [OrderId]
+cancelAll prid = authRequest methodDelete (mkRequestPath "/orders") "" (cancelAllAPI prid)
+  where
+    mkRequestPath :: RequestPath -> RequestPath
+    mkRequestPath rp = rp ++ (C8.unpack . renderQuery True . simpleQueryToQuery $ mkProductQuery prid)
+
+
+-- | https://docs.pro.coinbase.com/?javascript#fills
+fills :: MonadIO m => Maybe ProductId -> Maybe OrderId -> CBAuthT m [Fill]
+fills prid oid = authRequest methodGet mkRequestPath "" (fillsAPI prid oid)
+  where
+    brp = "/fills"
+
+    mkRequestPath :: RequestPath
+    mkRequestPath = brp ++ (C8.unpack . renderQuery True . simpleQueryToQuery $ mkSimpleQuery prid oid)
+
+    mkSimpleQuery :: Maybe ProductId -> Maybe OrderId -> SimpleQuery
+    mkSimpleQuery p o = mkProductQuery p <> mkOrderIdQuery o
+
+
+mkSimpleQueryItem :: String -> Text -> SimpleQueryItem
+mkSimpleQueryItem s t = (C8.pack s, C8.pack $ unpack t)
+
+
+mkProductQuery :: Maybe ProductId -> [SimpleQueryItem]
+mkProductQuery = maybe [] (return . mkSimpleQueryItem "product_id" . unProductId)
+
+
+mkOrderIdQuery :: Maybe OrderId -> SimpleQuery
+mkOrderIdQuery = maybe [] (return . mkSimpleQueryItem "order_id" . unOrderId)

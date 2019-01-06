@@ -5,20 +5,43 @@ module CoinbasePro.Headers
     , CBAccessPassphrase(..)
     ) where
 
-import           Data.ByteString (ByteString)
+import           Data.ByteString    (ByteString)
+import           Data.Text          (pack)
+import           Data.Text.Encoding (decodeUtf8)
+import           Web.HttpApiData    (ToHttpApiData (..))
 
 
-newtype CBAccessKey = CBAccessKey { unCBAccessKey :: ByteString }
-    deriving (Eq, Show, Ord)
+newtype CBAccessKey = CBAccessKey String
+    deriving (Eq, Show)
 
 
-newtype CBAccessSign = CBAccessSign { unCBAccessSign :: ByteString }
-    deriving (Eq, Show, Ord)
+instance ToHttpApiData CBAccessKey where
+    toUrlPiece (CBAccessKey k)   = pack k
+    toQueryParam (CBAccessKey k) = pack k
 
 
-newtype CBAccessTimeStamp = CBAccessTimeStamp { unCBAccessTimestamp :: String }
-    deriving (Eq, Show, Ord)
+newtype CBAccessSign = CBAccessSign ByteString
+    deriving (Eq, Show)
 
 
-newtype CBAccessPassphrase = CBAccessPassphrase { unCBAccessPassphrase :: ByteString }
-    deriving (Eq, Show, Ord)
+instance ToHttpApiData CBAccessSign where
+    toUrlPiece (CBAccessSign s)   = decodeUtf8 s
+    toQueryParam (CBAccessSign s) = decodeUtf8 s
+
+
+newtype CBAccessTimeStamp = CBAccessTimeStamp String
+    deriving (Eq, Show)
+
+
+instance ToHttpApiData CBAccessTimeStamp where
+    toUrlPiece (CBAccessTimeStamp ts)   = pack ts
+    toQueryParam (CBAccessTimeStamp ts) = pack ts
+
+
+newtype CBAccessPassphrase = CBAccessPassphrase String
+    deriving (Eq, Show)
+
+
+instance ToHttpApiData CBAccessPassphrase where
+    toUrlPiece (CBAccessPassphrase p)   = pack p
+    toQueryParam (CBAccessPassphrase p) = pack p

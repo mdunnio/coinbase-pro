@@ -1,34 +1,35 @@
 {-# LANGUAGE OverloadedStrings #-}
 
-module CoinbasePro.MarketData.OrderBook
-    ( OrderBook(..)
-    , Order(..)
+module CoinbasePro.MarketData.FullOrderBook
+    ( FullOrderBook (..)
+    , Order (..)
     ) where
 
-import           Data.Aeson  (FromJSON (..), withArray, withObject, (.:))
-import           Data.Text   (Text)
-import qualified Data.Vector as V
+import           Data.Aeson        (FromJSON (..), withArray, withObject, (.:))
+import qualified Data.Vector       as V
+
+import           CoinbasePro.Types (OrderId (..), Price, Size)
 
 
-data OrderBook = OrderBook
+data FullOrderBook = FullOrderBook
     { sequence :: Int
     , bids     :: [Order]
     , asks     :: [Order]
     } deriving (Eq, Ord, Show)
 
 
-instance FromJSON OrderBook where
+instance FromJSON FullOrderBook where
     parseJSON = withObject "orderbook" $ \o ->
-        OrderBook <$>
+        FullOrderBook <$>
             o .: "sequence" <*>
             o .: "bids" <*>
             o .: "asks"
 
 
 data Order = Order
-    { price   :: Double
-    , size    :: Double
-    , orderId :: Text
+    { price   :: Price
+    , size    :: Size
+    , orderId :: OrderId
     } deriving (Eq, Ord, Show)
 
 
@@ -38,4 +39,4 @@ instance FromJSON Order where
         px  <- parseJSON $ head l
         sz  <- parseJSON $ l !! 1
         oid <- parseJSON $ l !! 2
-        return $ Order (read px) (read sz) oid
+        return $ Order px sz oid

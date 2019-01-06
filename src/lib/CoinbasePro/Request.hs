@@ -2,69 +2,106 @@
 {-# LANGUAGE OverloadedStrings          #-}
 
 module CoinbasePro.Request
-    ( Connection(..)
-    , CBT (..)
-    , apiEndpoint
-    , runCBT
+    ( CBAuthT (..)
+    , runCbAuthT
+
+    , CoinbaseProCredentials (..)
+    , CBSecretKey (..)
+    , RequestPath
+    , Body
+
     , request
+    , authRequest
+    , apiEndpoint
     ) where
 
+import           Control.Exception          (throw)
 import           Control.Monad.IO.Class     (MonadIO, liftIO)
 import           Control.Monad.Trans.Class  (MonadTrans)
-import           Control.Monad.Trans.Reader (ReaderT (..), asks)
-import           Data.Aeson                 (FromJSON, eitherDecodeStrict)
+import           Control.Monad.Trans.Reader (ReaderT, asks, runReaderT)
+import           Crypto.Hash.Algorithms     (SHA256)
+import qualified Crypto.MAC.HMAC            as HMAC
+import           Data.ByteArray.Encoding    (Base (Base64), convertFromBase,
+                                             convertToBase)
 import           Data.ByteString            (ByteString)
-import           Data.Text                  (Text)
-import           Data.Text.Encoding         (encodeUtf8)
-import           Network.Http.Client        (Hostname, Method (..), Port,
-                                             Request, baselineContextSSL,
-                                             buildRequest1, concatHandler,
-                                             emptyBody, http, openConnectionSSL,
-                                             receiveResponse, sendRequest,
-                                             setAccept, setContentType,
-                                             setHeader, setHostname)
+import qualified Data.ByteString.Char8      as C8
+import           Data.Time.Clock            (getCurrentTime)
+import           Data.Time.Format           (defaultTimeLocale, formatTime)
+import           Network.HTTP.Client        (newManager)
+import           Network.HTTP.Client.TLS    (tlsManagerSettings)
+import           Network.HTTP.Types         (Method)
+import           Servant.Client
+
+import           CoinbasePro.Headers        (CBAccessKey (..),
+                                             CBAccessPassphrase (..),
+                                             CBAccessSign (..),
+                                             CBAccessTimeStamp (..))
+import           CoinbasePro.Types          (UserAgent, userAgent)
 
 
-newtype CBT m a = CBT { unCBRequest :: ReaderT Connection m a }
-    deriving ( Functor, Applicative, Monad, MonadTrans, MonadIO )
+newtype CBSecretKey = CBSecretKey String
+    deriving (Eq)
 
 
-runCBT :: Connection -> CBT m a -> m a
-runCBT gc = flip runReaderT gc . unCBRequest
+data CoinbaseProCredentials = CoinbaseProCredentials
+    { cbAccessKey        :: CBAccessKey
+    , cbSecretKey        :: CBSecretKey
+    , cbAccessPassphrase :: CBAccessPassphrase
+    } deriving (Eq)
 
 
-data Connection = Connection
-    { host :: Hostname
-    , port :: Port
-    } deriving (Eq, Show)
+newtype CBAuthT m a = CBAuthT { unCbAuth :: ReaderT CoinbaseProCredentials m a }
+    deriving (Functor, Applicative, Monad, MonadIO, MonadTrans)
 
 
-apiEndpoint :: Connection
-apiEndpoint = Connection h p
+runCbAuthT :: MonadIO m => CoinbaseProCredentials -> CBAuthT m a -> m a
+runCbAuthT cpc = flip runReaderT cpc . unCbAuth
+
+
+type APIRequest a = UserAgent -> ClientM a
+type AuthAPIRequest a = CBAccessKey -> CBAccessSign -> CBAccessTimeStamp -> CBAccessPassphrase -> UserAgent -> ClientM a
+
+
+type RequestPath = String
+type Body        = String
+
+
+apiEndpoint :: String
+apiEndpoint = "api.pro.coinbase.com"
+
+
+request :: APIRequest a -> IO a
+request f = do
+    mgr <- newManager tlsManagerSettings
+    result <- runClientM (f userAgent) (mkClientEnv mgr (BaseUrl Https apiEndpoint 443 ""))
+    either throw return result
+
+
+authRequest :: MonadIO m => Method -> RequestPath -> Body -> AuthAPIRequest a -> CBAuthT m a
+authRequest method requestPath body f = do
+    ak <- CBAuthT $ asks cbAccessKey
+    sk <- CBAuthT $ asks cbSecretKey
+    pp <- CBAuthT $ asks cbAccessPassphrase
+
+    ts <- liftIO mkCBAccessTimeStamp
+    let cbs = mkCBAccessSign sk ts method requestPath body
+    liftIO $ request (f ak cbs ts pp)
+
+
+mkCBAccessTimeStamp :: IO CBAccessTimeStamp
+mkCBAccessTimeStamp = CBAccessTimeStamp . formatTime defaultTimeLocale "%s%Q" <$> getCurrentTime
+
+
+mkCBAccessSign :: CBSecretKey -> CBAccessTimeStamp -> Method -> RequestPath -> Body -> CBAccessSign
+mkCBAccessSign sk ts method requestPath body = CBAccessSign $ convertToBase Base64 hmac
   where
-    h = "api.pro.coinbase.com"
-    p = 443
+    dak  = decodeApiKey sk
+    msg  = mkMsg ts method requestPath body
+    hmac = HMAC.hmac dak msg :: HMAC.HMAC SHA256
+
+    mkMsg :: CBAccessTimeStamp -> Method -> RequestPath -> Body -> ByteString
+    mkMsg (CBAccessTimeStamp s) m rp b = C8.pack $ s ++ C8.unpack m ++ rp ++ b
 
 
-request :: (MonadIO m, FromJSON a) => Text -> CBT m a
-request endpoint = do
-    ctx   <- liftIO baselineContextSSL
-    host' <- CBT $ asks host
-    port' <- CBT $ asks port
-    c     <- liftIO $ openConnectionSSL ctx host' port'
-    let req = mkRequest GET (encodeUtf8 endpoint) host'
-    liftIO $ sendRequest c req emptyBody
-    res <- liftIO $ receiveResponse c concatHandler
-    either fail return $ eitherDecodeStrict res
-
-
-mkRequest :: Method -> ByteString -> Hostname -> Request
-mkRequest m endpoint host' = buildRequest1 $ do
-    http m endpoint
-    setContentType contentType
-    setHostname host' pt
-    setAccept contentType
-    setHeader "User-Agent" "coinbase-pro/0.1"
-  where
-    pt = 80
-    contentType = "application/json"
+decodeApiKey :: CBSecretKey -> ByteString
+decodeApiKey (CBSecretKey s) = either error id . convertFromBase Base64 $ C8.pack s

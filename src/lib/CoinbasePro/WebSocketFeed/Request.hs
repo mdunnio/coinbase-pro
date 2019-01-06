@@ -5,14 +5,16 @@ module CoinbasePro.WebSocketFeed.Request
   , RequestMessageType (..)
   , ChannelName(..)
   , WebSocketFeedRequest (..)
+
   , wsEndpoint
   ) where
 
 import           Data.Aeson              (FromJSON (..), ToJSON (..), object,
                                           withText, (.=))
-import           Data.Text               (Text)
 import           Network.Socket          (HostName)
 import           Network.Socket.Internal (PortNumber)
+
+import           CoinbasePro.Types       (ProductId)
 
 
 data WSConnection = WSConnection
@@ -65,11 +67,12 @@ instance FromJSON ChannelName where
         "level2"    -> return Level2
         "matches"   -> return Matches
         "full"      -> return Full
+        _           -> fail "Unable to parse channel"
 
 
 data WebSocketFeedRequest = WebSocketFeedRequest
     { reqMsgType    :: RequestMessageType
-    , reqProductIds :: [Text]
+    , reqProductIds :: [ProductId]
     , reqChannels   :: [ChannelName]
     } deriving (Eq, Ord, Show)
 
