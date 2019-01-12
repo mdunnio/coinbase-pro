@@ -3,6 +3,10 @@ resolver: lts-12.5
 packages:
 - .
 
+extra-deps:
+  - unagi-streams-0.2.4
+  - unagi-chan-0.4.1.0
+
 system-ghc: false
 
 extra-include-dirs: ["/usr/local/opt/openssl/include"]

@@ -2,7 +2,7 @@
 
 ## Request API
 
-```
+```haskell
 {-# LANGUAGE OverloadedStrings #-}
 
 module Main where
@@ -60,35 +60,19 @@ main = do
 To print out all of the full order book updates for BTC-USD:
 
 
-```
+```haskell
 {-# LANGUAGE OverloadedStrings #-}
 
 module Main where
 
-import           CoinbasePro.Types                 (ProductId (..))
-import           CoinbasePro.WebSocketFeed         (parseFeed)
-import           CoinbasePro.WebSocketFeed.Request (ChannelName (..),
-                                                    RequestMessageType (..),
-                                                    WebSocketFeedRequest (..),
-                                                    wsEndpoint)
-import qualified CoinbasePro.WebSocketFeed.Request as WR
-import           Control.Monad                     (forever)
-import           Control.Monad.IO.Class            (liftIO)
-import           Data.Aeson                        (encode)
-import qualified Network.WebSockets                as WS
-import qualified Wuss                              as WU
+import           CoinbasePro.Types         (ProductId (..))
+import           CoinbasePro.WebSocketFeed (subscribeToFeed)
+import qualified System.IO.Streams         as Streams
 
 
 main :: IO ()
-main =
-    WU.runSecureClient wsHost wsPort "/" $ \conn -> do
-        WS.sendTextData conn $ encode request
-        liftIO . forever $ liftIO (parseFeed conn) >>= print
-  where
-    wsHost = WR.host wsEndpoint
-    wsPort = WR.port wsEndpoint
-
-    request = WebSocketFeedRequest Subscribe [prids] [Full]
-    prids = ProductId "BTC-USD"
+main = do
+    msgs <- subscribeToFeed [ProductId "BTC-USD"]
+    forever $ Streams.read msgs >>= print
 
 ```

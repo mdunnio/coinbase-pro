@@ -36,8 +36,6 @@ import           Text.Printf       (printf)
 
 
 type Sequence = Int
-type Funds    = Double
-
 
 data Side = Buy | Sell
     deriving (Eq, Ord, Show)
@@ -98,6 +96,19 @@ instance ToJSON Size where
 instance FromJSON Size where
     parseJSON = withText "size" $ \t ->
       return . Size . read $ unpack t
+
+
+newtype Funds = Funds { unFunds :: Double }
+    deriving (Eq, Ord, Show, ToHttpApiData)
+
+
+instance ToJSON Funds where
+    toJSON (Funds s) = A.String . pack $ printf "%.16f" s
+
+
+instance FromJSON Funds where
+    parseJSON = withText "size" $ \t ->
+      return . Funds . read $ unpack t
 
 
 data OrderType = Limit | Market
