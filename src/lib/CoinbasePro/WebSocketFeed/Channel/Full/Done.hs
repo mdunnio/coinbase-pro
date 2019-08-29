@@ -40,16 +40,3 @@ data Done = Done
 
 
 deriveJSON defaultOptions {fieldLabelModifier = snakeCase} ''Done
-
-
--- instance FromJSON Done where
---     parseJSON = withObject "done" $ \o -> do
---       ti   <- o .: "time"
---       prid <- o .: "product_id"
---       sq   <- o .: "sequence"
---       p    <- o .:? "price"
---       oid  <- o .: "order_id"
---       re   <- o .: "reason"
---       s    <- o .: "side"
---       rs   <- o .:? "remaining_size"
---       return $ Done ti prid sq (read <$> p) oid re s (read <$> rs)

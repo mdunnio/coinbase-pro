@@ -28,17 +28,3 @@ data Received = Received
 
 
 deriveJSON defaultOptions {fieldLabelModifier = snakeCase} ''Received
-
-
--- instance FromJSON Received where
---     parseJSON = withObject "received" $ \o -> do
---         ti   <- o .: "time"
---         prid <- o .: "product_id"
---         sq   <- o .: "sequence"
---         oid  <- o .: "order_id"
---         sz   <- o .:? "size"
---         p    <- o .:? "price"
---         f    <- o .:? "funds"
---         s    <- o .: "side"
---         ot   <- o .: "order_type"
---         return $ Received ti prid sq oid (read <$> sz) (read <$> p) (read <$> f) s ot

@@ -34,24 +34,3 @@ data Ticker = Ticker
 
 
 deriveJSON defaultOptions ''Ticker
-
-
--- instance FromJSON Ticker where
---     parseJSON = withObject "ticker" $ \o -> do
---         sq   <- o .: "sequence"
---         prid <- o .: "product_id"
---         p    <- o .: "price"
---         o24h <- o .: "open_24h"
---         v24h <- o .: "volume_24h"
---         l24h <- o .: "low_24h"
---         h24h <- o .: "high_24h"
---         v30d <- o .: "volume_30d"
---         b    <- o .: "best_bid"
---         a    <- o .: "best_ask"
---         s    <- o .:? "side"
---         ti   <- o .:? "time"
---         trid <- o .:? "trade_id"
---         ls   <- o .:? "last_size"
---         return $
---             Ticker sq prid (read p) (read o24h) (read v24h) (read l24h)
---             (read h24h) (read v30d) (read b) (read a) s ti trid (read <$> ls)

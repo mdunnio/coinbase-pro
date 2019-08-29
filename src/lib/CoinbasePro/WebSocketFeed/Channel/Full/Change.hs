@@ -29,19 +29,3 @@ data Change = Change
 
 
 deriveJSON defaultOptions {fieldLabelModifier = snakeCase} ''Change
-
-
--- instance FromJSON Change where
---     parseJSON = withObject "change" $ \o -> do
---       ti   <- o .: "time"
---       sq   <- o .: "sequence"
---       oid  <- o .: "order_id"
---       prid <- o .: "product_id"
---       ns   <- o .:? "new_size"
---       os   <- o .:? "old_size"
---       nf   <- o .:? "new_funds"
---       olf  <- o .:? "old_funds"
---       p    <- o .:? "price"
---       s    <- o .: "side"
---       return $ Change ti sq oid prid
---           (read <$> ns) (read <$> os) (read <$> nf) (read <$> olf) (read <$> p) s
