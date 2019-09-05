@@ -1,18 +1,23 @@
 {-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE TemplateHaskell   #-}
 
 module CoinbasePro.MarketData.Types
     ( Product (..)
     , CBTime (..)
     , AggregateBookLevel (..)
     , FullBookLevel (..)
+    , Trade (..)
     ) where
 
 import           Data.Aeson        (FromJSON (..), withObject, (.:))
+import           Data.Aeson.Casing (snakeCase)
+import           Data.Aeson.TH     (defaultOptions, deriveJSON,
+                                    fieldLabelModifier)
 import           Data.Text         (Text, pack)
 import           Data.Time.Clock   (UTCTime)
 import           Web.HttpApiData   (ToHttpApiData (..))
 
-import           CoinbasePro.Types (ProductId)
+import           CoinbasePro.Types (Price, ProductId, Side, Size, TradeId)
 
 
 data Product = Product
@@ -73,3 +78,15 @@ instance ToHttpApiData FullBookLevel where
 
 fullBookLevel :: FullBookLevel -> Int
 fullBookLevel FullBookLevel = 3
+
+
+data Trade = Trade
+    { time    :: UTCTime
+    , tradeId :: TradeId
+    , price   :: Price
+    , size    :: Size
+    , side    :: Side
+    } deriving (Eq, Show)
+
+
+deriveJSON defaultOptions { fieldLabelModifier = snakeCase } ''Trade
