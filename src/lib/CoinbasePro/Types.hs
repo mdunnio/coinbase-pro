@@ -10,6 +10,7 @@ module CoinbasePro.Types
     , Sequence
     , Side (..)
     , Size (..)
+    , TradeId (..)
     , Funds
     , OrderType (..)
     , CreatedAt (..)
@@ -96,6 +97,13 @@ instance ToJSON Size where
 instance FromJSON Size where
     parseJSON = withText "size" $ \t ->
       return . Size . read $ unpack t
+
+
+newtype TradeId = TradeId Int
+    deriving (Eq, Show)
+
+
+deriveJSON defaultOptions { fieldLabelModifier = snakeCase } ''TradeId
 
 
 newtype Funds = Funds { unFunds :: Double }

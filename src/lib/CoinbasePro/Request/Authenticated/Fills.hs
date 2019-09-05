@@ -9,11 +9,7 @@ module CoinbasePro.Request.Authenticated.Fills
 import           Data.Aeson        (FromJSON (..), withObject, withText, (.:))
 
 import           CoinbasePro.Types (CreatedAt (..), OrderId, Price, ProductId,
-                                    Side, Size)
-
-
-newtype TradeId = TradeId Int
-    deriving (Eq, Show)
+                                    Side, Size, TradeId (..))
 
 
 data Liquidity = Maker | Taker
