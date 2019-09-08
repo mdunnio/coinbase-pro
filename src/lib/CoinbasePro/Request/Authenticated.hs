@@ -35,9 +35,8 @@ import           Servant.Client
 import           CoinbasePro.Headers                        (CBAccessKey (..), CBAccessPassphrase (..),
                                                              CBAccessSign (..),
                                                              CBAccessTimeStamp (..),
-                                                             RequiredHeader,
-                                                             UserAgent,
-                                                             UserAgentHeader)
+                                                             CBAuthenticationHeaders,
+                                                             UserAgent)
 import           CoinbasePro.Request                        (CBAuthT,
                                                              RequestPath,
                                                              authRequest)
@@ -55,61 +54,14 @@ import           CoinbasePro.Types                          (OrderId (..),
                                                              ProductId (..),
                                                              Side, Size)
 
-type API = "accounts"
-    :> RequiredHeader "CB-ACCESS-KEY" CBAccessKey
-    :> RequiredHeader "CB-ACCESS-SIGN" CBAccessSign
-    :> RequiredHeader "CB-ACCESS-TIMESTAMP" CBAccessTimeStamp
-    :> RequiredHeader "CB-ACCESS-PASSPHRASE" CBAccessPassphrase
-    :> UserAgentHeader
-    :> Get '[JSON] [Account]
-    :<|> "accounts" :> Capture "account-id" AccountId
-    :> RequiredHeader "CB-ACCESS-KEY" CBAccessKey
-    :> RequiredHeader "CB-ACCESS-SIGN" CBAccessSign
-    :> RequiredHeader "CB-ACCESS-TIMESTAMP" CBAccessTimeStamp
-    :> RequiredHeader "CB-ACCESS-PASSPHRASE" CBAccessPassphrase
-    :> UserAgentHeader
-    :> Get '[JSON] Account
-    :<|> "orders"
-    :> QueryParams "status" Status
-    :> QueryParam "product_id" ProductId
-    :> RequiredHeader "CB-ACCESS-KEY" CBAccessKey
-    :> RequiredHeader "CB-ACCESS-SIGN" CBAccessSign
-    :> RequiredHeader "CB-ACCESS-TIMESTAMP" CBAccessTimeStamp
-    :> RequiredHeader "CB-ACCESS-PASSPHRASE" CBAccessPassphrase
-    :> UserAgentHeader
-    :> Get '[JSON] [Order]
-    :<|> "orders"
-    :> ReqBody '[JSON] PlaceOrderBody
-    :> RequiredHeader "CB-ACCESS-KEY" CBAccessKey
-    :> RequiredHeader "CB-ACCESS-SIGN" CBAccessSign
-    :> RequiredHeader "CB-ACCESS-TIMESTAMP" CBAccessTimeStamp
-    :> RequiredHeader "CB-ACCESS-PASSPHRASE" CBAccessPassphrase
-    :> UserAgentHeader
-    :> Post '[JSON] Order
-    :<|> "orders" :> Capture "order_id" OrderId
-    :> RequiredHeader "CB-ACCESS-KEY" CBAccessKey
-    :> RequiredHeader "CB-ACCESS-SIGN" CBAccessSign
-    :> RequiredHeader "CB-ACCESS-TIMESTAMP" CBAccessTimeStamp
-    :> RequiredHeader "CB-ACCESS-PASSPHRASE" CBAccessPassphrase
-    :> UserAgentHeader
-    :> Delete '[JSON] NoContent
-    :<|> "orders"
-    :> QueryParam "product_id" ProductId
-    :> RequiredHeader "CB-ACCESS-KEY" CBAccessKey
-    :> RequiredHeader "CB-ACCESS-SIGN" CBAccessSign
-    :> RequiredHeader "CB-ACCESS-TIMESTAMP" CBAccessTimeStamp
-    :> RequiredHeader "CB-ACCESS-PASSPHRASE" CBAccessPassphrase
-    :> UserAgentHeader
-    :> Delete '[JSON] [OrderId]
-    :<|> "fills"
-    :> QueryParam "product_id" ProductId
-    :> QueryParam "order_id" OrderId
-    :> RequiredHeader "CB-ACCESS-KEY" CBAccessKey
-    :> RequiredHeader "CB-ACCESS-SIGN" CBAccessSign
-    :> RequiredHeader "CB-ACCESS-TIMESTAMP" CBAccessTimeStamp
-    :> RequiredHeader "CB-ACCESS-PASSPHRASE" CBAccessPassphrase
-    :> UserAgentHeader
-    :> Get '[JSON] [Fill]
+
+type API =    "accounts" :> CBAuthenticationHeaders (Get '[JSON] [Account])
+         :<|> "accounts" :> Capture "account-id" AccountId :> CBAuthenticationHeaders (Get '[JSON] Account)
+         :<|> "orders" :> QueryParams "status" Status :> QueryParam "product_id" ProductId :> CBAuthenticationHeaders (Get '[JSON] [Order])
+         :<|> "orders" :> ReqBody '[JSON] PlaceOrderBody :> CBAuthenticationHeaders (Post '[JSON] Order)
+         :<|> "orders" :> Capture "order_id" OrderId :> CBAuthenticationHeaders (Delete '[JSON] NoContent)
+         :<|> "orders" :> QueryParam "product_id" ProductId :> CBAuthenticationHeaders (Delete '[JSON] [OrderId])
+         :<|> "fills" :> QueryParam "product_id" ProductId :> QueryParam "order_id" OrderId :> CBAuthenticationHeaders (Get '[JSON] [Fill])
 
 
 api :: Proxy API
