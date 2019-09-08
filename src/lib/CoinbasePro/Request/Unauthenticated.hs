@@ -8,6 +8,7 @@ module CoinbasePro.Request.Unauthenticated
    , fullOrderBook
    , trades
    , candles
+   , stats
    ) where
 
 import           Data.Proxy                                (Proxy (..))
@@ -26,7 +27,8 @@ import           CoinbasePro.MarketData.Types              (AggregateBookLevel (
 import           CoinbasePro.Request                       (request)
 import           CoinbasePro.Types                         (Candle,
                                                             CandleGranularity,
-                                                            ProductId)
+                                                            ProductId,
+                                                            TwentyFourHourStats)
 
 
 type API = "products" :> UserAgentHeader :> Get '[JSON] [Product]
@@ -39,6 +41,8 @@ type API = "products" :> UserAgentHeader :> Get '[JSON] [Product]
       :<|> "products" :> Capture "product" ProductId :> "candles" :> QueryParam "start" UTCTime
       :> QueryParam "end" UTCTime :> QueryParam' '[Required] "granularity" CandleGranularity
       :> UserAgentHeader :> Get '[JSON] [Candle]
+      :<|> "products" :> Capture "product" ProductId :> "stats"
+      :> UserAgentHeader :> Get '[JSON] TwentyFourHourStats
 
 
 api :: Proxy API
@@ -51,7 +55,8 @@ aggregateOrderBookAPI :: ProductId -> Maybe AggregateBookLevel -> UserAgent -> C
 fullOrderBookAPI :: ProductId -> Maybe FullBookLevel -> UserAgent -> ClientM FullOrderBook
 tradesAPI :: ProductId -> UserAgent -> ClientM [Trade]
 candlesAPI :: ProductId -> Maybe UTCTime -> Maybe UTCTime -> CandleGranularity -> UserAgent -> ClientM [Candle]
-productsAPI :<|> timeAPI :<|> aggregateOrderBookAPI :<|> fullOrderBookAPI :<|> tradesAPI :<|> candlesAPI = client api
+statsAPI :: ProductId -> UserAgent -> ClientM TwentyFourHourStats
+productsAPI :<|> timeAPI :<|> aggregateOrderBookAPI :<|> fullOrderBookAPI :<|> tradesAPI :<|> candlesAPI :<|> statsAPI = client api
 
 
 -- | https://docs.pro.coinbase.com/#get-products
@@ -82,3 +87,8 @@ trades = request . tradesAPI
 -- | https://docs.pro.coinbase.com/#get-historic-rates
 candles :: ProductId -> Maybe UTCTime -> Maybe UTCTime -> CandleGranularity -> IO [Candle]
 candles prid start end = request . candlesAPI prid start end
+
+
+-- | https://docs.pro.coinbase.com/#get-24hr-stats
+stats :: ProductId -> IO TwentyFourHourStats
+stats = request . statsAPI

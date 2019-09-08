@@ -16,6 +16,7 @@ module CoinbasePro.Types
     , CreatedAt (..)
     , Candle (..)
     , CandleGranularity (..)
+    , TwentyFourHourStats (..)
 
     , filterOrderFieldName
     ) where
@@ -96,6 +97,19 @@ instance ToJSON Size where
 instance FromJSON Size where
     parseJSON = withText "size" $ \t ->
       return . Size . read $ unpack t
+
+
+newtype Volume = Volume { unVolume :: Double }
+    deriving (Eq, Ord, Show)
+
+
+instance FromJSON Volume where
+    parseJSON = withText "volume" $ \t ->
+      return . Volume . read $ unpack t
+
+
+instance ToJSON Volume where
+    toJSON (Volume v) = A.String . pack $ printf "%.8f" v
 
 
 newtype TradeId = TradeId Int
@@ -182,3 +196,16 @@ instance ToHttpApiData CandleGranularity where
     toQueryParam Hour           = "3600"
     toQueryParam SixHours       = "21600"
     toQueryParam Day            = "86400"
+
+
+data TwentyFourHourStats = TwentyFourHourStats
+    { open24   :: Price
+    , high24   :: Price
+    , low24    :: Price
+    , volume24 :: Volume
+    , last24   :: Price
+    , volume30 :: Volume
+    } deriving (Eq, Show)
+
+
+deriveJSON defaultOptions { fieldLabelModifier = init . init } ''TwentyFourHourStats
