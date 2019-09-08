@@ -14,6 +14,8 @@ module CoinbasePro.Types
     , Funds
     , OrderType (..)
     , CreatedAt (..)
+    , Candle (..)
+    , CandleGranularity (..)
 
     , RequiredHeader
     , UserAgent
@@ -23,17 +25,19 @@ module CoinbasePro.Types
     , filterOrderFieldName
     ) where
 
-import           Data.Aeson        (FromJSON, ToJSON, parseJSON, toJSON,
-                                    withText)
-import qualified Data.Aeson        as A
-import           Data.Aeson.Casing (camelCase, snakeCase)
-import           Data.Aeson.TH     (constructorTagModifier, defaultOptions,
-                                    deriveJSON, fieldLabelModifier,
-                                    unwrapUnaryRecords)
-import           Data.Text         (Text, pack, toLower, unpack)
-import           Data.Time.Clock   (UTCTime)
+import           Data.Aeson            (FromJSON, ToJSON, parseJSON, toJSON,
+                                        withArray, withText)
+import qualified Data.Aeson            as A
+import           Data.Aeson.Casing     (camelCase, snakeCase)
+import           Data.Aeson.TH         (constructorTagModifier, defaultOptions,
+                                        deriveJSON, fieldLabelModifier,
+                                        unwrapUnaryRecords)
+import           Data.Text             (Text, pack, toLower, unpack)
+import           Data.Time.Clock       (UTCTime)
+import           Data.Time.Clock.POSIX (posixSecondsToUTCTime)
+import qualified Data.Vector           as V
 import           Servant.API
-import           Text.Printf       (printf)
+import           Text.Printf           (printf)
 
 
 type Sequence = Int
@@ -152,3 +156,45 @@ deriveJSON defaultOptions ''CreatedAt
 filterOrderFieldName :: String -> String
 filterOrderFieldName "order_type" = "type"
 filterOrderFieldName s            = s
+
+
+data Candle = Candle
+    { time   :: UTCTime
+    , low    :: Price
+    , high   :: Price
+    , open   :: Price
+    , close  :: Price
+    , volume :: Double
+    } deriving (Eq, Show)
+
+
+instance FromJSON Candle where
+    parseJSON = withArray "candle" $ \a -> do
+      let l = V.toList a
+      t  <- posixSecondsToUTCTime <$> parseJSON (head l)
+      lw <- Price <$> parseJSON (l !! 1)
+      h  <- Price <$> parseJSON (l !! 2)
+      o  <- Price <$> parseJSON (l !! 3)
+      c  <- Price <$> parseJSON (l !! 4)
+      v  <- parseJSON $ l !! 5
+      return $ Candle t lw h o c v
+
+
+data CandleGranularity = Minute | FiveMinutes | FifteenMinutes | Hour | SixHours | Day
+    deriving (Eq, Ord, Show)
+
+
+instance ToHttpApiData CandleGranularity where
+    toUrlPiece Minute         = "60"
+    toUrlPiece FiveMinutes    = "300"
+    toUrlPiece FifteenMinutes = "900"
+    toUrlPiece Hour           = "3600"
+    toUrlPiece SixHours       = "21600"
+    toUrlPiece Day            = "86400"
+
+    toQueryParam Minute         = "60"
+    toQueryParam FiveMinutes    = "300"
+    toQueryParam FifteenMinutes = "900"
+    toQueryParam Hour           = "3600"
+    toQueryParam SixHours       = "21600"
+    toQueryParam Day            = "86400"
