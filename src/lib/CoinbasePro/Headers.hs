@@ -1,14 +1,39 @@
+{-# LANGUAGE DataKinds                  #-}
+{-# LANGUAGE GeneralizedNewtypeDeriving #-}
+{-# LANGUAGE OverloadedStrings          #-}
+{-# LANGUAGE TypeOperators              #-}
+
 module CoinbasePro.Headers
-    ( CBAccessKey(..)
+    ( RequiredHeader
+    , UserAgent
+    , UserAgentHeader
+    , CBAccessKey(..)
     , CBAccessSign(..)
     , CBAccessTimeStamp(..)
     , CBAccessPassphrase(..)
+
+    , userAgent
     ) where
 
 import           Data.ByteString    (ByteString)
-import           Data.Text          (pack)
+import           Data.Text          (Text, pack)
 import           Data.Text.Encoding (decodeUtf8)
+import           Servant.API        (Header', Required)
 import           Web.HttpApiData    (ToHttpApiData (..))
+
+
+type RequiredHeader = Header' '[Required]
+
+
+newtype UserAgent = UserAgent Text
+    deriving (Eq, Show, ToHttpApiData)
+
+
+userAgent :: UserAgent
+userAgent = UserAgent "coinbase-pro/0.1"
+
+
+type UserAgentHeader = RequiredHeader "User-Agent" UserAgent
 
 
 newtype CBAccessKey = CBAccessKey String

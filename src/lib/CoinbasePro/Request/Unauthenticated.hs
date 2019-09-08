@@ -15,6 +15,8 @@ import           Data.Time.Clock                           (UTCTime)
 import           Servant.API
 import           Servant.Client
 
+import           CoinbasePro.Headers                       (UserAgent,
+                                                            UserAgentHeader)
 import           CoinbasePro.MarketData.AggregateOrderBook (AggregateOrderBook)
 import           CoinbasePro.MarketData.FullOrderBook      (FullOrderBook)
 import           CoinbasePro.MarketData.Types              (AggregateBookLevel (..),
@@ -24,12 +26,7 @@ import           CoinbasePro.MarketData.Types              (AggregateBookLevel (
 import           CoinbasePro.Request                       (request)
 import           CoinbasePro.Types                         (Candle,
                                                             CandleGranularity,
-                                                            ProductId,
-                                                            RequiredHeader,
-                                                            UserAgent)
-
-
-type UserAgentHeader = RequiredHeader "User-Agent" UserAgent
+                                                            ProductId)
 
 
 type API = "products" :> UserAgentHeader :> Get '[JSON] [Product]

@@ -17,11 +17,6 @@ module CoinbasePro.Types
     , Candle (..)
     , CandleGranularity (..)
 
-    , RequiredHeader
-    , UserAgent
-
-    , userAgent
-
     , filterOrderFieldName
     ) where
 
@@ -133,17 +128,6 @@ instance ToHttpApiData OrderType where
 
 
 deriveJSON defaultOptions {constructorTagModifier = camelCase} ''OrderType
-
-
-type RequiredHeader = Header' '[Required]
-
-
-newtype UserAgent = UserAgent Text
-    deriving (Eq, Show, ToHttpApiData)
-
-
-userAgent :: UserAgent
-userAgent = UserAgent "coinbase-pro/0.1"
 
 
 newtype CreatedAt = CreatedAt UTCTime

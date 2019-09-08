@@ -35,8 +35,8 @@ import           Servant.Client
 import           CoinbasePro.Headers        (CBAccessKey (..),
                                              CBAccessPassphrase (..),
                                              CBAccessSign (..),
-                                             CBAccessTimeStamp (..))
-import           CoinbasePro.Types          (UserAgent, userAgent)
+                                             CBAccessTimeStamp (..), UserAgent,
+                                             userAgent)
 
 
 newtype CBSecretKey = CBSecretKey String

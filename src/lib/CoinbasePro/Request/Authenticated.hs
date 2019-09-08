@@ -34,7 +34,10 @@ import           Servant.Client
 
 import           CoinbasePro.Headers                        (CBAccessKey (..), CBAccessPassphrase (..),
                                                              CBAccessSign (..),
-                                                             CBAccessTimeStamp (..))
+                                                             CBAccessTimeStamp (..),
+                                                             RequiredHeader,
+                                                             UserAgent,
+                                                             UserAgentHeader)
 import           CoinbasePro.Request                        (CBAuthT,
                                                              RequestPath,
                                                              authRequest)
@@ -50,24 +53,21 @@ import           CoinbasePro.Request.Authenticated.Orders   (Order,
 import           CoinbasePro.Types                          (OrderId (..),
                                                              OrderType, Price,
                                                              ProductId (..),
-                                                             RequiredHeader,
-                                                             Side, Size,
-                                                             UserAgent)
-
+                                                             Side, Size)
 
 type API = "accounts"
     :> RequiredHeader "CB-ACCESS-KEY" CBAccessKey
     :> RequiredHeader "CB-ACCESS-SIGN" CBAccessSign
     :> RequiredHeader "CB-ACCESS-TIMESTAMP" CBAccessTimeStamp
     :> RequiredHeader "CB-ACCESS-PASSPHRASE" CBAccessPassphrase
-    :> RequiredHeader "User-Agent" UserAgent
+    :> UserAgentHeader
     :> Get '[JSON] [Account]
     :<|> "accounts" :> Capture "account-id" AccountId
     :> RequiredHeader "CB-ACCESS-KEY" CBAccessKey
     :> RequiredHeader "CB-ACCESS-SIGN" CBAccessSign
     :> RequiredHeader "CB-ACCESS-TIMESTAMP" CBAccessTimeStamp
     :> RequiredHeader "CB-ACCESS-PASSPHRASE" CBAccessPassphrase
-    :> RequiredHeader "User-Agent" UserAgent
+    :> UserAgentHeader
     :> Get '[JSON] Account
     :<|> "orders"
     :> QueryParams "status" Status
@@ -76,7 +76,7 @@ type API = "accounts"
     :> RequiredHeader "CB-ACCESS-SIGN" CBAccessSign
     :> RequiredHeader "CB-ACCESS-TIMESTAMP" CBAccessTimeStamp
     :> RequiredHeader "CB-ACCESS-PASSPHRASE" CBAccessPassphrase
-    :> RequiredHeader "User-Agent" UserAgent
+    :> UserAgentHeader
     :> Get '[JSON] [Order]
     :<|> "orders"
     :> ReqBody '[JSON] PlaceOrderBody
@@ -84,14 +84,14 @@ type API = "accounts"
     :> RequiredHeader "CB-ACCESS-SIGN" CBAccessSign
     :> RequiredHeader "CB-ACCESS-TIMESTAMP" CBAccessTimeStamp
     :> RequiredHeader "CB-ACCESS-PASSPHRASE" CBAccessPassphrase
-    :> RequiredHeader "User-Agent" UserAgent
+    :> UserAgentHeader
     :> Post '[JSON] Order
     :<|> "orders" :> Capture "order_id" OrderId
     :> RequiredHeader "CB-ACCESS-KEY" CBAccessKey
     :> RequiredHeader "CB-ACCESS-SIGN" CBAccessSign
     :> RequiredHeader "CB-ACCESS-TIMESTAMP" CBAccessTimeStamp
     :> RequiredHeader "CB-ACCESS-PASSPHRASE" CBAccessPassphrase
-    :> RequiredHeader "User-Agent" UserAgent
+    :> UserAgentHeader
     :> Delete '[JSON] NoContent
     :<|> "orders"
     :> QueryParam "product_id" ProductId
@@ -99,7 +99,7 @@ type API = "accounts"
     :> RequiredHeader "CB-ACCESS-SIGN" CBAccessSign
     :> RequiredHeader "CB-ACCESS-TIMESTAMP" CBAccessTimeStamp
     :> RequiredHeader "CB-ACCESS-PASSPHRASE" CBAccessPassphrase
-    :> RequiredHeader "User-Agent" UserAgent
+    :> UserAgentHeader
     :> Delete '[JSON] [OrderId]
     :<|> "fills"
     :> QueryParam "product_id" ProductId
@@ -108,7 +108,7 @@ type API = "accounts"
     :> RequiredHeader "CB-ACCESS-SIGN" CBAccessSign
     :> RequiredHeader "CB-ACCESS-TIMESTAMP" CBAccessTimeStamp
     :> RequiredHeader "CB-ACCESS-PASSPHRASE" CBAccessPassphrase
-    :> RequiredHeader "User-Agent" UserAgent
+    :> UserAgentHeader
     :> Get '[JSON] [Fill]
 
 
