@@ -1,7 +1,7 @@
 {-# LANGUAGE DataKinds     #-}
 {-# LANGUAGE TypeOperators #-}
 
-module CoinbasePro.Request.Unauthenticated
+module CoinbasePro.Unauthenticated
    ( products
    , time
    , aggregateOrderBook

@@ -1,6 +1,6 @@
 {-# LANGUAGE OverloadedStrings #-}
 
-module CoinbasePro.Request.Authenticated.Accounts
+module CoinbasePro.Authenticated.Accounts
     ( Account (..)
     , AccountId (..)
     , Currency (..)

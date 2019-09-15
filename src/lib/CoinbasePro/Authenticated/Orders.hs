@@ -1,7 +1,7 @@
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
 {-# LANGUAGE TemplateHaskell            #-}
 
-module CoinbasePro.Request.Authenticated.Orders
+module CoinbasePro.Authenticated.Orders
   ( Status (..)
   , Statuses (..)
   , Order (..)

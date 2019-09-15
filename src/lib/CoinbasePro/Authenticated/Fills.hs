@@ -1,6 +1,6 @@
 {-# LANGUAGE OverloadedStrings #-}
 
-module CoinbasePro.Request.Authenticated.Fills
+module CoinbasePro.Authenticated.Fills
     ( Fill (..)
     , TradeId
     , Liquidity (..)

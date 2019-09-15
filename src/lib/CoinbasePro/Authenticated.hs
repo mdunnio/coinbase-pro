@@ -2,7 +2,7 @@
 {-# LANGUAGE TypeFamilies  #-}
 {-# LANGUAGE TypeOperators #-}
 
-module CoinbasePro.Request.Authenticated
+module CoinbasePro.Authenticated
   ( accounts
   , account
   , listOrders
@@ -13,44 +13,36 @@ module CoinbasePro.Request.Authenticated
   ) where
 
 
-import           Control.Monad                              (void)
-import           Data.Aeson                                 (encode)
-import qualified Data.ByteString.Char8                      as C8
-import qualified Data.ByteString.Lazy.Char8                 as LC8
-import           Data.Maybe                                 (fromMaybe)
-import           Data.Proxy                                 (Proxy (..))
-import qualified Data.Set                                   as S
-import           Data.Text                                  (Text, pack,
-                                                             toLower, unpack)
-import           Network.HTTP.Types                         (SimpleQuery,
-                                                             SimpleQueryItem,
-                                                             methodDelete,
-                                                             methodGet,
-                                                             methodPost,
-                                                             renderQuery,
-                                                             simpleQueryToQuery)
+import           Control.Monad                      (void)
+import           Data.Aeson                         (encode)
+import qualified Data.ByteString.Char8              as C8
+import qualified Data.ByteString.Lazy.Char8         as LC8
+import           Data.Maybe                         (fromMaybe)
+import           Data.Proxy                         (Proxy (..))
+import qualified Data.Set                           as S
+import           Data.Text                          (Text, pack, toLower,
+                                                     unpack)
+import           Network.HTTP.Types                 (SimpleQuery,
+                                                     SimpleQueryItem,
+                                                     methodDelete, methodGet,
+                                                     methodPost, renderQuery,
+                                                     simpleQueryToQuery)
 import           Servant.API
 import           Servant.Client
-import           Servant.Client.Core                        (AuthenticatedRequest)
+import           Servant.Client.Core                (AuthenticatedRequest)
 
-import           CoinbasePro.Request                        (AuthDelete,
-                                                             AuthGet, AuthPost,
-                                                             CBAuthT (..),
-                                                             RequestPath,
-                                                             authRequest)
-import           CoinbasePro.Request.Authenticated.Accounts (Account,
-                                                             AccountId (..))
-import           CoinbasePro.Request.Authenticated.Fills    (Fill)
-import           CoinbasePro.Request.Authenticated.Orders   (Order,
-                                                             PlaceOrderBody (..),
-                                                             STP, Status (..),
-                                                             Statuses (..),
-                                                             TimeInForce,
-                                                             statuses)
-import           CoinbasePro.Types                          (OrderId (..),
-                                                             OrderType, Price,
-                                                             ProductId (..),
-                                                             Side, Size)
+import           CoinbasePro.Authenticated.Accounts (Account, AccountId (..))
+import           CoinbasePro.Authenticated.Fills    (Fill)
+import           CoinbasePro.Authenticated.Orders   (Order, PlaceOrderBody (..),
+                                                     STP, Status (..),
+                                                     Statuses (..), TimeInForce,
+                                                     statuses)
+import           CoinbasePro.Request                (AuthDelete, AuthGet,
+                                                     AuthPost, CBAuthT (..),
+                                                     RequestPath, authRequest)
+import           CoinbasePro.Types                  (OrderId (..), OrderType,
+                                                     Price, ProductId (..),
+                                                     Side, Size)
 
 
 type API =    "accounts" :> AuthGet [Account]
