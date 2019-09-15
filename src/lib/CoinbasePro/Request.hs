@@ -1,5 +1,8 @@
+{-# LANGUAGE DataKinds                  #-}
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
 {-# LANGUAGE OverloadedStrings          #-}
+{-# LANGUAGE TypeFamilies               #-}
+{-# LANGUAGE TypeOperators              #-}
 
 module CoinbasePro.Request
     ( CBAuthT (..)
@@ -10,14 +13,18 @@ module CoinbasePro.Request
     , RequestPath
     , Body
 
-    , request
+    , AuthGet
+    , AuthPost
+    , AuthDelete
+
+    , run
     , authRequest
     , apiEndpoint
     ) where
 
 import           Control.Exception          (throw)
 import           Control.Monad.IO.Class     (MonadIO, liftIO)
-import           Control.Monad.Trans.Class  (MonadTrans)
+import           Control.Monad.Trans.Class  (MonadTrans, lift)
 import           Control.Monad.Trans.Reader (ReaderT, asks, runReaderT)
 import           Crypto.Hash.Algorithms     (SHA256)
 import qualified Crypto.MAC.HMAC            as HMAC
@@ -27,16 +34,22 @@ import           Data.ByteString            (ByteString)
 import qualified Data.ByteString.Char8      as C8
 import           Data.Time.Clock            (getCurrentTime)
 import           Data.Time.Format           (defaultTimeLocale, formatTime)
+import           GHC.TypeLits               (Symbol)
 import           Network.HTTP.Client        (newManager)
 import           Network.HTTP.Client.TLS    (tlsManagerSettings)
 import           Network.HTTP.Types         (Method)
+import           Servant.API                ((:>), AuthProtect, Delete, Get,
+                                             JSON, Post)
 import           Servant.Client
+import           Servant.Client.Core        (AuthClientData,
+                                             AuthenticatedRequest, addHeader,
+                                             mkAuthenticatedRequest)
+import qualified Servant.Client.Core        as SCC
 
 import           CoinbasePro.Headers        (CBAccessKey (..),
                                              CBAccessPassphrase (..),
                                              CBAccessSign (..),
-                                             CBAccessTimeStamp (..), UserAgent,
-                                             userAgent)
+                                             CBAccessTimeStamp (..), userAgent)
 
 
 newtype CBSecretKey = CBSecretKey String
@@ -54,12 +67,8 @@ newtype CBAuthT m a = CBAuthT { unCbAuth :: ReaderT CoinbaseProCredentials m a }
     deriving (Functor, Applicative, Monad, MonadIO, MonadTrans)
 
 
-runCbAuthT :: MonadIO m => CoinbaseProCredentials -> CBAuthT m a -> m a
-runCbAuthT cpc = flip runReaderT cpc . unCbAuth
-
-
-type APIRequest a = UserAgent -> ClientM a
-type AuthAPIRequest a = CBAccessKey -> CBAccessSign -> CBAccessTimeStamp -> CBAccessPassphrase -> UserAgent -> ClientM a
+runCbAuthT :: CoinbaseProCredentials -> CBAuthT ClientM a -> IO a
+runCbAuthT cpc = run . flip runReaderT cpc . unCbAuth
 
 
 type RequestPath = String
@@ -70,14 +79,36 @@ apiEndpoint :: String
 apiEndpoint = "api.pro.coinbase.com"
 
 
-request :: APIRequest a -> IO a
-request f = do
+run :: ClientM a -> IO a
+run f = do
     mgr <- newManager tlsManagerSettings
-    result <- runClientM (f userAgent) (mkClientEnv mgr (BaseUrl Https apiEndpoint 443 ""))
+    result <- runClientM f (mkClientEnv mgr (BaseUrl Https apiEndpoint 443 mempty))
     either throw return result
 
 
-authRequest :: MonadIO m => Method -> RequestPath -> Body -> AuthAPIRequest a -> CBAuthT m a
+type instance AuthClientData (AuthProtect "CBAuth") = (CBAccessKey, CBAccessSign, CBAccessTimeStamp, CBAccessPassphrase)
+
+
+type CBAuthAPI (auth :: Symbol) method a = AuthProtect auth :> method '[JSON] a
+
+
+type AuthGet a    = CBAuthAPI "CBAuth" Get a
+type AuthPost a   = CBAuthAPI "CBAuth" Post a
+type AuthDelete a = CBAuthAPI "CBAuth" Delete a
+
+
+addAuthHeaders :: (CBAccessKey, CBAccessSign, CBAccessTimeStamp, CBAccessPassphrase) -> SCC.Request -> SCC.Request
+addAuthHeaders (key, sig, timestamp, pass) req =
+      addHeader "CB-ACCESS-KEY" key
+    $ addHeader "CB-ACCESS-SIGN" sig
+    $ addHeader "CB-ACCESS-TIMESTAMP" timestamp
+    $ addHeader "CB-ACCESS-PASSPHRASE" pass
+    $ addHeader "User-Agent" userAgent req
+
+
+authRequest :: Method -> RequestPath -> Body
+            -> (AuthenticatedRequest (AuthProtect "CBAuth") -> ClientM b)
+            -> CBAuthT ClientM b
 authRequest method requestPath body f = do
     ak <- CBAuthT $ asks cbAccessKey
     sk <- CBAuthT $ asks cbSecretKey
@@ -85,7 +116,7 @@ authRequest method requestPath body f = do
 
     ts <- liftIO mkCBAccessTimeStamp
     let cbs = mkCBAccessSign sk ts method requestPath body
-    liftIO $ request (f ak cbs ts pp)
+    lift . f $ mkAuthenticatedRequest (ak, cbs, ts, pp) addAuthHeaders
 
 
 mkCBAccessTimeStamp :: IO CBAccessTimeStamp

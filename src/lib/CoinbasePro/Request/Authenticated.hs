@@ -1,4 +1,5 @@
 {-# LANGUAGE DataKinds     #-}
+{-# LANGUAGE TypeFamilies  #-}
 {-# LANGUAGE TypeOperators #-}
 
 module CoinbasePro.Request.Authenticated
@@ -13,7 +14,6 @@ module CoinbasePro.Request.Authenticated
 
 
 import           Control.Monad                              (void)
-import           Control.Monad.IO.Class                     (MonadIO)
 import           Data.Aeson                                 (encode)
 import qualified Data.ByteString.Char8                      as C8
 import qualified Data.ByteString.Lazy.Char8                 as LC8
@@ -31,13 +31,11 @@ import           Network.HTTP.Types                         (SimpleQuery,
                                                              simpleQueryToQuery)
 import           Servant.API
 import           Servant.Client
+import           Servant.Client.Core                        (AuthenticatedRequest)
 
-import           CoinbasePro.Headers                        (CBAccessKey (..), CBAccessPassphrase (..),
-                                                             CBAccessSign (..),
-                                                             CBAccessTimeStamp (..),
-                                                             CBAuthenticationHeaders,
-                                                             UserAgent)
-import           CoinbasePro.Request                        (CBAuthT,
+import           CoinbasePro.Request                        (AuthDelete,
+                                                             AuthGet, AuthPost,
+                                                             CBAuthT (..),
                                                              RequestPath,
                                                              authRequest)
 import           CoinbasePro.Request.Authenticated.Accounts (Account,
@@ -55,45 +53,43 @@ import           CoinbasePro.Types                          (OrderId (..),
                                                              Side, Size)
 
 
-type API =    "accounts" :> CBAuthenticationHeaders (Get '[JSON] [Account])
-         :<|> "accounts" :> Capture "account-id" AccountId :> CBAuthenticationHeaders (Get '[JSON] Account)
-         :<|> "orders" :> QueryParams "status" Status :> QueryParam "product_id" ProductId :> CBAuthenticationHeaders (Get '[JSON] [Order])
-         :<|> "orders" :> ReqBody '[JSON] PlaceOrderBody :> CBAuthenticationHeaders (Post '[JSON] Order)
-         :<|> "orders" :> Capture "order_id" OrderId :> CBAuthenticationHeaders (Delete '[JSON] NoContent)
-         :<|> "orders" :> QueryParam "product_id" ProductId :> CBAuthenticationHeaders (Delete '[JSON] [OrderId])
-         :<|> "fills" :> QueryParam "product_id" ProductId :> QueryParam "order_id" OrderId :> CBAuthenticationHeaders (Get '[JSON] [Fill])
+type API =    "accounts" :> AuthGet [Account]
+         :<|> "accounts" :> Capture "account-id" AccountId :> AuthGet Account
+         :<|> "orders" :> QueryParams "status" Status :> QueryParam "product_id" ProductId :> AuthGet [Order]
+         :<|> "orders" :> ReqBody '[JSON] PlaceOrderBody :> AuthPost Order
+         :<|> "orders" :> Capture "order_id" OrderId :> AuthDelete NoContent
+         :<|> "orders" :> QueryParam "product_id" ProductId :> AuthDelete [OrderId]
+         :<|> "fills" :> QueryParam "product_id" ProductId :> QueryParam "order_id" OrderId :> AuthGet [Fill]
 
 
 api :: Proxy API
 api = Proxy
 
 
-accountsAPI :: CBAccessKey -> CBAccessSign -> CBAccessTimeStamp -> CBAccessPassphrase -> UserAgent -> ClientM [Account]
-singleAccountAPI :: AccountId -> CBAccessKey -> CBAccessSign -> CBAccessTimeStamp -> CBAccessPassphrase -> UserAgent -> ClientM Account
-listOrdersAPI :: [Status] -> Maybe ProductId -> CBAccessKey -> CBAccessSign -> CBAccessTimeStamp -> CBAccessPassphrase -> UserAgent -> ClientM [Order]
-placeOrderAPI :: PlaceOrderBody
-              -> CBAccessKey -> CBAccessSign -> CBAccessTimeStamp -> CBAccessPassphrase -> UserAgent
-              -> ClientM Order
-cancelOrderAPI :: OrderId -> CBAccessKey -> CBAccessSign -> CBAccessTimeStamp -> CBAccessPassphrase -> UserAgent -> ClientM NoContent
-cancelAllAPI :: Maybe ProductId -> CBAccessKey -> CBAccessSign -> CBAccessTimeStamp -> CBAccessPassphrase -> UserAgent -> ClientM [OrderId]
-fillsAPI :: Maybe ProductId -> Maybe OrderId -> CBAccessKey -> CBAccessSign -> CBAccessTimeStamp -> CBAccessPassphrase -> UserAgent -> ClientM [Fill]
+accountsAPI :: AuthenticatedRequest (AuthProtect "CBAuth") -> ClientM [Account]
+singleAccountAPI :: AccountId -> AuthenticatedRequest (AuthProtect "CBAuth") -> ClientM Account
+listOrdersAPI :: [Status] -> Maybe ProductId -> AuthenticatedRequest (AuthProtect "CBAuth") -> ClientM [Order]
+placeOrderAPI :: PlaceOrderBody -> AuthenticatedRequest (AuthProtect "CBAuth") -> ClientM Order
+cancelOrderAPI :: OrderId -> AuthenticatedRequest (AuthProtect "CBAuth") -> ClientM NoContent
+cancelAllAPI :: Maybe ProductId -> AuthenticatedRequest (AuthProtect "CBAuth") -> ClientM [OrderId]
+fillsAPI :: Maybe ProductId -> Maybe OrderId -> AuthenticatedRequest (AuthProtect "CBAuth") -> ClientM [Fill]
 accountsAPI :<|> singleAccountAPI :<|> listOrdersAPI :<|> placeOrderAPI :<|> cancelOrderAPI :<|> cancelAllAPI :<|> fillsAPI = client api
 
 
 -- | https://docs.pro.coinbase.com/?javascript#accounts
-accounts :: MonadIO m => CBAuthT m [Account]
+accounts :: CBAuthT ClientM [Account]
 accounts = authRequest methodGet "/accounts" "" accountsAPI
 
 
 -- | https://docs.pro.coinbase.com/?javascript#get-an-account
-account :: MonadIO m => AccountId -> CBAuthT m Account
+account :: AccountId -> CBAuthT ClientM Account
 account aid@(AccountId t) = authRequest methodGet requestPath "" $ singleAccountAPI aid
   where
     requestPath = "/accounts/" ++ unpack t
 
 
 -- | https://docs.pro.coinbase.com/?javascript#list-orders
-listOrders :: MonadIO m => Maybe [Status] -> Maybe ProductId -> CBAuthT m [Order]
+listOrders :: Maybe [Status] -> Maybe ProductId -> CBAuthT ClientM [Order]
 listOrders st prid = authRequest methodGet (mkRequestPath "/orders") "" $ listOrdersAPI (defaultStatus st) prid
   where
     mkRequestPath :: RequestPath -> RequestPath
@@ -110,7 +106,7 @@ listOrders st prid = authRequest methodGet (mkRequestPath "/orders") "" $ listOr
 
 
 -- | https://docs.pro.coinbase.com/?javascript#place-a-new-order
-placeOrder :: MonadIO m => ProductId -> Side -> Size -> Price -> Bool -> Maybe OrderType -> Maybe STP -> Maybe TimeInForce -> CBAuthT m Order
+placeOrder :: ProductId -> Side -> Size -> Price -> Bool -> Maybe OrderType -> Maybe STP -> Maybe TimeInForce -> CBAuthT ClientM Order
 placeOrder prid sd sz price po ot stp tif =
     authRequest methodPost "/orders" (LC8.unpack $ encode body) $ placeOrderAPI body
   where
@@ -118,7 +114,7 @@ placeOrder prid sd sz price po ot stp tif =
 
 
 -- | https://docs.pro.coinbase.com/?javascript#cancel-an-order
-cancelOrder :: MonadIO m => OrderId -> CBAuthT m ()
+cancelOrder :: OrderId -> CBAuthT ClientM ()
 cancelOrder oid = void . authRequest methodDelete (mkRequestPath "/orders") "" $ cancelOrderAPI oid
   where
     mkRequestPath :: RequestPath -> RequestPath
@@ -126,7 +122,7 @@ cancelOrder oid = void . authRequest methodDelete (mkRequestPath "/orders") "" $
 
 
 -- | https://docs.pro.coinbase.com/?javascript#cancel-all
-cancelAll :: MonadIO m => Maybe ProductId -> CBAuthT m [OrderId]
+cancelAll :: Maybe ProductId -> CBAuthT ClientM [OrderId]
 cancelAll prid = authRequest methodDelete (mkRequestPath "/orders") "" (cancelAllAPI prid)
   where
     mkRequestPath :: RequestPath -> RequestPath
@@ -134,7 +130,7 @@ cancelAll prid = authRequest methodDelete (mkRequestPath "/orders") "" (cancelAl
 
 
 -- | https://docs.pro.coinbase.com/?javascript#fills
-fills :: MonadIO m => Maybe ProductId -> Maybe OrderId -> CBAuthT m [Fill]
+fills :: Maybe ProductId -> Maybe OrderId -> CBAuthT ClientM [Fill]
 fills prid oid = authRequest methodGet mkRequestPath "" (fillsAPI prid oid)
   where
     brp = "/fills"

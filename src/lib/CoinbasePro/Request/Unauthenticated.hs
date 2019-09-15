@@ -17,14 +17,15 @@ import           Servant.API
 import           Servant.Client
 
 import           CoinbasePro.Headers                       (UserAgent,
-                                                            UserAgentHeader)
+                                                            UserAgentHeader,
+                                                            userAgent)
 import           CoinbasePro.MarketData.AggregateOrderBook (AggregateOrderBook)
 import           CoinbasePro.MarketData.FullOrderBook      (FullOrderBook)
 import           CoinbasePro.MarketData.Types              (AggregateBookLevel (..),
                                                             CBTime,
                                                             FullBookLevel (..),
                                                             Product, Trade)
-import           CoinbasePro.Request                       (request)
+import           CoinbasePro.Request                       (run)
 import           CoinbasePro.Types                         (Candle,
                                                             CandleGranularity,
                                                             ProductId,
@@ -61,34 +62,34 @@ productsAPI :<|> timeAPI :<|> aggregateOrderBookAPI :<|> fullOrderBookAPI :<|> t
 
 -- | https://docs.pro.coinbase.com/#get-products
 products :: IO [Product]
-products = request productsAPI
+products = run $ productsAPI userAgent
 
 
 -- | https://docs.pro.coinbase.com/#time
 time :: IO CBTime
-time = request timeAPI
+time = run $ timeAPI userAgent
 
 
 -- | https://docs.pro.coinbase.com/#get-product-order-book
 aggregateOrderBook :: ProductId -> Maybe AggregateBookLevel -> IO AggregateOrderBook
-aggregateOrderBook prid = request . aggregateOrderBookAPI prid
+aggregateOrderBook prid agg = run $ aggregateOrderBookAPI prid agg userAgent
 
 
 -- | https://docs.pro.coinbase.com/#get-product-order-book
 fullOrderBook :: ProductId -> Maybe FullBookLevel -> IO FullOrderBook
-fullOrderBook prid = request . fullOrderBookAPI prid
+fullOrderBook prid full = run $ fullOrderBookAPI prid full userAgent
 
 
 -- | https://docs.pro.coinbase.com/#get-trades
 trades :: ProductId -> IO [Trade]
-trades = request . tradesAPI
+trades prid = run $ tradesAPI prid userAgent
 
 
 -- | https://docs.pro.coinbase.com/#get-historic-rates
 candles :: ProductId -> Maybe UTCTime -> Maybe UTCTime -> CandleGranularity -> IO [Candle]
-candles prid start end = request . candlesAPI prid start end
+candles prid start end cg = run $ candlesAPI prid start end cg userAgent
 
 
 -- | https://docs.pro.coinbase.com/#get-24hr-stats
 stats :: ProductId -> IO TwentyFourHourStats
-stats = request . statsAPI
+stats prid = run $ statsAPI prid userAgent
