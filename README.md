@@ -7,34 +7,26 @@
 
 module Main where
 
-import           Control.Monad.IO.Class                     (liftIO)
+import           Control.Monad.IO.Class             (liftIO)
 
-import           CoinbasePro.Headers                        (CBAccessKey (..), CBAccessPassphrase (..))
-import           CoinbasePro.MarketData.Types               (AggregateBookLevel (..),
-                                                             FullBookLevel (..))
-import           CoinbasePro.Request                        (CBSecretKey (..), CoinbaseProCredentials (..),
-                                                             runCbAuthT)
-import           CoinbasePro.Request.Authenticated          (account, accounts,
-                                                             cancelAll,
-                                                             cancelOrder, fills,
-                                                             listOrders,
-                                                             placeOrder)
-import           CoinbasePro.Request.Authenticated.Accounts (AccountId (..))
-import           CoinbasePro.Request.Authenticated.Orders   (Status (..))
-import           CoinbasePro.Request.Unauthenticated        (aggregateOrderBook,
-                                                             fullOrderBook,
-                                                             products, time)
-import           CoinbasePro.Types                          (OrderId (..),
-                                                             Price (..),
-                                                             ProductId (..),
-                                                             Side (..),
-                                                             Size (..))
+import           CoinbasePro.Authenticated
+import           CoinbasePro.Authenticated.Accounts
+import           CoinbasePro.Authenticated.Orders
+import           CoinbasePro.Headers
+import           CoinbasePro.MarketData.Types       hiding (time)
+import           CoinbasePro.Request
+import           CoinbasePro.Types                  hiding (time)
+import           CoinbasePro.Unauthenticated
 
 
 main :: IO ()
 main = do
+    stats btcusd >>= print
+    candles btcusd Nothing Nothing Minute >>= print
+    trades btcusd >>= print
     time >>= print
     products >>= print
+    aggregateOrderBook btcusd (Just Best) >>= print
     aggregateOrderBook btcusd (Just TopFifty) >>= print
     fullOrderBook btcusd (Just FullBookLevel) >>= print
     runCbAuthT cpc $ do
