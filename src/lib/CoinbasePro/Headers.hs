@@ -11,7 +11,6 @@ module CoinbasePro.Headers
     , CBAccessSign(..)
     , CBAccessTimeStamp(..)
     , CBAccessPassphrase(..)
-    , CBAuthenticationHeaders
 
     , userAgent
     ) where
@@ -19,7 +18,7 @@ module CoinbasePro.Headers
 import           Data.ByteString    (ByteString)
 import           Data.Text          (Text, pack)
 import           Data.Text.Encoding (decodeUtf8)
-import           Servant.API        ((:>), Header', Required)
+import           Servant.API        (Header', Required)
 import           Web.HttpApiData    (ToHttpApiData (..))
 
 
@@ -71,11 +70,3 @@ newtype CBAccessPassphrase = CBAccessPassphrase String
 instance ToHttpApiData CBAccessPassphrase where
     toUrlPiece (CBAccessPassphrase p)   = pack p
     toQueryParam (CBAccessPassphrase p) = pack p
-
-
-type CBAuthenticationHeaders api =  RequiredHeader "CB-ACCESS-KEY" CBAccessKey
-                                 :> RequiredHeader "CB-ACCESS-SIGN" CBAccessSign
-                                 :> RequiredHeader "CB-ACCESS-TIMESTAMP" CBAccessTimeStamp
-                                 :> RequiredHeader "CB-ACCESS-PASSPHRASE" CBAccessPassphrase
-                                 :> UserAgentHeader
-                                 :> api
