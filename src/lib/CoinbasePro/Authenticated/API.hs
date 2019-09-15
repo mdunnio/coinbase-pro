@@ -13,7 +13,10 @@ module CoinbasePro.Authenticated.API
     ) where
 
 import           Data.Proxy                         (Proxy (..))
-import           Servant.API
+import           Servant.API                        ((:<|>) (..), (:>),
+                                                     AuthProtect, Capture, JSON,
+                                                     NoContent, QueryParam,
+                                                     QueryParams, ReqBody)
 import           Servant.Client
 import           Servant.Client.Core                (AuthenticatedRequest)
 
