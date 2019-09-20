@@ -1,5 +1,5 @@
 name:           coinbase-pro
-version:        0.3.1.0
+version:        0.4.0.0
 description:    API to coinbase-pro
 homepage:       https://github.com/mdunnio/coinbase-pro#readme
 bug-reports:    https://github.com/mdunnio/coinbase-pro/issues
