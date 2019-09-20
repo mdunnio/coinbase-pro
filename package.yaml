@@ -13,7 +13,7 @@ build-type:     Simple
 extra-source-files:
     README.md
 
-github: https://github.com/michaelsdunn1/coinbase-pro
+github: https://github.com/mdunnio/coinbase-pro
 
 dependencies:
   - base
