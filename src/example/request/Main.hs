@@ -6,10 +6,10 @@ import           Control.Monad.IO.Class             (liftIO)
 
 import           CoinbasePro.Authenticated
 import           CoinbasePro.Authenticated.Accounts
+import           CoinbasePro.Authenticated.Headers
 import           CoinbasePro.Authenticated.Orders
-import           CoinbasePro.Headers
+import           CoinbasePro.Authenticated.Request
 import           CoinbasePro.MarketData.Types       hiding (time)
-import           CoinbasePro.Request
 import           CoinbasePro.Types                  hiding (time)
 import           CoinbasePro.Unauthenticated
 

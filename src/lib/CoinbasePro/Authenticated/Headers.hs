@@ -6,7 +6,7 @@ module CoinbasePro.Authenticated.Headers
     ) where
 
 import           Data.ByteString    (ByteString)
-import           Data.Text          (Text, pack)
+import           Data.Text          (pack)
 import           Data.Text.Encoding (decodeUtf8)
 import           Web.HttpApiData    (ToHttpApiData (..))
 
