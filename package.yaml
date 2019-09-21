@@ -16,7 +16,7 @@ extra-source-files:
 github: https://github.com/mdunnio/coinbase-pro
 
 dependencies:
-  - base
+  - base >= 4.7 && < 4.12
   - HsOpenSSL
   - aeson
   - aeson-casing
