@@ -20,8 +20,8 @@ import           CoinbasePro.WebSocketFeed.Request  (ChannelName (..),
 import qualified CoinbasePro.WebSocketFeed.Request  as WR
 
 
-subscribeToFeed :: [ProductId] -> IO (Streams.InputStream ChannelMessage)
-subscribeToFeed prids = do
+subscribeToFeed :: [ProductId] -> [ChannelName] -> IO (Streams.InputStream ChannelMessage)
+subscribeToFeed prids channels = do
     (is, os) <- makeChanPipe
     _ <- forkIO . WU.runSecureClient wsHost wsPort "/" $ \conn -> do
         WS.sendTextData conn $ encode request
@@ -31,7 +31,7 @@ subscribeToFeed prids = do
     wsHost = WR.host wsEndpoint
     wsPort = WR.port wsEndpoint
 
-    request = WebSocketFeedRequest Subscribe prids [Full]
+    request = WebSocketFeedRequest Subscribe prids channels
 
 
 parseFeed :: WS.Connection -> IO ChannelMessage
