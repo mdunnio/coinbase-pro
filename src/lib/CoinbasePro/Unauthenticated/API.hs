@@ -14,47 +14,42 @@ module CoinbasePro.Unauthenticated.API
 import           Data.Proxy                                (Proxy (..))
 import           Data.Time.Clock                           (UTCTime)
 import           Servant.API                               ((:<|>) (..), (:>),
-                                                            Capture, Get, JSON,
-                                                            QueryParam,
+                                                            Capture, QueryParam,
                                                             QueryParam',
                                                             Required)
-import           Servant.Client                            (ClientM, client)
+import           Servant.Client                            (client)
 
-import           CoinbasePro.Headers                       (UserAgent,
-                                                            UserAgentHeader)
 import           CoinbasePro.MarketData.AggregateOrderBook (AggregateOrderBook)
 import           CoinbasePro.MarketData.FullOrderBook      (FullOrderBook)
 import           CoinbasePro.MarketData.Types              (AggregateBookLevel (..),
                                                             CBTime,
                                                             FullBookLevel (..),
                                                             Product, Trade)
+import           CoinbasePro.Request                       (CBGet, CBRequest)
 import           CoinbasePro.Types                         (Candle,
                                                             CandleGranularity,
                                                             ProductId,
                                                             TwentyFourHourStats)
 
-type Products = "products" :> UserAgentHeader :> Get '[JSON] [Product]
+
+type Products = "products" :> CBGet [Product]
 
 type ProductAggregateOrderBook = "products"
                                :> Capture "product" ProductId
                                :> "book"
                                :> QueryParam "level" AggregateBookLevel
-                               :> UserAgentHeader
-                               :> Get '[JSON] AggregateOrderBook
+                               :> CBGet AggregateOrderBook
 
 type ProductFullOrderBook = "products"
                           :> Capture "product" ProductId
                           :> "book"
                           :> QueryParam "level" FullBookLevel
-                          :> UserAgentHeader
-                          :> Get '[JSON] FullOrderBook
+                          :> CBGet FullOrderBook
 
 type Trades = "products"
             :> Capture "product" ProductId
             :> "trades"
-            :> UserAgentHeader
-            :> Get '[JSON] [Trade]
-
+            :> CBGet [Trade]
 
 type Candles = "products"
              :> Capture "product" ProductId
@@ -62,18 +57,14 @@ type Candles = "products"
              :> QueryParam "start" UTCTime
              :> QueryParam "end" UTCTime
              :> QueryParam' '[Required] "granularity" CandleGranularity
-             :> UserAgentHeader
-             :> Get '[JSON] [Candle]
+             :> CBGet [Candle]
 
 type Stats = "products"
             :> Capture "product" ProductId
             :> "stats"
-            :> UserAgentHeader
-            :> Get '[JSON] TwentyFourHourStats
+            :> CBGet TwentyFourHourStats
 
-type Time = "time"
-          :> UserAgentHeader
-          :> Get '[JSON] CBTime
+type Time = "time" :> CBGet CBTime
 
 type API =    Products
          :<|> ProductAggregateOrderBook
@@ -88,11 +79,11 @@ api :: Proxy API
 api = Proxy
 
 
-products :: UserAgent -> ClientM [Product]
-aggregateOrderBook :: ProductId -> Maybe AggregateBookLevel -> UserAgent -> ClientM AggregateOrderBook
-fullOrderBook :: ProductId -> Maybe FullBookLevel -> UserAgent -> ClientM FullOrderBook
-trades :: ProductId -> UserAgent -> ClientM [Trade]
-candles :: ProductId -> Maybe UTCTime -> Maybe UTCTime -> CandleGranularity -> UserAgent -> ClientM [Candle]
-stats :: ProductId -> UserAgent -> ClientM TwentyFourHourStats
-time :: UserAgent -> ClientM CBTime
+products :: CBRequest [Product]
+aggregateOrderBook :: ProductId -> Maybe AggregateBookLevel -> CBRequest AggregateOrderBook
+fullOrderBook :: ProductId -> Maybe FullBookLevel -> CBRequest FullOrderBook
+trades :: ProductId -> CBRequest [Trade]
+candles :: ProductId -> Maybe UTCTime -> Maybe UTCTime -> CandleGranularity -> CBRequest [Candle]
+stats :: ProductId -> CBRequest TwentyFourHourStats
+time :: CBRequest CBTime
 products :<|> aggregateOrderBook :<|> fullOrderBook :<|> trades :<|> candles :<|> stats :<|> time = client api

@@ -24,7 +24,7 @@ import           CoinbasePro.Authenticated.Accounts (Account, AccountId (..))
 import           CoinbasePro.Authenticated.Fills    (Fill)
 import           CoinbasePro.Authenticated.Orders   (Order, PlaceOrderBody (..),
                                                      Status (..))
-import           CoinbasePro.Request                (AuthDelete, AuthGet,
+import           CoinbasePro.Authenticated.Request  (AuthDelete, AuthGet,
                                                      AuthPost)
 import           CoinbasePro.Types                  (OrderId (..),
                                                      ProductId (..))

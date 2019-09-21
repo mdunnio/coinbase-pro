@@ -35,8 +35,8 @@ import           CoinbasePro.Authenticated.Orders   (Order, PlaceOrderBody (..),
                                                      STP, Status (..),
                                                      Statuses (..), TimeInForce,
                                                      statuses)
-import           CoinbasePro.Request                (CBAuthT (..), RequestPath,
-                                                     authRequest)
+import           CoinbasePro.Authenticated.Request  (CBAuthT (..), authRequest)
+import           CoinbasePro.Request                (RequestPath)
 
 
 import           CoinbasePro.Types                  (OrderId (..), OrderType,

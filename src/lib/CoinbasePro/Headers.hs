@@ -7,19 +7,15 @@ module CoinbasePro.Headers
     ( RequiredHeader
     , UserAgent
     , UserAgentHeader
-    , CBAccessKey(..)
-    , CBAccessSign(..)
-    , CBAccessTimeStamp(..)
-    , CBAccessPassphrase(..)
+    , Before
+    , After
 
     , userAgent
     ) where
 
-import           Data.ByteString    (ByteString)
-import           Data.Text          (Text, pack)
-import           Data.Text.Encoding (decodeUtf8)
-import           Servant.API        (Header', Required)
-import           Web.HttpApiData    (ToHttpApiData (..))
+import           Data.Text       (Text, pack, toLower)
+import           Servant.API     (Header', Required)
+import           Web.HttpApiData (ToHttpApiData (..))
 
 
 type RequiredHeader = Header' '[Required]
@@ -36,37 +32,19 @@ userAgent = UserAgent "coinbase-pro/0.4"
 type UserAgentHeader = RequiredHeader "User-Agent" UserAgent
 
 
-newtype CBAccessKey = CBAccessKey String
+data Before = Before
     deriving (Eq, Show)
 
 
-instance ToHttpApiData CBAccessKey where
-    toUrlPiece (CBAccessKey k)   = pack k
-    toQueryParam (CBAccessKey k) = pack k
+instance ToHttpApiData Before where
+    toUrlPiece   = toLower . pack . show
+    toQueryParam = toLower . pack . show
 
 
-newtype CBAccessSign = CBAccessSign ByteString
+data After = After
     deriving (Eq, Show)
 
 
-instance ToHttpApiData CBAccessSign where
-    toUrlPiece (CBAccessSign s)   = decodeUtf8 s
-    toQueryParam (CBAccessSign s) = decodeUtf8 s
-
-
-newtype CBAccessTimeStamp = CBAccessTimeStamp String
-    deriving (Eq, Show)
-
-
-instance ToHttpApiData CBAccessTimeStamp where
-    toUrlPiece (CBAccessTimeStamp ts)   = pack ts
-    toQueryParam (CBAccessTimeStamp ts) = pack ts
-
-
-newtype CBAccessPassphrase = CBAccessPassphrase String
-    deriving (Eq, Show)
-
-
-instance ToHttpApiData CBAccessPassphrase where
-    toUrlPiece (CBAccessPassphrase p)   = pack p
-    toQueryParam (CBAccessPassphrase p) = pack p
+instance ToHttpApiData After where
+    toUrlPiece   = toLower . pack . show
+    toQueryParam = toLower . pack . show
