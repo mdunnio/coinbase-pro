@@ -48,3 +48,16 @@ dependencies:
 library:
   source-dirs: src/lib/
   ghc-options: -Wall -fwarn-tabs -O2 -funbox-strict-fields
+
+executables:
+  test-request:
+    main: Main.hs
+    source-dirs: src/example/request/
+    dependencies:
+      - coinbase-pro
+
+  test-stream:
+    main: Main.hs
+    source-dirs: src/example/stream/
+    dependencies:
+      - coinbase-pro
