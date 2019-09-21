@@ -30,7 +30,7 @@ newtype UserAgent = UserAgent Text
 
 
 userAgent :: UserAgent
-userAgent = UserAgent "coinbase-pro/0.1"
+userAgent = UserAgent "coinbase-pro/0.4"
 
 
 type UserAgentHeader = RequiredHeader "User-Agent" UserAgent
