@@ -57,14 +57,19 @@ To print out all of the full order book updates for BTC-USD:
 
 module Main where
 
-import           CoinbasePro.Types         (ProductId (..))
-import           CoinbasePro.WebSocketFeed (subscribeToFeed)
-import qualified System.IO.Streams         as Streams
+import           Control.Monad                     (forever)
+import qualified System.IO.Streams                 as Streams
 
+import           CoinbasePro.Types                 (ProductId (..))
+import           CoinbasePro.WebSocketFeed         (subscribeToFeed)
+import           CoinbasePro.WebSocketFeed.Request (ChannelName (..))
 
 main :: IO ()
 main = do
-    msgs <- subscribeToFeed [ProductId "BTC-USD"]
+    msgs <- subscribeToFeed [ProductId "BTC-USD"] [Ticker]
     forever $ Streams.read msgs >>= print
-
 ```
+
+## Example
+
+Example execs can be found in `src/example/`
