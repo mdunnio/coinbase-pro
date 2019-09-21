@@ -44,8 +44,8 @@ aggregateOrderBook prid agg = run $ API.aggregateOrderBook prid agg userAgent
 
 
 -- | https://docs.pro.coinbase.com/#get-product-order-book
-fullOrderBook :: ProductId -> Maybe FullBookLevel -> IO FullOrderBook
-fullOrderBook prid full = run $ API.fullOrderBook prid full userAgent
+fullOrderBook :: ProductId -> IO FullOrderBook
+fullOrderBook prid = run $ API.fullOrderBook prid (Just FullBookLevel) userAgent
 
 
 -- | https://docs.pro.coinbase.com/#get-trades

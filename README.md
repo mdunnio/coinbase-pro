@@ -28,7 +28,7 @@ main = do
     products >>= print
     aggregateOrderBook btcusd (Just Best) >>= print
     aggregateOrderBook btcusd (Just TopFifty) >>= print
-    fullOrderBook btcusd (Just FullBookLevel) >>= print
+    fullOrderBook btcusd >>= print
     runCbAuthT cpc $ do
         accounts >>= liftIO . print
         account accountId >>= liftIO . print
