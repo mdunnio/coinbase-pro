@@ -1,2 +1,9 @@
 syntax: glob
 .stack-work/
+dist/
+dist-newstyle/
+.ghc.environment*
+coinbase-pro.cabal
+.swp
+tags
+TAGS
