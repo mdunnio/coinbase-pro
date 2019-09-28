@@ -1,0 +1,13 @@
+# Cabal
+dist/
+dist-newstyle/
+.ghc.environment*
+coinbase-pro.cabal
+
+# Stack
+.stack-work/
+
+# Editor
+.swp
+tags
+TAGS
