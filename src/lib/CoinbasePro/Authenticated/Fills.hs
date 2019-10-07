@@ -32,7 +32,7 @@ data Fill = Fill
     , size      :: Size
     , orderId   :: OrderId
     , createdAt :: CreatedAt
-    , liquidiy  :: Liquidity
+    , liquidity :: Liquidity
     , fee       :: Double
     , settled   :: Bool
     } deriving (Eq, Show)
