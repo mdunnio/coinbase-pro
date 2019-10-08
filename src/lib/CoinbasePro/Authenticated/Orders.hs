@@ -14,10 +14,11 @@ module CoinbasePro.Authenticated.Orders
 
 
 import           Data.Aeson        (FromJSON, ToJSON, parseJSON, withText)
-import           Data.Aeson.Casing (camelCase, snakeCase)
+import           Data.Aeson.Casing (snakeCase)
 import           Data.Aeson.TH     (constructorTagModifier, defaultOptions,
                                     deriveJSON, fieldLabelModifier,
                                     omitNothingFields)
+import qualified Data.Char         as Char
 import           Data.Set          (Set, fromList)
 import           Data.Text         (pack, toLower, unpack)
 import           Web.HttpApiData   (ToHttpApiData (..))
@@ -62,9 +63,9 @@ instance ToHttpApiData STP where
     toQueryParam = toLower . pack . show
 
 
-deriveJSON defaultOptions {constructorTagModifier = camelCase} ''Status
+deriveJSON defaultOptions {constructorTagModifier = fmap Char.toLower} ''Status
 deriveJSON defaultOptions ''TimeInForce
-deriveJSON defaultOptions {constructorTagModifier = camelCase} ''STP
+deriveJSON defaultOptions {constructorTagModifier = fmap Char.toLower} ''STP
 
 
 newtype FillFees = FillFees { unFillFees :: Double }
