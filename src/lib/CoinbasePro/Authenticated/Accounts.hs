@@ -1,5 +1,6 @@
-{-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE TemplateHaskell   #-}
+{-# LANGUAGE GeneralizedNewtypeDeriving #-}
+{-# LANGUAGE OverloadedStrings          #-}
+{-# LANGUAGE TemplateHaskell            #-}
 
 module CoinbasePro.Authenticated.Accounts
     ( Account (..)
@@ -7,10 +8,11 @@ module CoinbasePro.Authenticated.Accounts
     , Currency (..)
     , Balance (..)
     , ProfileId (..)
+    , Fees (..)
     , TrailingVolume (..)
     ) where
 
-import           Data.Aeson        (FromJSON (..), withObject, (.:))
+import           Data.Aeson        (FromJSON (..), ToJSON, withObject, (.:))
 import           Data.Aeson.Casing (snakeCase)
 import           Data.Aeson.TH     (defaultOptions, deriveJSON,
                                     fieldLabelModifier)
@@ -18,7 +20,7 @@ import           Data.Text         (Text)
 import           Data.Time.Clock   (UTCTime)
 import           Web.HttpApiData   (ToHttpApiData (..))
 
-import           CoinbasePro.Types (ProductId, Volume)
+import           CoinbasePro.Types (ProductId, Volume (..))
 
 
 newtype AccountId = AccountId Text
@@ -60,6 +62,24 @@ instance FromJSON Account where
         <*> (Balance . read <$> o .: "available")
         <*> (Balance . read <$> o .: "hold")
         <*> (ProfileId <$> o .: "profile_id")
+
+
+newtype FeeRate = FeeRate { unFeeRate :: Double }
+    deriving (Eq, Show, FromJSON, ToJSON)
+
+
+data Fees = Fees
+    { makerFeeRate :: FeeRate
+    , takerFeeRate :: FeeRate
+    , usdVolume    :: Volume
+    } deriving (Eq, Show)
+
+
+instance FromJSON Fees where
+    parseJSON = withObject "fees" $ \o -> Fees
+        <$> (FeeRate . read <$> o .: "maker_fee_rate")
+        <*> (FeeRate . read <$> o .: "taker_fee_rate")
+        <*> (Volume . read <$> o .: "usd_volume")
 
 
 data TrailingVolume = TrailingVolume

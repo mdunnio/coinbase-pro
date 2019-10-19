@@ -10,6 +10,7 @@ module CoinbasePro.Authenticated
   , cancelOrder
   , cancelAll
   , fills
+  , fees
   , trailingVolume
   ) where
 
@@ -30,7 +31,7 @@ import           Network.HTTP.Types                 (SimpleQuery,
 import           Servant.Client                     (ClientM)
 
 import           CoinbasePro.Authenticated.Accounts (Account, AccountId (..),
-                                                     TrailingVolume (..))
+                                                     Fees, TrailingVolume (..))
 import qualified CoinbasePro.Authenticated.API      as API
 import           CoinbasePro.Authenticated.Fills    (Fill)
 import           CoinbasePro.Authenticated.Orders   (Order, PlaceOrderBody (..),
@@ -110,6 +111,14 @@ fills prid oid = authRequest methodGet mkRequestPath "" (API.fills prid oid)
 
     mkSimpleQuery :: Maybe ProductId -> Maybe OrderId -> SimpleQuery
     mkSimpleQuery p o = mkProductQuery p <> mkOrderIdQuery o
+
+
+-- | https://docs.pro.coinbase.com/?javascript#get-current-fees
+fees :: CBAuthT ClientM Fees
+fees = authRequest methodGet mkRequestPath "" API.fees
+  where
+    mkRequestPath :: RequestPath
+    mkRequestPath = "/fees"
 
 
 -- | https://docs.pro.coinbase.com/?javascript#trailing-volume

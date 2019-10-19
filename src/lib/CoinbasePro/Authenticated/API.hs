@@ -10,6 +10,7 @@ module CoinbasePro.Authenticated.API
     , cancelOrder
     , cancelAll
     , fills
+    , fees
     , trailingVolume
     ) where
 
@@ -22,7 +23,7 @@ import           Servant.Client
 import           Servant.Client.Core                (AuthenticatedRequest)
 
 import           CoinbasePro.Authenticated.Accounts (Account, AccountId (..),
-                                                     TrailingVolume)
+                                                     Fees, TrailingVolume)
 import           CoinbasePro.Authenticated.Fills    (Fill)
 import           CoinbasePro.Authenticated.Orders   (Order, PlaceOrderBody (..),
                                                      Status (..))
@@ -39,6 +40,7 @@ type API =    "accounts" :> AuthGet [Account]
          :<|> "orders" :> Capture "order_id" OrderId :> AuthDelete NoContent
          :<|> "orders" :> QueryParam "product_id" ProductId :> AuthDelete [OrderId]
          :<|> "fills" :> QueryParam "product_id" ProductId :> QueryParam "order_id" OrderId :> AuthGet [Fill]
+         :<|> "fees" :> AuthGet Fees
          :<|> "users" :> "self" :> "trailing-volume" :> AuthGet [TrailingVolume]
 
 
@@ -53,5 +55,6 @@ placeOrder :: PlaceOrderBody -> AuthenticatedRequest (AuthProtect "CBAuth") -> C
 cancelOrder :: OrderId -> AuthenticatedRequest (AuthProtect "CBAuth") -> ClientM NoContent
 cancelAll :: Maybe ProductId -> AuthenticatedRequest (AuthProtect "CBAuth") -> ClientM [OrderId]
 fills :: Maybe ProductId -> Maybe OrderId -> AuthenticatedRequest (AuthProtect "CBAuth") -> ClientM [Fill]
+fees :: AuthenticatedRequest (AuthProtect "CBAuth") -> ClientM Fees
 trailingVolume :: AuthenticatedRequest (AuthProtect "CBAuth") -> ClientM [TrailingVolume]
-accounts :<|> singleAccount :<|> listOrders :<|> placeOrder :<|> cancelOrder :<|> cancelAll :<|> fills :<|> trailingVolume = client api
+accounts :<|> singleAccount :<|> listOrders :<|> placeOrder :<|> cancelOrder :<|> cancelAll :<|> fills :<|> fees :<|> trailingVolume = client api
