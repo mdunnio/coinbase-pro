@@ -3,12 +3,13 @@
 
 module CoinbasePro.Unauthenticated
    ( products
-   , time
    , aggregateOrderBook
    , fullOrderBook
    , trades
    , candles
    , stats
+   , currencies
+   , time
    ) where
 
 import           Data.Time.Clock                           (UTCTime)
@@ -23,7 +24,7 @@ import           CoinbasePro.MarketData.Types              (AggregateBookLevel (
 import           CoinbasePro.Request                       (run)
 import           CoinbasePro.Types                         (Candle,
                                                             CandleGranularity,
-                                                            ProductId,
+                                                            Currency, ProductId,
                                                             TwentyFourHourStats)
 import qualified CoinbasePro.Unauthenticated.API           as API
 
@@ -31,11 +32,6 @@ import qualified CoinbasePro.Unauthenticated.API           as API
 -- | https://docs.pro.coinbase.com/#get-products
 products :: IO [Product]
 products = run $ API.products userAgent
-
-
--- | https://docs.pro.coinbase.com/#time
-time :: IO CBTime
-time = run $ API.time userAgent
 
 
 -- | https://docs.pro.coinbase.com/#get-product-order-book
@@ -61,3 +57,13 @@ candles prid start end cg = run $ API.candles prid start end cg userAgent
 -- | https://docs.pro.coinbase.com/#get-24hr-stats
 stats :: ProductId -> IO TwentyFourHourStats
 stats prid = run $ API.stats prid userAgent
+
+
+-- | https://docs.pro.coinbase.com/?javascript#get-currencies
+currencies :: IO [Currency]
+currencies = run $ API.currencies userAgent
+
+
+-- | https://docs.pro.coinbase.com/#time
+time :: IO CBTime
+time = run $ API.time userAgent

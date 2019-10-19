@@ -18,12 +18,14 @@ module CoinbasePro.Types
     , Candle (..)
     , CandleGranularity (..)
     , TwentyFourHourStats (..)
+    , Currency (..)
 
     , filterOrderFieldName
     ) where
 
-import           Data.Aeson            (FromJSON, ToJSON, parseJSON, toJSON,
-                                        withArray, withText)
+import           Data.Aeson            (FromJSON, ToJSON, Value (Null),
+                                        parseJSON, toJSON, withArray,
+                                        withObject, withText, (.:), (.:?))
 import qualified Data.Aeson            as A
 import           Data.Aeson.Casing     (camelCase, snakeCase)
 import           Data.Aeson.TH         (constructorTagModifier, defaultOptions,
@@ -210,3 +212,47 @@ data TwentyFourHourStats = TwentyFourHourStats
 
 
 deriveJSON defaultOptions { fieldLabelModifier = init . init } ''TwentyFourHourStats
+
+
+data CurrencyDetails = CurrencyDetails
+    { cdType               :: Text
+    , symbol               :: Maybe Text
+    , networkConfirmations :: Maybe Int
+    , sortOrder            :: Maybe Int
+    , cryptoAddressLink    :: Maybe Text
+    , pushPaymentMethods   :: [Text]
+    , groupTypes           :: Maybe [Text]
+    , maxPrecision         :: Maybe Double
+    } deriving (Eq, Show)
+
+
+instance FromJSON CurrencyDetails where
+    parseJSON = withObject "currency details" $ \o -> CurrencyDetails
+        <$> o .: "type"
+        <*> o .:? "symbol"
+        <*> o .:? "network_confirmations"
+        <*> o .:? "set_order"
+        <*> o .:? "crypto_address_link"
+        <*> o .: "push_payment_methods"
+        <*> o .:? "group_types"
+        <*> o .:? "max_precision"
+
+
+data Currency = Currency
+    { id      :: Text
+    , name    :: Text
+    , minSize :: Double
+    , status  :: Text
+    , message :: Maybe Text
+    , details :: CurrencyDetails
+    } deriving (Eq, Show)
+
+
+instance FromJSON Currency where
+    parseJSON = withObject "currency" $ \o -> Currency
+        <$> o .: "id"
+        <*> o .: "name"
+        <*> (read <$> o .: "min_size")
+        <*> o .: "status"
+        <*> o .:? "message"
+        <*> o .: "details"

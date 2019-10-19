@@ -8,6 +8,7 @@ module CoinbasePro.Unauthenticated.API
     , trades
     , candles
     , stats
+    , currencies
     , time
     ) where
 
@@ -28,7 +29,7 @@ import           CoinbasePro.MarketData.Types              (AggregateBookLevel (
 import           CoinbasePro.Request                       (CBGet, CBRequest)
 import           CoinbasePro.Types                         (Candle,
                                                             CandleGranularity,
-                                                            ProductId,
+                                                            Currency, ProductId,
                                                             TwentyFourHourStats)
 
 
@@ -64,6 +65,9 @@ type Stats = "products"
             :> "stats"
             :> CBGet TwentyFourHourStats
 
+type Currencies = "currencies"
+                :> CBGet [Currency]
+
 type Time = "time" :> CBGet CBTime
 
 type API =    Products
@@ -72,6 +76,7 @@ type API =    Products
          :<|> Trades
          :<|> Candles
          :<|> Stats
+         :<|> Currencies
          :<|> Time
 
 
@@ -85,5 +90,6 @@ fullOrderBook :: ProductId -> Maybe FullBookLevel -> CBRequest FullOrderBook
 trades :: ProductId -> CBRequest [Trade]
 candles :: ProductId -> Maybe UTCTime -> Maybe UTCTime -> CandleGranularity -> CBRequest [Candle]
 stats :: ProductId -> CBRequest TwentyFourHourStats
+currencies :: CBRequest [Currency]
 time :: CBRequest CBTime
-products :<|> aggregateOrderBook :<|> fullOrderBook :<|> trades :<|> candles :<|> stats :<|> time = client api
+products :<|> aggregateOrderBook :<|> fullOrderBook :<|> trades :<|> candles :<|> stats :<|> currencies :<|> time = client api
