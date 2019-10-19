@@ -6,10 +6,11 @@ module CoinbasePro.Authenticated
   ( accounts
   , account
   , listOrders
-  , fills
   , placeOrder
   , cancelOrder
   , cancelAll
+  , fills
+  , trailingVolume
   ) where
 
 
@@ -28,7 +29,8 @@ import           Network.HTTP.Types                 (SimpleQuery,
                                                      simpleQueryToQuery)
 import           Servant.Client                     (ClientM)
 
-import           CoinbasePro.Authenticated.Accounts (Account, AccountId (..))
+import           CoinbasePro.Authenticated.Accounts (Account, AccountId (..),
+                                                     TrailingVolume (..))
 import qualified CoinbasePro.Authenticated.API      as API
 import           CoinbasePro.Authenticated.Fills    (Fill)
 import           CoinbasePro.Authenticated.Orders   (Order, PlaceOrderBody (..),
@@ -108,6 +110,14 @@ fills prid oid = authRequest methodGet mkRequestPath "" (API.fills prid oid)
 
     mkSimpleQuery :: Maybe ProductId -> Maybe OrderId -> SimpleQuery
     mkSimpleQuery p o = mkProductQuery p <> mkOrderIdQuery o
+
+
+-- | https://docs.pro.coinbase.com/?javascript#trailing-volume
+trailingVolume :: CBAuthT ClientM [TrailingVolume]
+trailingVolume = authRequest methodGet mkRequestPath "" API.trailingVolume
+  where
+    mkRequestPath :: RequestPath
+    mkRequestPath = "/users/self/trailing-volume"
 
 
 mkSimpleQueryItem :: String -> Text -> SimpleQueryItem

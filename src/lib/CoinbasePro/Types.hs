@@ -10,6 +10,7 @@ module CoinbasePro.Types
     , Sequence
     , Side (..)
     , Size (..)
+    , Volume (..)
     , TradeId (..)
     , Funds
     , OrderType (..)

@@ -1,4 +1,5 @@
 {-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE TemplateHaskell   #-}
 
 module CoinbasePro.Authenticated.Accounts
     ( Account (..)
@@ -6,11 +7,18 @@ module CoinbasePro.Authenticated.Accounts
     , Currency (..)
     , Balance (..)
     , ProfileId (..)
+    , TrailingVolume (..)
     ) where
 
-import           Data.Aeson      (FromJSON (..), withObject, (.:))
-import           Data.Text       (Text)
-import           Web.HttpApiData (ToHttpApiData (..))
+import           Data.Aeson        (FromJSON (..), withObject, (.:))
+import           Data.Aeson.Casing (snakeCase)
+import           Data.Aeson.TH     (defaultOptions, deriveJSON,
+                                    fieldLabelModifier)
+import           Data.Text         (Text)
+import           Data.Time.Clock   (UTCTime)
+import           Web.HttpApiData   (ToHttpApiData (..))
+
+import           CoinbasePro.Types (ProductId, Volume)
 
 
 newtype AccountId = AccountId Text
@@ -52,3 +60,14 @@ instance FromJSON Account where
         <*> (Balance . read <$> o .: "available")
         <*> (Balance . read <$> o .: "hold")
         <*> (ProfileId <$> o .: "profile_id")
+
+
+data TrailingVolume = TrailingVolume
+    { productId      :: ProductId
+    , exchangeVolume :: Volume
+    , volume         :: Volume
+    , recordedAt     :: UTCTime
+    } deriving (Eq, Show)
+
+
+deriveJSON defaultOptions { fieldLabelModifier = snakeCase } ''TrailingVolume
