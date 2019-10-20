@@ -1,50 +1,83 @@
 # coinbase-pro
 
+Client for Coinabse Pro REST and Websocket APIS.
+
+Here is a list of implemented/unimplemented features:
+
+- Market Data
+    - [x] Products
+        - [x] Get Products
+        - [x] Get Product Order Book
+        - [x] Get Product Ticker
+        - [x] Get Trades
+        - [x] Get Historic Rates
+        - [x] Get 24hr Stats
+    - [x] Currencies
+        - [x] Get Currencies
+    - [x] Time
+- Private
+    - [ ] Accounts
+        - [x] List Accounts
+        - [x] Get An Account
+        - [ ] Get Account History
+        - [ ] Get Holds
+    - [ ] Orders
+        - [x] Place a New Order
+        - [x] Cancel an Order
+        - [x] Cancel all
+        - [x] List Orders
+        - [ ] Get an Order
+    - [x] Fills
+        - [x] List Fills
+    - [ ] Deposits
+        - [ ] Payment Method
+        - [ ] Coinbase
+    - [ ] Withdrawals
+        - [ ] Payment Method
+        - [ ] Coinbase
+        - [ ] Crypto
+    - [ ] Stablecoin Conversions
+        - [ ] Create Conversion
+    - [ ] Payment Methods
+        - [ ] List Payment Methods
+    - [x] Fees
+        - [x] Get Current Fees
+    - [ ] Reports
+        - [ ] Create a new report
+        - [ ] Get report status
+    - [x] User Account
+        - [x] Trailing Volume
+- Websocket Feed
+    - [x] Channels
+        - [x] The heartbeat channel
+        - [ ] The status channel
+        - [x] The ticker channel
+        - [x] The level2 channel
+        - [ ] The user channel
+        - [x] The matches channel
+        - [x] The full channel
+- FIX API
+    - [ ] Messages
+
+
 ## Request API
 
+### Market Data Requests
+
 ```haskell
-{-# LANGUAGE OverloadedStrings #-}
+run (trades (ProductId "BTC-USD")) >>= print
+```
 
-module Main where
+### Authenticated Private Requests
 
-import           Control.Monad.IO.Class             (liftIO)
-
-import           CoinbasePro.Authenticated
-import           CoinbasePro.Authenticated.Accounts
-import           CoinbasePro.Authenticated.Orders
-import           CoinbasePro.Headers
-import           CoinbasePro.MarketData.Types       hiding (time)
-import           CoinbasePro.Request
-import           CoinbasePro.Types                  hiding (time)
-import           CoinbasePro.Unauthenticated
-
-
-main :: IO ()
-main = do
-    stats btcusd >>= print
-    candles btcusd Nothing Nothing Minute >>= print
-    trades btcusd >>= print
-    time >>= print
-    products >>= print
-    aggregateOrderBook btcusd (Just Best) >>= print
-    aggregateOrderBook btcusd (Just TopFifty) >>= print
-    fullOrderBook btcusd >>= print
-    runCbAuthT cpc $ do
-        accounts >>= liftIO . print
-        account accountId >>= liftIO . print
-        fills (Just btcusd) Nothing >>= liftIO . print
-        listOrders (Just [All]) (Just btcusd) >>= liftIO . print
-        placeOrder btcusd Sell (Size 0.001) (Price 99999.00) True Nothing Nothing Nothing >>= liftIO . print
-        placeOrder btcusd Buy (Size 1.0) (Price 1.00) True Nothing Nothing Nothing >>= liftIO . print
-        cancelOrder (OrderId "<cancel-order-id>")
-        cancelAll (Just btcusd) >>= liftIO . print
+```haskell
+runCbAuthT cpc $ do
+    fills (Just btcusd) Nothing >>= liftIO . print
   where
     accessKey  = CBAccessKey "<access-key>"
     secretKey  = CBSecretKey "<secret-key>"
     passphrase = CBAccessPassphrase "<passphrase>"
     cpc        = CoinbaseProCredentials accessKey secretKey passphrase
-    accountId  = AccountId "<account-id>"
-    btcusd     = ProductId "BTC-USD"
 ```
 
 ## Websocket API
@@ -53,17 +86,6 @@ To print out all of the full order book updates for BTC-USD:
 
 
 ```haskell
-{-# LANGUAGE OverloadedStrings #-}
-
-module Main where
-
-import           Control.Monad                     (forever)
-import qualified System.IO.Streams                 as Streams
-
-import           CoinbasePro.Types                 (ProductId (..))
-import           CoinbasePro.WebSocketFeed         (subscribeToFeed)
-import           CoinbasePro.WebSocketFeed.Request (ChannelName (..))
-
 main :: IO ()
 main = do
     msgs <- subscribeToFeed [ProductId "BTC-USD"] [Ticker]
