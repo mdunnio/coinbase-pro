@@ -11,11 +11,12 @@ module CoinbasePro.Request
     , CBRequest
 
     , run
+    , runWithManager
     , apiEndpoint
     ) where
 
 import           Control.Exception       (throw)
-import           Network.HTTP.Client     (newManager)
+import           Network.HTTP.Client     (Manager, newManager)
 import           Network.HTTP.Client.TLS (tlsManagerSettings)
 import           Servant.API             ((:>), Get, JSON)
 import           Servant.Client
@@ -38,7 +39,9 @@ apiEndpoint = "api.pro.coinbase.com"
 
 
 run :: ClientM a -> IO a
-run f = do
-    mgr <- newManager tlsManagerSettings
-    result <- runClientM f (mkClientEnv mgr (BaseUrl Https apiEndpoint 443 mempty))
-    either throw return result
+run f = flip runWithManager f =<< newManager tlsManagerSettings
+
+
+runWithManager :: Manager -> ClientM a -> IO a
+runWithManager mgr f = either throw return =<<
+    runClientM f (mkClientEnv mgr (BaseUrl Https apiEndpoint 443 mempty))
