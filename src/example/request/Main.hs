@@ -10,6 +10,7 @@ import           CoinbasePro.Authenticated.Headers
 import           CoinbasePro.Authenticated.Orders
 import           CoinbasePro.Authenticated.Request
 import           CoinbasePro.MarketData.Types       hiding (time)
+import           CoinbasePro.Request
 import           CoinbasePro.Types                  hiding (time)
 import           CoinbasePro.Unauthenticated
 
