@@ -12,7 +12,8 @@ module CoinbasePro.Request
 
     , run
     , runWithManager
-    , apiEndpoint
+    , runSandbox
+    , runSandboxWithManager
     ) where
 
 import           Control.Exception       (throw)
@@ -34,14 +35,23 @@ type RequestPath = String
 type Body        = String
 
 
-apiEndpoint :: String
-apiEndpoint = "api.pro.coinbase.com"
-
-
 run :: ClientM a -> IO a
 run f = flip runWithManager f =<< newManager tlsManagerSettings
 
 
 runWithManager :: Manager -> ClientM a -> IO a
 runWithManager mgr f = either throw return =<<
-    runClientM f (mkClientEnv mgr (BaseUrl Https apiEndpoint 443 mempty))
+    runClientM f (mkClientEnv mgr (BaseUrl Https production 443 mempty))
+  where
+    production = "api.pro.coinbase.com"
+
+
+runSandbox :: ClientM a -> IO a
+runSandbox f = flip runSandboxWithManager f =<< newManager tlsManagerSettings
+
+
+runSandboxWithManager :: Manager -> ClientM a -> IO a
+runSandboxWithManager mgr f = either throw return =<<
+    runClientM f (mkClientEnv mgr (BaseUrl Https sandbox 443 mempty))
+  where
+    sandbox = "api-public.sandbox.pro.coinbase.com"
