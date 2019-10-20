@@ -39,12 +39,13 @@ instance Show RequestMessageType where
     show Unsubscribe = "unsubscribe"
 
 
-data ChannelName = Heartbeat | Ticker | Level2 | Matches | Full
+data ChannelName = Heartbeat | Status | Ticker | Level2 | Matches | Full
     deriving (Eq, Ord)
 
 
 instance Show ChannelName where
     show Heartbeat = "heartbeat"
+    show Status    = "status"
     show Ticker    = "ticker"
     show Level2    = "level2"
     show Matches   = "matches"
@@ -53,6 +54,7 @@ instance Show ChannelName where
 
 instance ToJSON ChannelName where
     toJSON Heartbeat = toJSON $ show Heartbeat
+    toJSON Status    = toJSON $ show Status
     toJSON Ticker    = toJSON $ show Ticker
     toJSON Level2    = toJSON $ show Level2
     toJSON Matches   = toJSON $ show Matches
@@ -63,6 +65,7 @@ instance FromJSON ChannelName where
     parseJSON = withText "channel name" $ \t ->
       case t of
         "heartbeat" -> return Heartbeat
+        "status"    -> return Status
         "ticker"    -> return Ticker
         "level2"    -> return Level2
         "matches"   -> return Matches

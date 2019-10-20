@@ -19,6 +19,7 @@ import           CoinbasePro.WebSocketFeed.Channel.Heartbeat     (Heartbeat (..)
 import           CoinbasePro.WebSocketFeed.Channel.Level2        (L2Update (..),
                                                                   Snapshot (..))
 import qualified CoinbasePro.WebSocketFeed.Channel.Level2        as L2
+import           CoinbasePro.WebSocketFeed.Channel.Status        (Status (..))
 import           CoinbasePro.WebSocketFeed.Channel.Ticker        (Ticker (..))
 import           CoinbasePro.WebSocketFeed.Response              (Subscription)
 
@@ -27,6 +28,7 @@ data ChannelMessage =
     | ChangeMessage Change
     | DoneMessage Done
     | HeartbeatMessage Heartbeat
+    | StatusMessage Status
     | L2ChangeMessage L2.Change
     | L2SnapshotMessage Snapshot
     | L2UpdateMessage L2Update
@@ -46,6 +48,7 @@ instance FromJSON ChannelMessage where
           "change"        -> ChangeMessage <$> parseJSON (Object o)
           "done"          -> DoneMessage <$> parseJSON (Object o)
           "heartbeat"     -> HeartbeatMessage <$> parseJSON (Object o)
+          "status"        -> StatusMessage <$> parseJSON (Object o)
           "l2update"      -> L2UpdateMessage <$> parseJSON (Object o)
           "last_match"    -> MatchMessage <$> parseJSON (Object o)
           "match"         -> MatchMessage <$> parseJSON (Object o)

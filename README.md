@@ -50,7 +50,7 @@ Here is a list of implemented/unimplemented features:
 - Websocket Feed
     - [x] Channels
         - [x] The heartbeat channel
-        - [ ] The status channel
+        - [x] The status channel
         - [x] The ticker channel
         - [x] The level2 channel
         - [ ] The user channel
