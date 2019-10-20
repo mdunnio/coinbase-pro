@@ -17,14 +17,14 @@ import           CoinbasePro.Unauthenticated
 
 main :: IO ()
 main = do
-    stats btcusd >>= print
-    candles btcusd Nothing Nothing Minute >>= print
-    trades btcusd >>= print
-    time >>= print
-    products >>= print
-    aggregateOrderBook btcusd (Just Best) >>= print
-    aggregateOrderBook btcusd (Just TopFifty) >>= print
-    fullOrderBook btcusd >>= print
+    run (stats btcusd) >>= print
+    run (candles btcusd Nothing Nothing Minute) >>= print
+    run (trades btcusd) >>= print
+    run time >>= print
+    run products >>= print
+    run (aggregateOrderBook btcusd (Just Best)) >>= print
+    run (aggregateOrderBook btcusd (Just TopFifty)) >>= print
+    run (fullOrderBook btcusd) >>= print
     runCbAuthT cpc $ do
         accounts >>= liftIO . print
         account aid >>= liftIO . print
