@@ -1,11 +1,11 @@
-resolver: lts-12.5
+resolver: lts-14.17
 
 packages:
 - .
 
 extra-deps:
-  - unagi-streams-0.2.4
-  - unagi-chan-0.4.1.0
+  - unagi-streams-0.2.6
+  - unagi-chan-0.4.1.3
 
 system-ghc: false
 
