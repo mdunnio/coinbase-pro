@@ -13,7 +13,8 @@ category:       Web, Finance
 synopsis:       Client for Coinbase Pro
 
 extra-source-files:
-    README.md
+- README.md
+- changelog.md
 
 github: https://github.com/mdunnio/coinbase-pro
 
