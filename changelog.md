@@ -1,3 +1,6 @@
+# Version 0.7.2.0
+ - Upgraded to stack lts-14.17
+
 # Version 0.7.1.0
  - Fixed broken examples
 

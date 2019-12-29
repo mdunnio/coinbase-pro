@@ -1,5 +1,5 @@
 name:           coinbase-pro
-version:        0.7.1.0
+version:        0.7.2.0
 description:    Client for Coinbase Pro REST and Websocket APIs
 homepage:       https://github.com/mdunnio/coinbase-pro#readme
 bug-reports:    https://github.com/mdunnio/coinbase-pro/issues

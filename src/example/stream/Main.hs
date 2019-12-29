@@ -11,5 +11,5 @@ import           CoinbasePro.WebSocketFeed.Request (ChannelName (..))
 
 main :: IO ()
 main = do
-    msgs <- subscribeToFeed [ProductId "BTC-USD"] [Ticker]
+    msgs <- subscribeToFeed [ProductId "BTC-USD"] [Status]
     forever $ Streams.read msgs >>= print
