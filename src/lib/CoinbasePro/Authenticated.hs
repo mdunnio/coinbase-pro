@@ -43,7 +43,8 @@ import           CoinbasePro.Authenticated.Request  (CBAuthT (..), authRequest)
 import           CoinbasePro.Request                (RequestPath)
 
 
-import           CoinbasePro.Types                  (OrderId (..), OrderType,
+import           CoinbasePro.Types                  (ClientOrderId,
+                                                     OrderId (..), OrderType,
                                                      Price, ProductId (..),
                                                      Side, Size)
 
@@ -85,11 +86,20 @@ getOrder oid = authRequest methodGet (mkRequestPath "/orders") "" $ API.getOrder
 
 
 -- | https://docs.pro.coinbase.com/?javascript#place-a-new-order
-placeOrder :: ProductId -> Side -> Size -> Price -> Bool -> Maybe OrderType -> Maybe STP -> Maybe TimeInForce -> CBAuthT ClientM Order
-placeOrder prid sd sz price po ot stp tif =
+placeOrder :: Maybe ClientOrderId
+           -> ProductId
+           -> Side
+           -> Size
+           -> Price
+           -> Bool
+           -> Maybe OrderType
+           -> Maybe STP
+           -> Maybe TimeInForce
+           -> CBAuthT ClientM Order
+placeOrder clordid prid sd sz price po ot stp tif =
     authRequest methodPost "/orders" (LC8.unpack $ encode body) $ API.placeOrder body
   where
-    body = PlaceOrderBody prid sd sz price po ot stp tif
+    body = PlaceOrderBody clordid prid sd sz price po ot stp tif
 
 
 -- | https://docs.pro.coinbase.com/?javascript#cancel-an-order

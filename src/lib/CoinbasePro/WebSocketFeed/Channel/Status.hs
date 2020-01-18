@@ -6,10 +6,6 @@ module CoinbasePro.WebSocketFeed.Channel.Status
 
 import           Data.Aeson                   (FromJSON, parseJSON, withObject,
                                                (.:))
-import           Data.Aeson.Casing            (snakeCase)
-import           Data.Aeson.TH                (defaultOptions, deriveJSON,
-                                               fieldLabelModifier)
-import           Data.Text                    (Text)
 
 import           CoinbasePro.MarketData.Types (Product)
 import           CoinbasePro.Types            (Currency)

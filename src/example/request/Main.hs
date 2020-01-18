@@ -30,8 +30,8 @@ main = do
         account aid >>= liftIO . print
         fills (Just btcusd) Nothing >>= liftIO . print
         listOrders (Just [All]) (Just btcusd) >>= liftIO . print
-        placeOrder btcusd Sell (Size 0.001) (Price 99999.00) True Nothing Nothing Nothing >>= liftIO . print
-        placeOrder btcusd Buy (Size 1.0) (Price 1.00) True Nothing Nothing Nothing >>= liftIO . print
+        placeOrder Nothing btcusd Sell (Size 0.001) (Price 99999.00) True Nothing Nothing Nothing >>= liftIO . print
+        placeOrder Nothing btcusd Buy (Size 1.0) (Price 1.00) True Nothing Nothing Nothing >>= liftIO . print
         cancelAll (Just btcusd) >>= liftIO . print
   where
     accessKey  = CBAccessKey "accesskey"

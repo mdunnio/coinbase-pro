@@ -23,8 +23,9 @@ import           Data.Set          (Set, fromList)
 import           Data.Text         (pack, toLower, unpack)
 import           Web.HttpApiData   (ToHttpApiData (..))
 
-import           CoinbasePro.Types (CreatedAt, OrderId, OrderType, Price,
-                                    ProductId, Side, Size, filterOrderFieldName)
+import           CoinbasePro.Types (ClientOrderId, CreatedAt, OrderId,
+                                    OrderType, Price, ProductId, Side, Size,
+                                    filterOrderFieldName)
 
 
 -- TODO: All is not a status
@@ -110,7 +111,8 @@ deriveJSON defaultOptions {fieldLabelModifier = filterOrderFieldName . snakeCase
 
 
 data PlaceOrderBody = PlaceOrderBody
-    { bProductId :: ProductId
+    { bClientOid :: Maybe ClientOrderId
+    , bProductId :: ProductId
     , bSide      :: Side
     , bSize      :: Size
     , bPrice     :: Price

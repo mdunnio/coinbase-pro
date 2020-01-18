@@ -5,6 +5,7 @@
 
 module CoinbasePro.Types
     ( OrderId (..)
+    , ClientOrderId (..)
     , Price (..)
     , ProductId (..)
     , Sequence
@@ -23,9 +24,9 @@ module CoinbasePro.Types
     , filterOrderFieldName
     ) where
 
-import           Data.Aeson            (FromJSON, ToJSON, Value (Null),
-                                        parseJSON, toJSON, withArray,
-                                        withObject, withText, (.:), (.:?))
+import           Data.Aeson            (FromJSON, ToJSON, parseJSON, toJSON,
+                                        withArray, withObject, withText, (.:),
+                                        (.:?))
 import qualified Data.Aeson            as A
 import           Data.Aeson.Casing     (camelCase, snakeCase)
 import           Data.Aeson.TH         (constructorTagModifier, defaultOptions,
@@ -34,6 +35,7 @@ import           Data.Aeson.TH         (constructorTagModifier, defaultOptions,
 import           Data.Text             (Text, pack, toLower, unpack)
 import           Data.Time.Clock       (UTCTime)
 import           Data.Time.Clock.POSIX (posixSecondsToUTCTime)
+import           Data.UUID             (UUID)
 import qualified Data.Vector           as V
 import           Servant.API
 import           Text.Printf           (printf)
@@ -64,6 +66,15 @@ deriveJSON defaultOptions
     { fieldLabelModifier = snakeCase
     , unwrapUnaryRecords = True
     } ''OrderId
+
+
+newtype ClientOrderId = ClientOrderId { unClientOrderId :: UUID }
+    deriving (Eq, Ord, Show, ToHttpApiData)
+
+
+deriveJSON defaultOptions
+    { unwrapUnaryRecords = True
+    } ''ClientOrderId
 
 
 newtype ProductId = ProductId { unProductId :: Text }
