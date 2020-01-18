@@ -19,6 +19,8 @@ module CoinbasePro.Request
     , runSandbox
     , runSandbox_
     , runSandboxWithManager
+
+    , RunEnvironment
     ) where
 
 import           Control.Exception       (throw)
@@ -39,6 +41,9 @@ type CBRequest a = UserAgent -> ClientM a
 
 type RequestPath = String
 type Body        = String
+
+
+type RunEnvironment a = ClientM a -> IO a
 
 
 ------------------------------------------------------------------------------

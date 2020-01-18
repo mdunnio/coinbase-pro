@@ -47,7 +47,8 @@ import           CoinbasePro.Authenticated.Headers (CBAccessKey (..),
                                                     CBAccessSign (..),
                                                     CBAccessTimeStamp (..))
 import           CoinbasePro.Headers               (userAgent)
-import           CoinbasePro.Request               (Body, RequestPath, run)
+import           CoinbasePro.Request               (Body, RequestPath,
+                                                    RunEnvironment)
 
 
 newtype CBSecretKey = CBSecretKey String
@@ -65,8 +66,8 @@ newtype CBAuthT m a = CBAuthT { unCbAuth :: ReaderT CoinbaseProCredentials m a }
     deriving (Functor, Applicative, Monad, MonadIO, MonadTrans)
 
 
-runCbAuthT :: CoinbaseProCredentials -> CBAuthT ClientM a -> IO a
-runCbAuthT cpc = run . flip runReaderT cpc . unCbAuth
+runCbAuthT :: RunEnvironment a -> CoinbaseProCredentials -> CBAuthT ClientM a -> IO a
+runCbAuthT runEnv cpc = runEnv . flip runReaderT cpc . unCbAuth
 
 
 type instance AuthClientData (AuthProtect "CBAuth") = (CBAccessKey, CBAccessSign, CBAccessTimeStamp, CBAccessPassphrase)

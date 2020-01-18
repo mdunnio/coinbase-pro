@@ -25,7 +25,7 @@ main = do
     run (aggregateOrderBook btcusd (Just Best)) >>= print
     run (aggregateOrderBook btcusd (Just TopFifty)) >>= print
     run (fullOrderBook btcusd) >>= print
-    runCbAuthT cpc $ do
+    runCbAuthT run cpc $ do
         accounts >>= liftIO . print
         account aid >>= liftIO . print
         fills (Just btcusd) Nothing >>= liftIO . print

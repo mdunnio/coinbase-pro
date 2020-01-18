@@ -22,7 +22,6 @@ import           CoinbasePro.MarketData.Types              (AggregateBookLevel (
                                                             CBTime,
                                                             FullBookLevel (..),
                                                             Product, Trade)
-import           CoinbasePro.Request                       (run)
 import           CoinbasePro.Types                         (Candle,
                                                             CandleGranularity,
                                                             Currency, ProductId,
