@@ -7,6 +7,7 @@ module CoinbasePro.WebSocketFeed.Request
   , WebSocketFeedRequest (..)
 
   , wsEndpoint
+  , wsSandboxEndpoint
   ) where
 
 import           Data.Aeson              (FromJSON (..), ToJSON (..), object,
@@ -27,6 +28,13 @@ wsEndpoint :: WSConnection
 wsEndpoint = WSConnection h p
   where
     h = "ws-feed.pro.coinbase.com"
+    p = 443
+
+
+wsSandboxEndpoint :: WSConnection
+wsSandboxEndpoint = WSConnection h p
+  where
+    h = "ws-feed-public.sandbox.pro.coinbase.com"
     p = 443
 
 
