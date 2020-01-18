@@ -6,6 +6,7 @@ module CoinbasePro.Authenticated.API
     ( accounts
     , singleAccount
     , listOrders
+    , getOrder
     , placeOrder
     , cancelOrder
     , cancelAll
@@ -36,6 +37,7 @@ import           CoinbasePro.Types                  (OrderId (..),
 type API =    "accounts" :> AuthGet [Account]
          :<|> "accounts" :> Capture "account-id" AccountId :> AuthGet Account
          :<|> "orders" :> QueryParams "status" Status :> QueryParam "product_id" ProductId :> AuthGet [Order]
+         :<|> "orders" :> Capture "order_id" OrderId :> AuthGet Order
          :<|> "orders" :> ReqBody '[JSON] PlaceOrderBody :> AuthPost Order
          :<|> "orders" :> Capture "order_id" OrderId :> AuthDelete NoContent
          :<|> "orders" :> QueryParam "product_id" ProductId :> AuthDelete [OrderId]
@@ -51,10 +53,11 @@ api = Proxy
 accounts :: AuthenticatedRequest (AuthProtect "CBAuth") -> ClientM [Account]
 singleAccount :: AccountId -> AuthenticatedRequest (AuthProtect "CBAuth") -> ClientM Account
 listOrders :: [Status] -> Maybe ProductId -> AuthenticatedRequest (AuthProtect "CBAuth") -> ClientM [Order]
+getOrder :: OrderId -> AuthenticatedRequest (AuthProtect "CBAuth") -> ClientM Order
 placeOrder :: PlaceOrderBody -> AuthenticatedRequest (AuthProtect "CBAuth") -> ClientM Order
 cancelOrder :: OrderId -> AuthenticatedRequest (AuthProtect "CBAuth") -> ClientM NoContent
 cancelAll :: Maybe ProductId -> AuthenticatedRequest (AuthProtect "CBAuth") -> ClientM [OrderId]
 fills :: Maybe ProductId -> Maybe OrderId -> AuthenticatedRequest (AuthProtect "CBAuth") -> ClientM [Fill]
 fees :: AuthenticatedRequest (AuthProtect "CBAuth") -> ClientM Fees
 trailingVolume :: AuthenticatedRequest (AuthProtect "CBAuth") -> ClientM [TrailingVolume]
-accounts :<|> singleAccount :<|> listOrders :<|> placeOrder :<|> cancelOrder :<|> cancelAll :<|> fills :<|> fees :<|> trailingVolume = client api
+accounts :<|> singleAccount :<|> listOrders :<|> getOrder :<|> placeOrder :<|> cancelOrder :<|> cancelAll :<|> fills :<|> fees :<|> trailingVolume = client api

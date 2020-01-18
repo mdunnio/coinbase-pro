@@ -21,12 +21,12 @@ Here is a list of implemented/unimplemented features:
         - [x] Get An Account
         - [ ] Get Account History
         - [ ] Get Holds
-    - [ ] Orders
+    - [x] Orders
         - [x] Place a New Order
         - [x] Cancel an Order
         - [x] Cancel all
         - [x] List Orders
-        - [ ] Get an Order
+        - [x] Get an Order
     - [x] Fills
         - [x] List Fills
     - [ ] Deposits

@@ -6,6 +6,7 @@ module CoinbasePro.Authenticated
   ( accounts
   , account
   , listOrders
+  , getOrder
   , placeOrder
   , cancelOrder
   , cancelAll
@@ -74,6 +75,13 @@ listOrders st prid = authRequest methodGet (mkRequestPath "/orders") "" $ API.li
 
     defaultStatus :: Maybe [Status] -> [Status]
     defaultStatus = fromMaybe [All]
+
+
+-- | https://docs.pro.coinbase.com/#get-an-order
+getOrder :: OrderId -> CBAuthT ClientM Order
+getOrder oid = authRequest methodGet (mkRequestPath "/orders") "" $ API.getOrder oid
+  where
+    mkRequestPath rp = rp ++ "/" ++ unpack (unOrderId oid)
 
 
 -- | https://docs.pro.coinbase.com/?javascript#place-a-new-order
