@@ -1,5 +1,8 @@
 resolver: lts-14.17
 
+ghc-options:
+  "$locals": -Wall
+
 packages:
 - .
 
