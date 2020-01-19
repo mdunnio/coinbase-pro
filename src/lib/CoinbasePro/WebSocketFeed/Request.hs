@@ -1,3 +1,4 @@
+{-# LANGUAGE LambdaCase        #-}
 {-# LANGUAGE OverloadedStrings #-}
 
 module CoinbasePro.WebSocketFeed.Request
@@ -5,17 +6,22 @@ module CoinbasePro.WebSocketFeed.Request
   , RequestMessageType (..)
   , ChannelName(..)
   , WebSocketFeedRequest (..)
+  , AuthenticatedWebSocketFeedRequest (..)
 
   , wsEndpoint
   , wsSandboxEndpoint
   ) where
 
-import           Data.Aeson              (FromJSON (..), ToJSON (..), object,
-                                          withText, (.=))
-import           Network.Socket          (HostName)
-import           Network.Socket.Internal (PortNumber)
+import           Data.Aeson                        (FromJSON (..), ToJSON (..),
+                                                    object, withText, (.=))
+import           Network.Socket                    (HostName)
+import           Network.Socket.Internal           (PortNumber)
 
-import           CoinbasePro.Types       (ProductId)
+import           CoinbasePro.Authenticated.Headers (CBAccessKey (..),
+                                                    CBAccessPassphrase (..),
+                                                    CBAccessSign (..),
+                                                    CBAccessTimeStamp (..))
+import           CoinbasePro.Types                 (ProductId)
 
 
 data WSConnection = WSConnection
@@ -70,8 +76,7 @@ instance ToJSON ChannelName where
 
 
 instance FromJSON ChannelName where
-    parseJSON = withText "channel name" $ \t ->
-      case t of
+    parseJSON = withText "channel name" $ \case
         "heartbeat" -> return Heartbeat
         "status"    -> return Status
         "ticker"    -> return Ticker
@@ -93,4 +98,24 @@ instance ToJSON WebSocketFeedRequest where
         [ "type" .= show rmt
         , "product_ids" .= rpi
         , "channels" .= rc
+        ]
+
+data AuthenticatedWebSocketFeedRequest = AuthenticatedWebSocketFeedRequest
+    { request      :: WebSocketFeedRequest
+    , cbSig        :: CBAccessSign
+    , cbKey        :: CBAccessKey
+    , cbPassphrase :: CBAccessPassphrase
+    , cbTimestamp  :: CBAccessTimeStamp
+    } deriving (Eq)
+
+
+instance ToJSON AuthenticatedWebSocketFeedRequest where
+    toJSON (AuthenticatedWebSocketFeedRequest req s k p t) = object
+        [ "type" .= show (reqMsgType req)
+        , "product_ids" .= reqProductIds req
+        , "channels" .= reqChannels req
+        , "signature" .= s
+        , "key" .= k
+        , "passphrase" .= p
+        , "timestamp" .= t
         ]

@@ -23,6 +23,7 @@ import           CoinbasePro.WebSocketFeed.Channel.Status        (Status (..))
 import           CoinbasePro.WebSocketFeed.Channel.Ticker        (Ticker (..))
 import           CoinbasePro.WebSocketFeed.Response              (Subscription)
 
+
 data ChannelMessage =
       ActivateMessage Activate
     | ChangeMessage Change

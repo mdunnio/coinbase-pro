@@ -53,7 +53,7 @@ Here is a list of implemented/unimplemented features:
         - [x] The status channel
         - [x] The ticker channel
         - [x] The level2 channel
-        - [ ] The user channel
+        - [x] The user channel
         - [x] The matches channel
         - [x] The full channel
 - FIX API
@@ -88,7 +88,7 @@ To print out all of the full order book updates for BTC-USD:
 ```haskell
 main :: IO ()
 main = do
-    msgs <- subscribeToFeed [ProductId "BTC-USD"] [Ticker]
+    msgs <- subscribeToFeed [ProductId "BTC-USD"] [Ticker] Nothing
     forever $ Streams.read msgs >>= print
 ```
 
