@@ -16,6 +16,8 @@ module CoinbasePro.Authenticated.Request
     , AuthDelete
 
     , authRequest
+    , mkCBAccessSign
+    , mkCBAccessTimeStamp
     ) where
 
 import           Control.Monad.IO.Class            (MonadIO, liftIO)
