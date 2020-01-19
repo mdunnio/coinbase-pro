@@ -9,6 +9,8 @@ module CoinbasePro.Types
     , Price (..)
     , ProductId (..)
     , Sequence
+    , UserId
+    , ProfileId
     , Side (..)
     , Size (..)
     , Volume (..)
@@ -41,7 +43,10 @@ import           Servant.API
 import           Text.Printf           (printf)
 
 
-type Sequence = Int
+type UserId    = Text
+type ProfileId = Text
+type Sequence  = Int
+
 
 data Side = Buy | Sell
     deriving (Eq, Ord, Show)

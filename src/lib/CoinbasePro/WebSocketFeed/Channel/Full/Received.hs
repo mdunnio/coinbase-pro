@@ -9,8 +9,8 @@ import           Data.Time.Clock   (UTCTime)
 import           Data.UUID         (fromString)
 
 import           CoinbasePro.Types (ClientOrderId (..), Funds, OrderId,
-                                    OrderType, Price, ProductId, Sequence, Side,
-                                    Size)
+                                    OrderType, Price, ProductId, ProfileId,
+                                    Sequence, Side, Size, UserId)
 
 
 data Received = Received
@@ -24,6 +24,8 @@ data Received = Received
     , funds     :: Maybe Funds
     , side      :: Side
     , orderType :: OrderType
+    , userId    :: Maybe UserId
+    , profileId :: Maybe ProfileId
     } deriving (Eq, Ord, Show)
 
 
@@ -39,4 +41,6 @@ instance FromJSON Received where
         fs    <- o .:? "funds"
         sd    <- o .: "side"
         ot    <- o .: "order_type"
-        return $ Received t prd sq oid cloid sz px fs sd ot
+        ui    <- o .:? "user_id"
+        pfid  <- o .:? "profile_id"
+        return $ Received t prd sq oid cloid sz px fs sd ot ui pfid

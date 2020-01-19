@@ -10,8 +10,8 @@ import           Data.Aeson.TH     (defaultOptions, deriveJSON,
                                     fieldLabelModifier)
 import           Data.Time.Clock   (UTCTime)
 
-import           CoinbasePro.Types (OrderId, Price, ProductId, Sequence, Side,
-                                    Size)
+import           CoinbasePro.Types (OrderId, Price, ProductId, ProfileId,
+                                    Sequence, Side, Size, UserId)
 
 
 type TradeId = Int
@@ -27,6 +27,8 @@ data Match = Match
     , size         :: Size
     , price        :: Price
     , side         :: Side
+    , userId       :: Maybe UserId
+    , profileId    :: Maybe ProfileId
     } deriving (Eq, Ord, Show)
 
 

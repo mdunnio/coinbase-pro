@@ -13,8 +13,8 @@ import           Data.Aeson.TH     (defaultOptions, deriveJSON,
 import           Data.Text         (Text)
 import           Data.Time.Clock   (UTCTime)
 
-import           CoinbasePro.Types (OrderId, Price, ProductId, Sequence, Side,
-                                    Size)
+import           CoinbasePro.Types (OrderId, Price, ProductId, ProfileId,
+                                    Sequence, Side, Size, UserId)
 
 
 type Reason = Text
@@ -36,6 +36,8 @@ data Done = Done
     , reason        :: Reason
     , side          :: Side
     , remainingSize :: Maybe Size
+    , userId        :: Maybe UserId
+    , profileId     :: Maybe ProfileId
     } deriving (Eq, Ord, Show)
 
 

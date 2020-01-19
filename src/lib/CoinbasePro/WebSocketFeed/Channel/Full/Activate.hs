@@ -11,12 +11,10 @@ import           Data.Aeson.TH     (defaultOptions, deriveJSON,
 import           Data.Text         (Text)
 import           Data.Time.Clock   (UTCTime)
 
-import           CoinbasePro.Types (Funds, OrderId, Price, ProductId, Side,
-                                    Size)
+import           CoinbasePro.Types (Funds, OrderId, Price, ProductId, ProfileId,
+                                    Side, Size, UserId)
 
 
-type UserId       = Int
-type ProfileId    = Text
 type StopType     = Text
 type TakerFeeRate = Double
 
@@ -24,8 +22,6 @@ type TakerFeeRate = Double
 data Activate = Activate
     { productId    :: ProductId
     , timestamp    :: UTCTime
-    , userId       :: UserId
-    , profileId    :: ProfileId
     , orderId      :: OrderId
     , stopType     :: StopType
     , side         :: Side
@@ -34,6 +30,8 @@ data Activate = Activate
     , funds        :: Funds
     , takerFeeRate :: TakerFeeRate
     , private      :: Bool
+    , userId       :: UserId
+    , profileId    :: ProfileId
     } deriving (Eq, Ord, Show)
 
 
