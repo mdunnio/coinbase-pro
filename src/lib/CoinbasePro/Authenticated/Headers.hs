@@ -5,6 +5,7 @@ module CoinbasePro.Authenticated.Headers
     , CBAccessPassphrase(..)
     ) where
 
+import           Data.Aeson         (ToJSON (..), Value (String))
 import           Data.ByteString    (ByteString)
 import           Data.Text          (pack)
 import           Data.Text.Encoding (decodeUtf8)
@@ -20,6 +21,10 @@ instance ToHttpApiData CBAccessKey where
     toQueryParam (CBAccessKey k) = pack k
 
 
+instance ToJSON CBAccessKey where
+    toJSON (CBAccessKey k) = String $ pack k
+
+
 newtype CBAccessSign = CBAccessSign ByteString
     deriving (Eq, Show)
 
@@ -27,6 +32,10 @@ newtype CBAccessSign = CBAccessSign ByteString
 instance ToHttpApiData CBAccessSign where
     toUrlPiece (CBAccessSign s)   = decodeUtf8 s
     toQueryParam (CBAccessSign s) = decodeUtf8 s
+
+
+instance ToJSON CBAccessSign where
+    toJSON (CBAccessSign s) = String $ decodeUtf8 s
 
 
 newtype CBAccessTimeStamp = CBAccessTimeStamp String
@@ -38,8 +47,16 @@ instance ToHttpApiData CBAccessTimeStamp where
     toQueryParam (CBAccessTimeStamp ts) = pack ts
 
 
+instance ToJSON CBAccessTimeStamp where
+    toJSON (CBAccessTimeStamp ts) = String $ pack ts
+
+
 newtype CBAccessPassphrase = CBAccessPassphrase String
     deriving (Eq, Show)
+
+
+instance ToJSON CBAccessPassphrase where
+    toJSON (CBAccessPassphrase p) = String $ pack p
 
 
 instance ToHttpApiData CBAccessPassphrase where
