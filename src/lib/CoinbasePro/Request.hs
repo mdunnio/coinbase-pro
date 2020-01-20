@@ -13,7 +13,7 @@ module CoinbasePro.Request
     , run_
     , runWithManager
 
-    , RunEnvironment
+    , Runner
     ) where
 
 import           Control.Exception       (throw)
@@ -37,7 +37,7 @@ type RequestPath = String
 type Body        = String
 
 
-type RunEnvironment a = ClientM a -> IO a
+type Runner a = ClientM a -> IO a
 
 
 ------------------------------------------------------------------------------
