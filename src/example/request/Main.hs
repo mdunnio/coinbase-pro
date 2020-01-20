@@ -9,6 +9,7 @@ import           CoinbasePro.Authenticated.Accounts
 import           CoinbasePro.Authenticated.Headers
 import           CoinbasePro.Authenticated.Orders
 import           CoinbasePro.Authenticated.Request
+import           CoinbasePro.Environment
 import           CoinbasePro.MarketData.Types       hiding (time)
 import           CoinbasePro.Request
 import           CoinbasePro.Types                  hiding (time)
@@ -17,15 +18,15 @@ import           CoinbasePro.Unauthenticated
 
 main :: IO ()
 main = do
-    run (stats btcusd) >>= print
-    run (candles btcusd Nothing Nothing Minute) >>= print
-    run (trades btcusd) >>= print
-    run time >>= print
-    run products >>= print
-    run (aggregateOrderBook btcusd (Just Best)) >>= print
-    run (aggregateOrderBook btcusd (Just TopFifty)) >>= print
-    run (fullOrderBook btcusd) >>= print
-    runCbAuthT run cpc $ do
+    run Production (stats btcusd) >>= print
+    run Production (candles btcusd Nothing Nothing Minute) >>= print
+    run Production (trades btcusd) >>= print
+    run Production time >>= print
+    run Production products >>= print
+    run Production (aggregateOrderBook btcusd (Just Best)) >>= print
+    run Production (aggregateOrderBook btcusd (Just TopFifty)) >>= print
+    run Production (fullOrderBook btcusd) >>= print
+    runCbAuthT (run Production) cpc $ do
         accounts >>= liftIO . print
         account aid >>= liftIO . print
         fills (Just btcusd) Nothing >>= liftIO . print

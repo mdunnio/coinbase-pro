@@ -1,7 +1,6 @@
-{-# LANGUAGE DataKinds         #-}
-{-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE TypeFamilies      #-}
-{-# LANGUAGE TypeOperators     #-}
+{-# LANGUAGE DataKinds     #-}
+{-# LANGUAGE TypeFamilies  #-}
+{-# LANGUAGE TypeOperators #-}
 
 module CoinbasePro.Request
     ( RequestPath
@@ -10,15 +9,9 @@ module CoinbasePro.Request
     , CBGet
     , CBRequest
 
-    -- * Production
     , run
     , run_
     , runWithManager
-
-    -- * Sandbox
-    , runSandbox
-    , runSandbox_
-    , runSandboxWithManager
 
     , RunEnvironment
     ) where
@@ -30,6 +23,7 @@ import           Network.HTTP.Client.TLS (tlsManagerSettings)
 import           Servant.API             ((:>), Get, JSON)
 import           Servant.Client
 
+import           CoinbasePro.Environment (Environment, apiEndpoint)
 import           CoinbasePro.Headers     (UserAgent, UserAgentHeader)
 
 
@@ -49,16 +43,18 @@ type RunEnvironment a = ClientM a -> IO a
 ------------------------------------------------------------------------------
 -- | Runs a coinbase pro HTTPS request and returns the result `a`
 --
--- > run products >>= print
+-- > run Production products >>= print
 --
-run :: ClientM a -> IO a
-run f = flip runWithManager f =<< newManager tlsManagerSettings
+run :: Environment -> ClientM a -> IO a
+run env f = do
+    mgr <- newManager tlsManagerSettings
+    runWithManager mgr env f
 
 
 ------------------------------------------------------------------------------
 -- | Same as 'run', except uses `()` instead of a type `a`
-run_ :: ClientM a -> IO ()
-run_ = void . run
+run_ :: Environment -> ClientM a -> IO ()
+run_ = (void .) . run
 
 
 ------------------------------------------------------------------------------
@@ -68,43 +64,12 @@ run_ = void . run
 -- @
 -- do $
 -- mgr  <- newManager tlsManagerSettings
--- prds <- runWithManager mgr products
+-- prds <- runWithManager mgr Production products
 -- print prds
 -- @
 --
-runWithManager :: Manager -> ClientM a -> IO a
-runWithManager mgr f = either throw return =<<
-    runClientM f (mkClientEnv mgr (BaseUrl Https production 443 mempty))
+runWithManager :: Manager -> Environment -> ClientM a -> IO a
+runWithManager mgr env f = either throw return =<<
+    runClientM f (mkClientEnv mgr (BaseUrl Https api 443 mempty))
   where
-    production = "api.pro.coinbase.com"
-
-------------------------------------------------------------------------------
--- | Runs a coinbase pro HTTPS request in sandbox and returns the result 'a'
---
--- > run products >>= print
---
-runSandbox :: ClientM a -> IO a
-runSandbox f = flip runSandboxWithManager f =<< newManager tlsManagerSettings
-
-
-------------------------------------------------------------------------------
--- | Same as 'runSandbox', except uses '()' instead of a type 'a'
-runSandbox_ :: ClientM a -> IO ()
-runSandbox_ = void . runSandbox
-
-
-------------------------------------------------------------------------------
--- | Allows the user to use their own 'Network.HTTP.Client.Types.ManagerSettings`
---
--- @
--- do $
--- mgr  <- newManager tlsManagerSettings
--- prds <- runSandboxWithManager mgr products
--- print prds
--- @
---
-runSandboxWithManager :: Manager -> ClientM a -> IO a
-runSandboxWithManager mgr f = either throw return =<<
-    runClientM f (mkClientEnv mgr (BaseUrl Https sandbox 443 mempty))
-  where
-    sandbox = "api-public.sandbox.pro.coinbase.com"
+    api = apiEndpoint env

@@ -1,6 +1,5 @@
 module CoinbasePro.WebSocketFeed
     ( subscribeToFeed
-    , subscribeToSandboxFeed
     ) where
 
 import           Control.Concurrent                 (forkIO)
@@ -10,8 +9,6 @@ import           Data.Aeson                         (eitherDecode', encode)
 import           Data.Either                        (either)
 import           Data.Maybe                         (maybe)
 import           Network.HTTP.Types                 (methodGet)
-import           Network.Socket                     (HostName)
-import           Network.Socket.Internal            (PortNumber)
 import qualified Network.WebSockets                 as WS
 import qualified System.IO.Streams                  as Streams
 import           System.IO.Streams.Concurrent.Unagi (makeChanPipe)
@@ -20,33 +17,23 @@ import qualified Wuss                               as WU
 import           CoinbasePro.Authenticated.Request  (CoinbaseProCredentials (..),
                                                      mkCBAccessSign,
                                                      mkCBAccessTimeStamp)
+import           CoinbasePro.Environment            (Environment,
+                                                     WSConnection (..),
+                                                     wsEndpoint)
 import           CoinbasePro.Types                  (ProductId)
 import           CoinbasePro.WebSocketFeed.Channel  (ChannelMessage (..))
 import           CoinbasePro.WebSocketFeed.Request  (AuthenticatedWebSocketFeedRequest (..),
                                                      ChannelName (..),
                                                      RequestMessageType (..),
-                                                     WebSocketFeedRequest (..),
-                                                     wsEndpoint,
-                                                     wsSandboxEndpoint)
-import qualified CoinbasePro.WebSocketFeed.Request  as WR
+                                                     WebSocketFeedRequest (..))
 
 
-subscribeToFeed :: [ProductId] -> [ChannelName] -> Maybe CoinbaseProCredentials -> IO (Streams.InputStream ChannelMessage)
-subscribeToFeed = subscribe wsHost wsPort
-  where
-    wsHost = WR.host wsEndpoint
-    wsPort = WR.port wsEndpoint
+subscribeToFeed :: [ProductId] -> [ChannelName] -> Environment -> Maybe CoinbaseProCredentials -> IO (Streams.InputStream ChannelMessage)
+subscribeToFeed prds channels env = subscribe (wsEndpoint env) prds channels
 
 
-subscribeToSandboxFeed :: [ProductId] -> [ChannelName] -> Maybe CoinbaseProCredentials -> IO (Streams.InputStream ChannelMessage)
-subscribeToSandboxFeed = subscribe wsHost wsPort
-  where
-    wsHost = WR.host wsSandboxEndpoint
-    wsPort = WR.port wsSandboxEndpoint
-
-
-subscribe :: HostName -> PortNumber -> [ProductId] -> [ChannelName] -> Maybe CoinbaseProCredentials -> IO (Streams.InputStream ChannelMessage)
-subscribe wsHost wsPort prids channels cpc = do
+subscribe :: WSConnection -> [ProductId] -> [ChannelName] -> Maybe CoinbaseProCredentials -> IO (Streams.InputStream ChannelMessage)
+subscribe wsConn prids channels cpc = do
     (is, os) <- makeChanPipe
     req      <- mkWsRequest cpc
 
@@ -56,6 +43,9 @@ subscribe wsHost wsPort prids channels cpc = do
 
     return is
   where
+    wsHost = host wsConn
+    wsPort = port wsConn
+
     mkWsRequest = maybe (return $ encode wsRequest) (fmap encode . authWsRequest)
 
     wsRequest = WebSocketFeedRequest Subscribe prids channels
