@@ -37,7 +37,7 @@ import           Data.Aeson.TH         (constructorTagModifier, defaultOptions,
 import           Data.Text             (Text, pack, toLower, unpack)
 import           Data.Time.Clock       (UTCTime)
 import           Data.Time.Clock.POSIX (posixSecondsToUTCTime)
-import           Data.UUID             (UUID)
+import           Data.UUID             (UUID, toText)
 import qualified Data.Vector           as V
 import           Servant.API
 import           Text.Printf           (printf)
@@ -74,7 +74,11 @@ deriveJSON defaultOptions
 
 
 newtype ClientOrderId = ClientOrderId { unClientOrderId :: UUID }
-    deriving (Eq, Ord, Show, ToHttpApiData)
+    deriving (Eq, Ord, Show)
+
+
+instance ToHttpApiData ClientOrderId where
+    toUrlPiece = ("client:" <>) . toText . unClientOrderId
 
 
 deriveJSON defaultOptions

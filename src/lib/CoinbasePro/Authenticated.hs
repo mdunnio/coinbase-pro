@@ -7,6 +7,7 @@ module CoinbasePro.Authenticated
   , account
   , listOrders
   , getOrder
+  , getClientOrder
   , placeOrder
   , cancelOrder
   , cancelAll
@@ -24,6 +25,7 @@ import           Data.Maybe                         (fromMaybe)
 import qualified Data.Set                           as S
 import           Data.Text                          (Text, pack, toLower,
                                                      unpack)
+import           Data.UUID                          (toString)
 import           Network.HTTP.Types                 (SimpleQuery,
                                                      SimpleQueryItem,
                                                      methodDelete, methodGet,
@@ -43,7 +45,7 @@ import           CoinbasePro.Authenticated.Request  (CBAuthT (..), authRequest)
 import           CoinbasePro.Request                (RequestPath)
 
 
-import           CoinbasePro.Types                  (ClientOrderId,
+import           CoinbasePro.Types                  (ClientOrderId (..),
                                                      OrderId (..), OrderType,
                                                      Price, ProductId (..),
                                                      Side, Size)
@@ -83,6 +85,13 @@ getOrder :: OrderId -> CBAuthT ClientM Order
 getOrder oid = authRequest methodGet (mkRequestPath "/orders") "" $ API.getOrder oid
   where
     mkRequestPath rp = rp ++ "/" ++ unpack (unOrderId oid)
+
+
+-- | https://docs.pro.coinbase.com/#get-an-order
+getClientOrder :: ClientOrderId -> CBAuthT ClientM Order
+getClientOrder cloid = authRequest methodGet (mkRequestPath "/orders/client:") "" $ API.getClientOrder cloid
+  where
+    mkRequestPath rp = rp ++ toString (unClientOrderId cloid)
 
 
 -- | https://docs.pro.coinbase.com/?javascript#place-a-new-order
