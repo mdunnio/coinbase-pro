@@ -1,5 +1,5 @@
 name:           coinbase-pro
-version:        0.8.0.0
+version:        0.8.1.0
 description:    Client for Coinbase Pro REST and Websocket APIs
 homepage:       https://github.com/mdunnio/coinbase-pro#readme
 bug-reports:    https://github.com/mdunnio/coinbase-pro/issues
@@ -35,12 +35,12 @@ dependencies:
   - http-types           >= 0.12 && < 0.13
   - io-streams           >= 1.5  && < 1.6
   - memory               >= 0.14 && < 0.16
-  - network              >= 2.6  && < 2.9
+  - network              >= 2.6  && < 3.2
   - servant              >= 0.14 && < 0.17
   - servant-client       >= 0.14 && < 0.17
   - servant-client-core  >= 0.14 && < 0.17
   - text                 >= 1.2  && < 1.3
-  - time                 >= 1.8  && < 1.9
+  - time                 >= 1.8  && < 2.0
   - transformers         >= 0.5  && < 0.6
   - unagi-streams        >= 0.2  && < 0.3
   - unordered-containers >= 0.2  && < 0.3

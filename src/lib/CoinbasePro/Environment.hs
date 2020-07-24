@@ -7,8 +7,7 @@ module CoinbasePro.Environment
     ) where
 
 
-import           Network.Socket          (HostName)
-import           Network.Socket.Internal (PortNumber)
+import           Network.Socket (HostName)
 
 
 data Environment = Production | Sandbox
@@ -29,7 +28,7 @@ sandboxAPIEndpoint = "api-public.sandbox.pro.coinbase.com"
 
 data WSConnection = WSConnection
     { host :: HostName
-    , port :: PortNumber
+    , port :: Int
     } deriving (Eq, Show)
 
 

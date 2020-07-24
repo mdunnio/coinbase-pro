@@ -6,8 +6,6 @@ import           Control.Concurrent                 (forkIO)
 import           Control.Monad                      (forever)
 import           Control.Monad.IO.Class             (liftIO)
 import           Data.Aeson                         (eitherDecode', encode)
-import           Data.Either                        (either)
-import           Data.Maybe                         (maybe)
 import           Network.HTTP.Types                 (methodGet)
 import qualified Network.WebSockets                 as WS
 import qualified System.IO.Streams                  as Streams
@@ -44,7 +42,7 @@ subscribe wsConn prids channels cpc = do
     return is
   where
     wsHost = host wsConn
-    wsPort = port wsConn
+    wsPort = fromIntegral $ port wsConn
 
     mkWsRequest = maybe (return $ encode wsRequest) (fmap encode . authWsRequest)
 
