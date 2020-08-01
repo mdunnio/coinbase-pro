@@ -1,6 +1,6 @@
 # Version 0.8.1.0
 
-- Upgraded to lts-16.6 (ghc 8.8.3)
+- Upgraded to lts-16.7 (ghc 8.8.3)
 
 # Version 0.8.0.0
 
