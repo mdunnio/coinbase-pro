@@ -1,6 +1,11 @@
+# Version 0.8.2.0
+
+- Changed `port` in `WSConnection` back to `PortNumber` instead of `Int`
+
 # Version 0.8.1.0
 
 - Upgraded to lts-16.7 (ghc 8.8.3)
+- Changed `port` in `WSConnection` to `Int` instead of `PortNumber`
 
 # Version 0.8.0.0
 
