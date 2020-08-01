@@ -42,7 +42,7 @@ subscribe wsConn prids channels cpc = do
     return is
   where
     wsHost = host wsConn
-    wsPort = fromIntegral $ port wsConn
+    wsPort = port wsConn
 
     mkWsRequest = maybe (return $ encode wsRequest) (fmap encode . authWsRequest)
 
