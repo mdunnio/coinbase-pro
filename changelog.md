@@ -1,3 +1,7 @@
+# Version 0.8.3.0
+
+- Upgraded to nightly-2020-09-10 (ghc 8.10.2) in preparation for a new 8.10 LTS.
+
 # Version 0.8.2.0
 
 - Changed `port` in `WSConnection` back to `PortNumber` instead of `Int`

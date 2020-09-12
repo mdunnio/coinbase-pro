@@ -5,12 +5,26 @@
 
 packages:
 - completed:
-    hackage: unagi-streams-0.2.6@sha256:32f4ba71b07b0fb68ed2e4d1489c063f72d32c321e2d485485f602eb10e12acb,1145
+    hackage: base64-bytestring-1.0.0.3@sha256:6c82d900465345e30ff0eeb9a1374fbd2955c8e5ca6206e03669f04575830f88,2242
     pantry-tree:
-      size: 329
-      sha256: f8f9d8089c62c9e7a6265a018a01585dec0bbd6d8cde20bd53e47e3fa4575c5c
+      size: 848
+      sha256: 580b3808ee3ee06468d56808639a6b46615ff385c64d977423817434d17a9888
   original:
-    hackage: unagi-streams-0.2.6
+    hackage: base64-bytestring-1.0.0.3@sha256:6c82d900465345e30ff0eeb9a1374fbd2955c8e5ca6206e03669f04575830f88,2242
+- completed:
+    hackage: servant-client-0.18@sha256:3e3b8d145cf811e19849744ad305aa0bd42301d01ff75e1dac169bc9f5d18221,4589
+    pantry-tree:
+      size: 1299
+      sha256: 445c610d83a6e356ed2a7808af8deac84708be3e44d38cbf76e60fd6105f9715
+  original:
+    hackage: servant-client-0.18@sha256:3e3b8d145cf811e19849744ad305aa0bd42301d01ff75e1dac169bc9f5d18221,4589
+- completed:
+    hackage: servant-client-core-0.18@sha256:6702f04f3e5ac47abace5b26ab1948480437334747895407f0697502a403b96a,3593
+    pantry-tree:
+      size: 1444
+      sha256: 20f538ae12091696073a2ac5f3301a4a56686f5e2889b2a9e539c0d61a332cd1
+  original:
+    hackage: servant-client-core-0.18@sha256:6702f04f3e5ac47abace5b26ab1948480437334747895407f0697502a403b96a,3593
 - completed:
     hackage: unagi-chan-0.4.1.3@sha256:4283bb02bc5ee56203671756d92b24112eb6159f2b2840a10a539b4651d5f12e,8719
     pantry-tree:
@@ -20,7 +34,7 @@ packages:
     hackage: unagi-chan-0.4.1.3
 snapshots:
 - completed:
-    size: 531932
-    url: https://raw.githubusercontent.com/commercialhaskell/stackage-snapshots/master/lts/16/7.yaml
-    sha256: 96ceeddd4fd68b2d430f7695a12eadefee760b7034c88c75d99d0f380f483068
-  original: lts-16.7
+    size: 529075
+    url: https://raw.githubusercontent.com/commercialhaskell/stackage-snapshots/master/nightly/2020/9/10.yaml
+    sha256: 1dd058cc420674fc58fe42de6358baf6641aaf48b92def986b87258906176101
+  original: nightly-2020-09-10
