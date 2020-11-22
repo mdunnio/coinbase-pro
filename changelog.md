@@ -1,6 +1,7 @@
 # Version 0.8.3.0
 
 - Upgraded to nightly-2020-09-10 (ghc 8.10.2) in preparation for a new 8.10 LTS.
+- Added hie.yaml for use with haskell-language-server (hls)
 
 # Version 0.8.2.0
 

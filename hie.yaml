@@ -1,0 +1,8 @@
+cradle:
+  stack:
+    - path: "./src/example/request/Main.hs"
+      component: "coinbase-pro:exe:test-request"
+    - path: "./src/example/stream/Main.hs"
+      component: "coinbase-pro:exe:test-streame"
+    - path: "./src/lib/"
+      component: "coinbase-pro:lib"
