@@ -6,23 +6,24 @@ module CoinbasePro.Authenticated.Headers
     ) where
 
 import           Data.Aeson         (ToJSON (..), Value (String))
+import qualified Data.Aeson         as A
 import           Data.ByteString    (ByteString)
-import           Data.Text          (pack)
+import           Data.Text          (Text)
 import           Data.Text.Encoding (decodeUtf8)
 import           Web.HttpApiData    (ToHttpApiData (..))
 
 
-newtype CBAccessKey = CBAccessKey String
+newtype CBAccessKey = CBAccessKey Text
     deriving (Eq, Show)
 
 
 instance ToHttpApiData CBAccessKey where
-    toUrlPiece (CBAccessKey k)   = pack k
-    toQueryParam (CBAccessKey k) = pack k
+    toUrlPiece (CBAccessKey k)   = k
+    toQueryParam (CBAccessKey k) = k
 
 
 instance ToJSON CBAccessKey where
-    toJSON (CBAccessKey k) = String $ pack k
+    toJSON (CBAccessKey k) = A.String k
 
 
 newtype CBAccessSign = CBAccessSign ByteString
@@ -35,30 +36,30 @@ instance ToHttpApiData CBAccessSign where
 
 
 instance ToJSON CBAccessSign where
-    toJSON (CBAccessSign s) = String $ decodeUtf8 s
+    toJSON (CBAccessSign s) = A.String $ decodeUtf8 s
 
 
-newtype CBAccessTimeStamp = CBAccessTimeStamp String
+newtype CBAccessTimeStamp = CBAccessTimeStamp Text
     deriving (Eq, Show)
 
 
 instance ToHttpApiData CBAccessTimeStamp where
-    toUrlPiece (CBAccessTimeStamp ts)   = pack ts
-    toQueryParam (CBAccessTimeStamp ts) = pack ts
+    toUrlPiece (CBAccessTimeStamp ts)   = ts
+    toQueryParam (CBAccessTimeStamp ts) = ts
 
 
 instance ToJSON CBAccessTimeStamp where
-    toJSON (CBAccessTimeStamp ts) = String $ pack ts
+    toJSON (CBAccessTimeStamp ts) = String ts
 
 
-newtype CBAccessPassphrase = CBAccessPassphrase String
+newtype CBAccessPassphrase = CBAccessPassphrase Text
     deriving (Eq, Show)
 
 
 instance ToJSON CBAccessPassphrase where
-    toJSON (CBAccessPassphrase p) = String $ pack p
+    toJSON (CBAccessPassphrase p) = A.String p
 
 
 instance ToHttpApiData CBAccessPassphrase where
-    toUrlPiece (CBAccessPassphrase p)   = pack p
-    toQueryParam (CBAccessPassphrase p) = pack p
+    toUrlPiece (CBAccessPassphrase p)   = p
+    toQueryParam (CBAccessPassphrase p) = p

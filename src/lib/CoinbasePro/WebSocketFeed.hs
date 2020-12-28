@@ -1,3 +1,5 @@
+{-# LANGUAGE OverloadedStrings #-}
+
 module CoinbasePro.WebSocketFeed
     ( subscribeToFeed
     ) where
@@ -18,6 +20,7 @@ import           CoinbasePro.Authenticated.Request  (CoinbaseProCredentials (..)
 import           CoinbasePro.Environment            (Environment,
                                                      WSConnection (..),
                                                      wsEndpoint)
+import           CoinbasePro.Request                (emptyBody)
 import           CoinbasePro.Types                  (ProductId)
 import           CoinbasePro.WebSocketFeed.Channel  (ChannelMessage (..))
 import           CoinbasePro.WebSocketFeed.Request  (AuthenticatedWebSocketFeedRequest (..),
@@ -50,7 +53,7 @@ subscribe wsConn prids channels cpc = do
 
     authWsRequest cpc' = do
         ts <- liftIO mkCBAccessTimeStamp
-        let cbs = mkCBAccessSign (cbSecretKey cpc') ts methodGet authSubscriptionPath ""
+        let cbs = mkCBAccessSign (cbSecretKey cpc') ts methodGet authSubscriptionPath emptyBody
         return $ AuthenticatedWebSocketFeedRequest wsRequest cbs (cbAccessKey cpc') (cbAccessPassphrase cpc') ts
 
     authSubscriptionPath = "/users/self/verify"

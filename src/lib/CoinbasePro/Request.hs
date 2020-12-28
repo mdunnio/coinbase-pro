@@ -1,6 +1,8 @@
-{-# LANGUAGE DataKinds     #-}
-{-# LANGUAGE TypeFamilies  #-}
-{-# LANGUAGE TypeOperators #-}
+{-# LANGUAGE DataKinds         #-}
+{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE TypeFamilies      #-}
+{-# LANGUAGE TypeOperators     #-}
+
 
 module CoinbasePro.Request
     ( RequestPath
@@ -14,13 +16,17 @@ module CoinbasePro.Request
     , runWithManager
 
     , Runner
+
+    , emptyBody
     ) where
 
 import           Control.Exception       (throw)
 import           Control.Monad           (void)
+import           Data.ByteString         (ByteString)
+import           Data.Text               (unpack)
 import           Network.HTTP.Client     (Manager, newManager)
 import           Network.HTTP.Client.TLS (tlsManagerSettings)
-import           Servant.API             ((:>), Get, JSON)
+import           Servant.API             (Get, JSON, (:>))
 import           Servant.Client
 
 import           CoinbasePro.Environment (Environment, apiEndpoint)
@@ -32,9 +38,12 @@ type CBGet a = UserAgentHeader :> Get '[JSON] a
 
 type CBRequest a = UserAgent -> ClientM a
 
+-- ^ Serialized as a part of building CBAccessSign
+type RequestPath = ByteString
 
-type RequestPath = String
-type Body        = String
+-- ^ Serialized as a part of building CBAccessSign
+-- XXX: is there a problem if it's not Text? lazy bytestring?
+type Body        = ByteString
 
 
 type Runner a = ClientM a -> IO a
@@ -72,4 +81,8 @@ runWithManager :: Manager -> Environment -> ClientM a -> IO a
 runWithManager mgr env f = either throw return =<<
     runClientM f (mkClientEnv mgr (BaseUrl Https api 443 mempty))
   where
-    api = apiEndpoint env
+    api = unpack $ apiEndpoint env
+
+
+emptyBody :: ByteString
+emptyBody = ""

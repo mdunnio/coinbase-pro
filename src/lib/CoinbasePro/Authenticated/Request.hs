@@ -30,13 +30,15 @@ import           Data.ByteArray.Encoding           (Base (Base64),
                                                     convertToBase)
 import           Data.ByteString                   (ByteString)
 import qualified Data.ByteString.Char8             as C8
+import           Data.Text                         (pack)
+import           Data.Text.Encoding                (encodeUtf8)
 import           Data.Time.Clock                   (getCurrentTime)
 import           Data.Time.Format                  (defaultTimeLocale,
                                                     formatTime)
 import           GHC.TypeLits                      (Symbol)
 import           Network.HTTP.Types                (Method)
-import           Servant.API                       ((:>), AuthProtect, Delete,
-                                                    Get, JSON, Post)
+import           Servant.API                       (AuthProtect, Delete, Get,
+                                                    JSON, Post, (:>))
 import           Servant.Client                    (ClientM)
 import           Servant.Client.Core               (AuthClientData,
                                                     AuthenticatedRequest,
@@ -105,7 +107,7 @@ authRequest method requestPath body f = do
 
 
 mkCBAccessTimeStamp :: IO CBAccessTimeStamp
-mkCBAccessTimeStamp = CBAccessTimeStamp . formatTime defaultTimeLocale "%s%Q" <$> getCurrentTime
+mkCBAccessTimeStamp = CBAccessTimeStamp . pack . formatTime defaultTimeLocale "%s%Q" <$> getCurrentTime
 
 
 mkCBAccessSign :: CBSecretKey -> CBAccessTimeStamp -> Method -> RequestPath -> Body -> CBAccessSign
@@ -116,7 +118,7 @@ mkCBAccessSign sk ts method requestPath body = CBAccessSign $ convertToBase Base
     hmac = HMAC.hmac dak msg :: HMAC.HMAC SHA256
 
     mkMsg :: CBAccessTimeStamp -> Method -> RequestPath -> Body -> ByteString
-    mkMsg (CBAccessTimeStamp s) m rp b = C8.pack $ s ++ C8.unpack m ++ rp ++ b
+    mkMsg (CBAccessTimeStamp s) m rp b = encodeUtf8 s <> m <> rp <> b
 
 
 decodeApiKey :: CBSecretKey -> ByteString

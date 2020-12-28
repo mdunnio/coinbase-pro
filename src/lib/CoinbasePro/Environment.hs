@@ -1,3 +1,5 @@
+{-# LANGUAGE OverloadedStrings #-}
+
 module CoinbasePro.Environment
     ( Environment (..)
     , WSConnection (..)
@@ -7,22 +9,23 @@ module CoinbasePro.Environment
     ) where
 
 
+import           Data.Text      (Text)
 import           Network.Socket (HostName, PortNumber)
 
 
 data Environment = Production | Sandbox
 
 
-apiEndpoint :: Environment -> String
+apiEndpoint :: Environment -> Text
 apiEndpoint Production = productionAPIEndpoint
 apiEndpoint Sandbox    = sandboxAPIEndpoint
 
 
-productionAPIEndpoint :: String
+productionAPIEndpoint :: Text
 productionAPIEndpoint = "api.pro.coinbase.com"
 
 
-sandboxAPIEndpoint :: String
+sandboxAPIEndpoint :: Text
 sandboxAPIEndpoint = "api-public.sandbox.pro.coinbase.com"
 
 
