@@ -5,9 +5,10 @@ module CoinbasePro.WebSocketFeed
     ) where
 
 import           Control.Concurrent                 (forkIO)
+import           Control.Exception                  (Exception, throwIO)
 import           Control.Monad                      (forever)
 import           Control.Monad.IO.Class             (liftIO)
-import           Data.Aeson                         (eitherDecode', encode)
+import           Data.Aeson                         (decode', encode)
 import           Network.HTTP.Types                 (methodGet)
 import qualified Network.WebSockets                 as WS
 import qualified System.IO.Streams                  as Streams
@@ -27,6 +28,10 @@ import           CoinbasePro.WebSocketFeed.Request  (AuthenticatedWebSocketFeedR
                                                      ChannelName (..),
                                                      RequestMessageType (..),
                                                      WebSocketFeedRequest (..))
+
+
+data ParseException = ParseException deriving Show
+instance Exception ParseException
 
 
 subscribeToFeed :: [ProductId] -> [ChannelName] -> Environment -> Maybe CoinbaseProCredentials -> IO (Streams.InputStream ChannelMessage)
@@ -60,4 +65,5 @@ subscribe wsConn prids channels cpc = do
 
 
 parseFeed :: WS.Connection -> IO ChannelMessage
-parseFeed conn = either fail return =<< (eitherDecode' <$> WS.receiveData conn :: IO (Either String ChannelMessage))
+parseFeed conn = maybe err return =<< (decode' <$> WS.receiveData conn)
+  where err = throwIO ParseException
