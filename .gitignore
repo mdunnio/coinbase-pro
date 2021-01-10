@@ -1,3 +1,4 @@
+.backup/
 # Cabal
 dist/
 dist-newstyle/
