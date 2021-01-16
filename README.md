@@ -19,7 +19,7 @@ Here is a list of implemented/unimplemented features:
     - [ ] Accounts
         - [x] List Accounts
         - [x] Get An Account
-        - [ ] Get Account History
+        - [x] Get Account History
         - [ ] Get Holds
     - [x] Orders
         - [x] Place a New Order

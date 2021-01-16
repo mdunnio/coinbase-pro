@@ -16,22 +16,20 @@ import           CoinbasePro.Types (Funds, OrderId, Price, ProductId, ProfileId,
 
 
 type StopType     = Text
-type TakerFeeRate = Double
 
 
 data Activate = Activate
-    { productId    :: ProductId
-    , timestamp    :: UTCTime
-    , orderId      :: OrderId
-    , stopType     :: StopType
-    , side         :: Side
-    , stopPrice    :: Price
-    , size         :: Size
-    , funds        :: Funds
-    , takerFeeRate :: TakerFeeRate
-    , private      :: Bool
-    , userId       :: UserId
-    , profileId    :: ProfileId
+    { productId :: ProductId
+    , timestamp :: UTCTime
+    , orderId   :: OrderId
+    , stopType  :: StopType
+    , side      :: Side
+    , stopPrice :: Price
+    , size      :: Size
+    , funds     :: Funds
+    , private   :: Bool
+    , userId    :: UserId
+    , profileId :: ProfileId
     } deriving (Eq, Ord, Show)
 
 
