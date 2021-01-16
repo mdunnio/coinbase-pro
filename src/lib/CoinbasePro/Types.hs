@@ -243,6 +243,7 @@ data CurrencyDetails = CurrencyDetails
     , pushPaymentMethods   :: [Text]
     , groupTypes           :: Maybe [Text]
     , maxPrecision         :: Maybe Double
+    , maxWithdrawalAmount  :: Maybe Double
     } deriving (Eq, Show)
 
 
@@ -256,6 +257,7 @@ instance FromJSON CurrencyDetails where
         <*> o .: "push_payment_methods"
         <*> o .:? "group_types"
         <*> o .:? "max_precision"
+        <*> o .:? "max_withdrawal_amount"
 
 
 data Currency = Currency
