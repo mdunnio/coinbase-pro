@@ -6,6 +6,7 @@
 module CoinbasePro.Authenticated
   ( accounts
   , account
+  , accountHistory
   , listOrders
   , getOrder
   , getClientOrder
@@ -33,8 +34,9 @@ import           Network.HTTP.Types                 (SimpleQuery,
 import           Servant.Client                     (ClientM)
 
 import qualified CoinbasePro.Authenticated.API      as API
-import           CoinbasePro.Authenticated.Accounts (Account, AccountId (..),
-                                                     Fees, TrailingVolume (..))
+import           CoinbasePro.Authenticated.Accounts (Account, AccountHistory,
+                                                     AccountId (..), Fees,
+                                                     TrailingVolume (..))
 import           CoinbasePro.Authenticated.Fills    (Fill)
 import           CoinbasePro.Authenticated.Orders   (Order, PlaceOrderBody (..),
                                                      STP, Status (..),
@@ -60,6 +62,13 @@ account :: AccountId -> CBAuthT ClientM Account
 account aid@(AccountId t) = authRequest methodGet requestPath emptyBody $ API.singleAccount aid
   where
     requestPath = encodeUtf8 $ "/accounts/" <> t
+
+
+-- | https://docs.pro.coinbase.com/#get-account-history
+accountHistory :: AccountId -> CBAuthT ClientM [AccountHistory]
+accountHistory aid@(AccountId t) = authRequest methodGet requestPath emptyBody $ API.accountHistory aid
+  where
+    requestPath = encodeUtf8 $ "/accounts/" <> t <> "/ledger"
 
 
 -- | https://docs.pro.coinbase.com/?javascript#list-orders

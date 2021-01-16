@@ -10,21 +10,32 @@ module CoinbasePro.Authenticated.Accounts
     , ProfileId (..)
     , Fees (..)
     , TrailingVolume (..)
+    , AccountHistory (..)
     ) where
 
-import           Data.Aeson        (FromJSON (..), ToJSON, withObject, (.:))
+import           Data.Aeson        (FromJSON (..), ToJSON, withObject, withText,
+                                    (.:), (.:?))
+import qualified Data.Aeson        as A
 import           Data.Aeson.Casing (snakeCase)
-import           Data.Aeson.TH     (defaultOptions, deriveJSON,
-                                    fieldLabelModifier)
-import           Data.Text         (Text)
+import           Data.Aeson.TH     (constructorTagModifier, defaultOptions,
+                                    deriveJSON, fieldLabelModifier)
+import qualified Data.Char         as Char
+import           Data.Text         (Text, pack, unpack)
 import           Data.Time.Clock   (UTCTime)
+import           Text.Printf       (printf)
 import           Web.HttpApiData   (ToHttpApiData (..))
 
-import           CoinbasePro.Types (ProductId, Volume (..))
+import           CoinbasePro.Types (CreatedAt (..), OrderId, ProductId,
+                                    TradeId (..), Volume (..))
 
 
 newtype AccountId = AccountId Text
     deriving (Eq, Show)
+
+
+deriveJSON defaultOptions
+    { fieldLabelModifier = snakeCase
+    } ''AccountId
 
 
 instance ToHttpApiData AccountId where
@@ -38,6 +49,15 @@ newtype Currency = Currency Text
 
 newtype Balance = Balance Double
     deriving (Eq, Show)
+
+
+instance ToJSON Balance where
+    toJSON (Balance s) = A.String . pack $ printf "%.16f" s
+
+
+instance FromJSON Balance where
+    parseJSON = withText "balance" $ \t ->
+      return . Balance . read $ unpack t
 
 
 newtype ProfileId = ProfileId Text
@@ -91,3 +111,44 @@ data TrailingVolume = TrailingVolume
 
 
 deriveJSON defaultOptions { fieldLabelModifier = snakeCase } ''TrailingVolume
+
+
+data AccountHistoryType = Transfer | Match | Fee | Rebate | Conversion
+    deriving (Eq, Show)
+
+
+deriveJSON defaultOptions { constructorTagModifier = fmap Char.toLower } ''AccountHistoryType
+
+
+data Details = Details
+    { dOrderId   :: Maybe OrderId
+    , dTradeId   :: Maybe TradeId
+    , dProductId :: Maybe ProductId
+    } deriving (Eq, Show)
+
+
+instance FromJSON Details where
+    parseJSON = withObject "details" $ \o -> Details
+        <$> (o .:? "order_id")
+        <*> (fmap (TradeId . read) <$> o .:? "trade_id")
+        <*> (o .:? "product_id")
+
+
+data AccountHistory = AccountHistory
+    { hAccountId :: AccountId
+    , hCreatedAt :: CreatedAt
+    , hAmount    :: Double
+    , hBalance   :: Balance
+    , hType      :: AccountHistoryType
+    , hDetails   :: Maybe Details
+    } deriving (Eq, Show)
+
+
+instance FromJSON AccountHistory where
+    parseJSON = withObject "account_history" $ \o -> AccountHistory
+        <$> (AccountId <$> o .: "id")
+        <*> (CreatedAt <$> o .: "created_at")
+        <*> (read <$> o .: "amount")
+        <*> (Balance . read <$> o .: "balance")
+        <*> (o .: "type")
+        <*> (o .: "details")

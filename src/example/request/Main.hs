@@ -29,6 +29,7 @@ main = do
     runCbAuthT (run Production) cpc $ do
         accounts >>= liftIO . print
         account aid >>= liftIO . print
+        accountHistory aid >>= liftIO . print
         fills (Just btcusd) Nothing >>= liftIO . print
         listOrders (Just [All]) (Just btcusd) >>= liftIO . print
         placeOrder Nothing btcusd Sell (Size 0.001) (Price 99999.00) True Nothing Nothing Nothing >>= liftIO . print
