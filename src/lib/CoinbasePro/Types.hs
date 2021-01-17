@@ -87,7 +87,11 @@ deriveJSON defaultOptions
 
 
 newtype ProductId = ProductId { unProductId :: Text }
-    deriving (Eq, Ord, Show, ToHttpApiData, ToJSONKey, FromJSONKey)
+    deriving (Eq, Ord, ToHttpApiData, ToJSONKey, FromJSONKey)
+
+
+instance Show ProductId where
+  show (ProductId t) = unpack t
 
 
 deriveJSON defaultOptions

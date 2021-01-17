@@ -27,22 +27,25 @@ data Product = Product
     , baseMinSize    :: Double
     , baseMaxSize    :: Double
     , quoteIncrement :: Double
+    , minMarketFunds :: Double
+    , maxMarketFunds :: Double
     } deriving (Eq, Show)
 
 
 instance FromJSON Product where
-    parseJSON = withObject "product" $ \o -> do
-        prid  <- o .: "id"
-        bc    <- o .: "base_currency"
-        qc    <- o .: "quote_currency"
-        bmins <- o .: "base_min_size"
-        bmaxs <- o .: "base_max_size"
-        qi    <- o .: "quote_increment"
-        return $ Product prid bc qc (read bmins) (read bmaxs) (read qi)
+    parseJSON = withObject "product" $ \o -> Product
+        <$> o .: "id"
+        <*> o .: "base_currency"
+        <*> o .: "quote_currency"
+        <*> (read <$> o .: "base_min_size")
+        <*> (read <$> o .: "base_max_size")
+        <*> (read <$> o .: "quote_increment")
+        <*> (read <$> o .: "min_market_funds")
+        <*> (read <$> o .: "max_market_funds")
 
 
 instance ToHttpApiData Product where
-    toUrlPiece = toUrlPiece . productId
+    toUrlPiece   = toUrlPiece . productId
     toQueryParam = toQueryParam . productId
 
 
