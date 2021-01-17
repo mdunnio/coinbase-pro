@@ -29,13 +29,22 @@ Here is a list of implemented/unimplemented features:
         - [x] Get an Order
     - [x] Fills
         - [x] List Fills
+	- [ ] Limits
+		- [ ] Get Current Exchange Limits
     - [ ] Deposits
+		- [ ] List Deposits
+		- [ ] Single Deposit
         - [ ] Payment Method
         - [ ] Coinbase
+		- [ ] Generate a Crypto Deposit Address
     - [ ] Withdrawals
+		- [ ] List Withdrawals
+		- [ ] Single Withdrawal
+		- [ ] Canceled Withdrawal
         - [ ] Payment Method
         - [ ] Coinbase
         - [ ] Crypto
+		- [ ] Fee Estimate
     - [ ] Stablecoin Conversions
         - [ ] Create Conversion
     - [ ] Payment Methods
@@ -45,8 +54,15 @@ Here is a list of implemented/unimplemented features:
     - [ ] Reports
         - [ ] Create a new report
         - [ ] Get report status
+	- [ ] Profiles
+		- [ ] List Profiles
+		- [ ] Get a Profile
+		- [ ] Create a Profile Transfer
     - [x] User Account
         - [x] Trailing Volume
+	- [ ] Margin
+	- [ ] Oracle
+		- [ ] Get Oracle
 - Websocket Feed
     - [x] Channels
         - [x] The heartbeat channel
@@ -95,3 +111,8 @@ main = do
 ## Example
 
 Example execs can be found in `src/example/`
+
+### Run Example
+
+To run any of the authenticated endpoints in `test-request`, the access key,
+secret key, and passphrase must be provided. See _Authenticated Private Requests_ above.
