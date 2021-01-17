@@ -42,7 +42,6 @@ type CBRequest a = UserAgent -> ClientM a
 type RequestPath = ByteString
 
 -- ^ Serialized as a part of building CBAccessSign
--- XXX: is there a problem if it's not Text? lazy bytestring?
 type Body        = ByteString
 
 

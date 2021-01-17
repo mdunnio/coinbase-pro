@@ -3,11 +3,12 @@
 
 - Upgraded to nightly-2020-09-10 (ghc 8.10.2) in preparation for a new 8.10 LTS.
 - Added hie.yaml for use with haskell-language-server (hls)
-- removed `taker_fee_rate` from `Activate` websocket message
-- support account history endpoint
-- added `max_withdrawal_amount` to `CurrencyDetails`
-- support account holds endpoint
-- changed `example/test-request` to `Sandbox` instead of `Production`
+- Removed `taker_fee_rate` from `Activate` websocket message
+- Support account history endpoint
+- Added `max_withdrawal_amount` to `CurrencyDetails`
+- Support account holds endpoint
+- Changed `example/test-request` to `Sandbox` instead of `Production`
+- Use `Network.HTTP.Types.encodePathSegments` when making `RequestPath` in authenticated requests
 
 # Version 0.8.2.0
 

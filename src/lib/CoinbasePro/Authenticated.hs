@@ -21,14 +21,16 @@ module CoinbasePro.Authenticated
 
 import           Control.Monad                      (void)
 import           Data.Aeson                         (encode)
+import qualified Data.ByteString.Builder            as BB
 import qualified Data.ByteString.Lazy.Char8         as LC8
 import           Data.Maybe                         (fromMaybe)
 import qualified Data.Set                           as S
 import           Data.Text                          (Text, pack, toLower)
 import           Data.Text.Encoding                 (encodeUtf8)
-import           Data.UUID                          (toByteString)
+import           Data.UUID                          (toText)
 import           Network.HTTP.Types                 (SimpleQuery,
                                                      SimpleQueryItem,
+                                                     encodePathSegments,
                                                      methodDelete, methodGet,
                                                      methodPost, renderQuery,
                                                      simpleQueryToQuery)
@@ -52,45 +54,60 @@ import           CoinbasePro.Types                  (ClientOrderId (..),
                                                      Price, ProductId (..),
                                                      Side, Size)
 
+accountsPath :: Text
+accountsPath = "accounts"
+
+
+ordersPath :: Text
+ordersPath = "orders"
+
+
+encodeRequestPath :: [Text] -> RequestPath
+encodeRequestPath = LC8.toStrict . BB.toLazyByteString . encodePathSegments
+
 
 -- | https://docs.pro.coinbase.com/?javascript#accounts
 accounts :: CBAuthT ClientM [Account]
-accounts = authRequest methodGet "/accounts" emptyBody API.accounts
+accounts = authRequest methodGet requestPath emptyBody API.accounts
+  where
+    requestPath = encodeRequestPath [accountsPath]
 
 
 -- | https://docs.pro.coinbase.com/?javascript#get-an-account
 account :: AccountId -> CBAuthT ClientM Account
 account aid@(AccountId t) = authRequest methodGet requestPath emptyBody $ API.singleAccount aid
   where
-    requestPath = encodeUtf8 $ "/accounts/" <> t
+    requestPath = encodeRequestPath [accountsPath, t]
 
 
 -- | https://docs.pro.coinbase.com/#get-account-history
 accountHistory :: AccountId -> CBAuthT ClientM [AccountHistory]
 accountHistory aid@(AccountId t) = authRequest methodGet requestPath emptyBody $ API.accountHistory aid
   where
-    requestPath = encodeUtf8 $ "/accounts/" <> t <> "/ledger"
+    ledgerPath  = "ledger"
+    requestPath = encodeRequestPath [accountsPath, t, ledgerPath]
 
 
 -- | https://docs.pro.coinbase.com/#get-holds
 accountHolds :: AccountId -> CBAuthT ClientM [Hold]
 accountHolds aid@(AccountId t) = authRequest methodGet requestPath emptyBody $ API.accountHolds aid
   where
-    requestPath = encodeUtf8 $ "/accounts/" <> t <> "/holds"
+    holdsPath   = "holds"
+    requestPath = encodeRequestPath [accountsPath, t, holdsPath]
 
 
 -- | https://docs.pro.coinbase.com/?javascript#list-orders
 listOrders :: Maybe [Status] -> Maybe ProductId -> CBAuthT ClientM [Order]
-listOrders st prid = authRequest methodGet (mkRequestPath "/orders") emptyBody $ API.listOrders (defaultStatus st) prid
+listOrders st prid = authRequest methodGet requestPath emptyBody $ API.listOrders (defaultStatus st) prid
   where
-    mkRequestPath :: RequestPath -> RequestPath
-    mkRequestPath rp = rp <> (renderQuery True . simpleQueryToQuery $ mkOrderQuery st prid)
+    query       = renderQuery True . simpleQueryToQuery $ orderQuery st prid
+    requestPath = encodeRequestPath [ordersPath] <> query
 
-    mkOrderQuery :: Maybe [Status] -> Maybe ProductId -> SimpleQuery
-    mkOrderQuery ss p = mkStatusQuery ss <> mkProductQuery p
+    orderQuery :: Maybe [Status] -> Maybe ProductId -> SimpleQuery
+    orderQuery ss p = statusQuery ss <> mkProductQuery p
 
-    mkStatusQuery :: Maybe [Status] -> [SimpleQueryItem]
-    mkStatusQuery ss = mkSimpleQueryItem "status" . toLower . pack . show <$> S.toList (unStatuses . statuses $ defaultStatus ss)
+    statusQuery :: Maybe [Status] -> [SimpleQueryItem]
+    statusQuery ss = mkSimpleQueryItem "status" . toLower . pack . show <$> S.toList (unStatuses . statuses $ defaultStatus ss)
 
     defaultStatus :: Maybe [Status] -> [Status]
     defaultStatus = fromMaybe [All]
@@ -98,17 +115,17 @@ listOrders st prid = authRequest methodGet (mkRequestPath "/orders") emptyBody $
 
 -- | https://docs.pro.coinbase.com/#get-an-order
 getOrder :: OrderId -> CBAuthT ClientM Order
-getOrder oid = authRequest methodGet (mkRequestPath "/orders") emptyBody $ API.getOrder oid
+getOrder oid = authRequest methodGet requestPath emptyBody $ API.getOrder oid
   where
-    mkRequestPath rp = encodeUtf8 $ rp <> "/" <> unOrderId oid
+    requestPath = encodeRequestPath [ordersPath, unOrderId oid]
 
 
 -- | https://docs.pro.coinbase.com/#get-an-order
 getClientOrder :: ClientOrderId -> CBAuthT ClientM Order
-getClientOrder cloid = authRequest methodGet (mkRequestPath "/orders/client:") emptyBody $ API.getClientOrder cloid
+getClientOrder cloid = authRequest methodGet requestPath emptyBody $ API.getClientOrder cloid
   where
-    mkRequestPath rp = encodeUtf8 rp <>
-      LC8.toStrict (toByteString (unClientOrderId cloid))
+    oid         = toText $ unClientOrderId cloid
+    requestPath = encodeRequestPath [ordersPath, "client:" <> oid]
 
 
 -- | https://docs.pro.coinbase.com/?javascript#place-a-new-order
@@ -123,36 +140,35 @@ placeOrder :: Maybe ClientOrderId
            -> Maybe TimeInForce
            -> CBAuthT ClientM Order
 placeOrder clordid prid sd sz price po ot stp tif =
-    authRequest methodPost "/orders" seBody $ API.placeOrder body
+    authRequest methodPost requestPath seBody $ API.placeOrder body
   where
-    body   = PlaceOrderBody clordid prid sd sz price po ot stp tif
-    seBody = LC8.toStrict $ encode body
+    requestPath = encodeRequestPath [ordersPath]
+    body        = PlaceOrderBody clordid prid sd sz price po ot stp tif
+    seBody      = LC8.toStrict $ encode body
 
 
 -- | https://docs.pro.coinbase.com/?javascript#cancel-an-order
 cancelOrder :: OrderId -> CBAuthT ClientM ()
-cancelOrder oid = void . authRequest methodDelete (mkRequestPath "/orders") emptyBody $ API.cancelOrder oid
+cancelOrder oid = void . authRequest methodDelete requestPath emptyBody $ API.cancelOrder oid
   where
-    mkRequestPath :: RequestPath -> RequestPath
-    mkRequestPath rp = rp <> "/" <> encodeUtf8 (unOrderId oid)
+    requestPath = encodeRequestPath [ordersPath, unOrderId oid]
 
 
 -- | https://docs.pro.coinbase.com/?javascript#cancel-all
 cancelAll :: Maybe ProductId -> CBAuthT ClientM [OrderId]
-cancelAll prid = authRequest methodDelete (mkRequestPath "/orders") emptyBody (API.cancelAll prid)
+cancelAll prid = authRequest methodDelete requestPath emptyBody (API.cancelAll prid)
   where
-    mkRequestPath :: RequestPath -> RequestPath
-    mkRequestPath rp = rp <> (renderQuery True . simpleQueryToQuery $ mkProductQuery prid)
+    query       = renderQuery True . simpleQueryToQuery $ mkProductQuery prid
+    requestPath = encodeRequestPath [ordersPath] <> query
 
 
 -- | https://docs.pro.coinbase.com/?javascript#fills
 fills :: Maybe ProductId -> Maybe OrderId -> CBAuthT ClientM [Fill]
-fills prid oid = authRequest methodGet mkRequestPath "" (API.fills prid oid)
+fills prid oid = authRequest methodGet requestPath emptyBody (API.fills prid oid)
   where
-    brp = "/fills"
-
-    mkRequestPath :: RequestPath
-    mkRequestPath = brp <> (renderQuery True . simpleQueryToQuery $ mkSimpleQuery prid oid)
+    fillsPath   = "fills"
+    query       = renderQuery True . simpleQueryToQuery $ mkSimpleQuery prid oid
+    requestPath = encodeRequestPath [fillsPath] <> query
 
     mkSimpleQuery :: Maybe ProductId -> Maybe OrderId -> SimpleQuery
     mkSimpleQuery p o = mkProductQuery p <> mkOrderIdQuery o
@@ -160,16 +176,17 @@ fills prid oid = authRequest methodGet mkRequestPath "" (API.fills prid oid)
 
 -- | https://docs.pro.coinbase.com/?javascript#get-current-fees
 fees :: CBAuthT ClientM Fees
-fees = authRequest methodGet mkRequestPath "" API.fees
+fees = authRequest methodGet feesRequestPath emptyBody API.fees
   where
-    mkRequestPath = "/fees"
+    feesPath        = "fees"
+    feesRequestPath = encodeRequestPath [feesPath]
 
 
 -- | https://docs.pro.coinbase.com/?javascript#trailing-volume
 trailingVolume :: CBAuthT ClientM [TrailingVolume]
-trailingVolume = authRequest methodGet mkRequestPath "" API.trailingVolume
+trailingVolume = authRequest methodGet requestPath emptyBody API.trailingVolume
   where
-    mkRequestPath = "/users/self/trailing-volume"
+    requestPath = encodeRequestPath ["users", "self", "trailing-volume"]
 
 
 mkSimpleQueryItem :: Text -> Text -> SimpleQueryItem
