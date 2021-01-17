@@ -138,7 +138,7 @@ instance FromJSON Details where
 data AccountHistory = AccountHistory
     { hAccountId :: AccountId
     , hCreatedAt :: CreatedAt
-    , hAmount    :: Double -- TODO: Give this a newtype
+    , hAmount    :: Double
     , hBalance   :: Balance
     , hType      :: AccountHistoryType
     , hDetails   :: Maybe Details
@@ -175,7 +175,7 @@ data Hold = Hold
     , holdAccountId :: AccountId
     , holdCreatedAt :: CreatedAt
     , holdUpdatedAt :: CreatedAt
-    , holdAmount    :: Double -- TODO: Give this a newtype
+    , holdAmount    :: Double
     , holdType      :: HoldType
     , holdRef       :: HoldRef
     } deriving (Eq, Show)

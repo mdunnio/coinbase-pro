@@ -11,6 +11,7 @@
 - Use `Network.HTTP.Types.encodePathSegments` when making `RequestPath` in authenticated requests
 - Support exchange limits endpoint
 - Added `min_market_funds` and `max_market_funds` to `Product`
+- Made several explicit `Show` instances
 
 # Version 0.8.2.0
 

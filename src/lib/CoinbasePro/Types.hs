@@ -37,7 +37,7 @@ import           Data.Aeson.TH         (constructorTagModifier, defaultOptions,
 import           Data.Text             (Text, pack, toLower, unpack)
 import           Data.Time.Clock       (UTCTime)
 import           Data.Time.Clock.POSIX (posixSecondsToUTCTime)
-import           Data.UUID             (UUID, toText)
+import           Data.UUID             (UUID, toString, toText)
 import qualified Data.Vector           as V
 import           Servant.API
 import           Text.Printf           (printf)
@@ -64,7 +64,11 @@ deriveJSON defaultOptions
 
 
 newtype OrderId = OrderId { unOrderId :: Text }
-    deriving (Eq, Ord, Show, ToHttpApiData)
+    deriving (Eq, Ord, ToHttpApiData)
+
+
+instance Show OrderId where
+  show (OrderId t) = unpack t
 
 
 deriveJSON defaultOptions
@@ -74,7 +78,11 @@ deriveJSON defaultOptions
 
 
 newtype ClientOrderId = ClientOrderId { unClientOrderId :: UUID }
-    deriving (Eq, Ord, Show)
+    deriving (Eq, Ord)
+
+
+instance Show ClientOrderId where
+  show (ClientOrderId t) = toString t
 
 
 instance ToHttpApiData ClientOrderId where
@@ -101,7 +109,11 @@ deriveJSON defaultOptions
 
 
 newtype Price = Price { unPrice :: Double }
-    deriving (Eq, Ord, Show, ToHttpApiData)
+    deriving (Eq, Ord, ToHttpApiData)
+
+
+instance Show Price where
+  show (Price d) = printf "%.8f" d
 
 
 instance FromJSON Price where
@@ -110,15 +122,19 @@ instance FromJSON Price where
 
 
 instance ToJSON Price where
-    toJSON (Price p) = A.String . pack $ printf "%.8f" p
+    toJSON = A.String . pack . show
 
 
 newtype Size = Size { unSize :: Double }
-    deriving (Eq, Ord, Show, ToHttpApiData)
+    deriving (Eq, Ord, ToHttpApiData)
+
+
+instance Show Size where
+  show (Size d) = printf "%.8f" d
 
 
 instance ToJSON Size where
-    toJSON (Size s) = A.String . pack $ printf "%.8f" s
+    toJSON = A.String . pack . show
 
 
 instance FromJSON Size where
@@ -127,7 +143,11 @@ instance FromJSON Size where
 
 
 newtype Volume = Volume { unVolume :: Double }
-    deriving (Eq, Ord, Show)
+    deriving (Eq, Ord)
+
+
+instance Show Volume where
+  show (Volume d) = printf "%.8f" d
 
 
 instance FromJSON Volume where
@@ -136,7 +156,7 @@ instance FromJSON Volume where
 
 
 instance ToJSON Volume where
-    toJSON (Volume v) = A.String . pack $ printf "%.8f" v
+    toJSON = A.String . pack . show
 
 
 newtype TradeId = TradeId Int
@@ -146,16 +166,20 @@ newtype TradeId = TradeId Int
 deriveJSON defaultOptions { fieldLabelModifier = snakeCase } ''TradeId
 
 
-newtype Funds = Funds { unFunds :: Double }
-    deriving (Eq, Ord, Show, ToHttpApiData)
+newtype Funds = Funds Double
+    deriving (Eq, Ord, ToHttpApiData)
+
+
+instance Show Funds where
+  show (Funds d) = printf "%.16f" d
 
 
 instance ToJSON Funds where
-    toJSON (Funds s) = A.String . pack $ printf "%.16f" s
+    toJSON = A.String . pack . show
 
 
 instance FromJSON Funds where
-    parseJSON = withText "size" $ \t ->
+    parseJSON = withText "funds" $ \t ->
       return . Funds . read $ unpack t
 
 
