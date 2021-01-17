@@ -18,15 +18,15 @@ import           CoinbasePro.Unauthenticated
 
 main :: IO ()
 main = do
-    run Production (stats btcusd) >>= print
-    run Production (candles btcusd Nothing Nothing Minute) >>= print
-    run Production (trades btcusd) >>= print
-    run Production time >>= print
-    run Production products >>= print
-    run Production (aggregateOrderBook btcusd (Just Best)) >>= print
-    run Production (aggregateOrderBook btcusd (Just TopFifty)) >>= print
-    run Production (fullOrderBook btcusd) >>= print
-    runCbAuthT (run Production) cpc $ do
+    run Sandbox (stats btcusd) >>= print
+    run Sandbox (candles btcusd Nothing Nothing Minute) >>= print
+    run Sandbox (trades btcusd) >>= print
+    run Sandbox time >>= print
+    run Sandbox products >>= print
+    run Sandbox (aggregateOrderBook btcusd (Just Best)) >>= print
+    run Sandbox (aggregateOrderBook btcusd (Just TopFifty)) >>= print
+    run Sandbox (fullOrderBook btcusd) >>= print
+    runCbAuthT (run Sandbox) cpc $ do
         accounts >>= liftIO . print
         account aid >>= liftIO . print
         accountHistory aid >>= liftIO . print

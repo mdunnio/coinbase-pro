@@ -7,6 +7,7 @@
 - support account history endpoint
 - added `max_withdrawal_amount` to `CurrencyDetails`
 - support account holds endpoint
+- changed `example/test-request` to `Sandbox` instead of `Production`
 
 # Version 0.8.2.0
 
