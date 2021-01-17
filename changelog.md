@@ -6,6 +6,7 @@
 - removed `taker_fee_rate` from `Activate` websocket message
 - support account history endpoint
 - added `max_withdrawal_amount` to `CurrencyDetails`
+- support account holds endpoint
 
 # Version 0.8.2.0
 

@@ -16,11 +16,11 @@ Here is a list of implemented/unimplemented features:
         - [x] Get Currencies
     - [x] Time
 - Private
-    - [ ] Accounts
+    - [x] Accounts
         - [x] List Accounts
         - [x] Get An Account
         - [x] Get Account History
-        - [ ] Get Holds
+        - [x] Get Holds
     - [x] Orders
         - [x] Place a New Order
         - [x] Cancel an Order

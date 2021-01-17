@@ -6,6 +6,7 @@ module CoinbasePro.Authenticated.API
     ( accounts
     , singleAccount
     , accountHistory
+    , accountHolds
     , listOrders
     , getOrder
     , getClientOrder
@@ -26,7 +27,7 @@ import           Servant.Client
 import           Servant.Client.Core                (AuthenticatedRequest)
 
 import           CoinbasePro.Authenticated.Accounts (Account, AccountHistory,
-                                                     AccountId (..), Fees,
+                                                     AccountId (..), Fees, Hold,
                                                      TrailingVolume)
 import           CoinbasePro.Authenticated.Fills    (Fill)
 import           CoinbasePro.Authenticated.Orders   (Order, PlaceOrderBody (..),
@@ -41,6 +42,7 @@ import           CoinbasePro.Types                  (ClientOrderId (..),
 type API =    "accounts" :> AuthGet [Account]
          :<|> "accounts" :> Capture "account-id" AccountId :> AuthGet Account
          :<|> "accounts" :> Capture "account_id" AccountId :> "ledger" :> AuthGet [AccountHistory]
+         :<|> "accounts" :> Capture "account_id" AccountId :> "holds" :> AuthGet [Hold]
          :<|> "orders" :> QueryParams "status" Status :> QueryParam "product_id" ProductId :> AuthGet [Order]
          :<|> "orders" :> Capture "order_id" OrderId :> AuthGet Order
          :<|> "orders" :> Capture "client_oid" ClientOrderId :> AuthGet Order
@@ -59,6 +61,7 @@ api = Proxy
 accounts :: AuthenticatedRequest (AuthProtect "CBAuth") -> ClientM [Account]
 singleAccount :: AccountId -> AuthenticatedRequest (AuthProtect "CBAuth") -> ClientM Account
 accountHistory :: AccountId -> AuthenticatedRequest (AuthProtect "CBAuth") -> ClientM [AccountHistory]
+accountHolds :: AccountId -> AuthenticatedRequest (AuthProtect "CBAuth") -> ClientM [Hold]
 listOrders :: [Status] -> Maybe ProductId -> AuthenticatedRequest (AuthProtect "CBAuth") -> ClientM [Order]
 getOrder :: OrderId -> AuthenticatedRequest (AuthProtect "CBAuth") -> ClientM Order
 getClientOrder :: ClientOrderId -> AuthenticatedRequest (AuthProtect "CBAuth") -> ClientM Order
@@ -68,4 +71,4 @@ cancelAll :: Maybe ProductId -> AuthenticatedRequest (AuthProtect "CBAuth") -> C
 fills :: Maybe ProductId -> Maybe OrderId -> AuthenticatedRequest (AuthProtect "CBAuth") -> ClientM [Fill]
 fees :: AuthenticatedRequest (AuthProtect "CBAuth") -> ClientM Fees
 trailingVolume :: AuthenticatedRequest (AuthProtect "CBAuth") -> ClientM [TrailingVolume]
-accounts :<|> singleAccount :<|> accountHistory :<|> listOrders :<|> getOrder :<|> getClientOrder :<|> placeOrder :<|> cancelOrder :<|> cancelAll :<|> fills :<|> fees :<|> trailingVolume = client api
+accounts :<|> singleAccount :<|> accountHistory :<|> accountHolds :<|> listOrders :<|> getOrder :<|> getClientOrder :<|> placeOrder :<|> cancelOrder :<|> cancelAll :<|> fills :<|> fees :<|> trailingVolume = client api

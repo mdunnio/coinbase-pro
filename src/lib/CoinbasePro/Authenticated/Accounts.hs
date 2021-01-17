@@ -11,6 +11,7 @@ module CoinbasePro.Authenticated.Accounts
     , Fees (..)
     , TrailingVolume (..)
     , AccountHistory (..)
+    , Hold (..)
     ) where
 
 import           Data.Aeson        (FromJSON (..), ToJSON, withObject, withText,
@@ -137,7 +138,7 @@ instance FromJSON Details where
 data AccountHistory = AccountHistory
     { hAccountId :: AccountId
     , hCreatedAt :: CreatedAt
-    , hAmount    :: Double
+    , hAmount    :: Double -- TODO: Give this a newtype
     , hBalance   :: Balance
     , hType      :: AccountHistoryType
     , hDetails   :: Maybe Details
@@ -152,3 +153,32 @@ instance FromJSON AccountHistory where
         <*> (Balance . read <$> o .: "balance")
         <*> (o .: "type")
         <*> (o .: "details")
+
+
+newtype HoldId = HoldId Text
+  deriving (Eq, Show, ToJSON, FromJSON)
+
+
+data HoldType = Order | HoldTransfer
+  deriving (Eq, Show)
+
+
+newtype HoldRef = HoldRef Text
+  deriving (Eq, Show, ToJSON, FromJSON)
+
+
+deriveJSON defaultOptions { constructorTagModifier = fmap Char.toLower } ''HoldType
+
+
+data Hold = Hold
+    { holdId        :: HoldId
+    , holdAccountId :: AccountId
+    , holdCreatedAt :: CreatedAt
+    , holdUpdatedAt :: CreatedAt
+    , holdAmount    :: Double -- TODO: Give this a newtype
+    , holdType      :: HoldType
+    , holdRef       :: HoldRef
+    } deriving (Eq, Show)
+
+
+deriveJSON defaultOptions { constructorTagModifier = fmap Char.toLower . drop 4, fieldLabelModifier = snakeCase } ''Hold
