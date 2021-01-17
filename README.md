@@ -29,8 +29,8 @@ Here is a list of implemented/unimplemented features:
         - [x] Get an Order
     - [x] Fills
         - [x] List Fills
-	- [ ] Limits
-		- [ ] Get Current Exchange Limits
+	- [x] Limits
+		- [x] Get Current Exchange Limits
     - [ ] Deposits
 		- [ ] List Deposits
 		- [ ] Single Deposit

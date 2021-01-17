@@ -9,6 +9,7 @@
 - Support account holds endpoint
 - Changed `example/test-request` to `Sandbox` instead of `Production`
 - Use `Network.HTTP.Types.encodePathSegments` when making `RequestPath` in authenticated requests
+- Support exchange limits endpoint
 
 # Version 0.8.2.0
 

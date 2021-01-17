@@ -26,9 +26,9 @@ module CoinbasePro.Types
     , filterOrderFieldName
     ) where
 
-import           Data.Aeson            (FromJSON, ToJSON, parseJSON, toJSON,
-                                        withArray, withObject, withText, (.:),
-                                        (.:?))
+import           Data.Aeson            (FromJSON, FromJSONKey, ToJSON,
+                                        ToJSONKey, parseJSON, toJSON, withArray,
+                                        withObject, withText, (.:), (.:?))
 import qualified Data.Aeson            as A
 import           Data.Aeson.Casing     (camelCase, snakeCase)
 import           Data.Aeson.TH         (constructorTagModifier, defaultOptions,
@@ -87,7 +87,7 @@ deriveJSON defaultOptions
 
 
 newtype ProductId = ProductId { unProductId :: Text }
-    deriving (Eq, Ord, Show, ToHttpApiData)
+    deriving (Eq, Ord, Show, ToHttpApiData, ToJSONKey, FromJSONKey)
 
 
 deriveJSON defaultOptions

@@ -16,6 +16,7 @@ module CoinbasePro.Authenticated.API
     , fills
     , fees
     , trailingVolume
+    , limits
     ) where
 
 import           Data.Proxy                         (Proxy (..))
@@ -30,6 +31,7 @@ import           CoinbasePro.Authenticated.Accounts (Account, AccountHistory,
                                                      AccountId (..), Fees, Hold,
                                                      TrailingVolume)
 import           CoinbasePro.Authenticated.Fills    (Fill)
+import           CoinbasePro.Authenticated.Limits   (Limits)
 import           CoinbasePro.Authenticated.Orders   (Order, PlaceOrderBody (..),
                                                      Status (..))
 import           CoinbasePro.Authenticated.Request  (AuthDelete, AuthGet,
@@ -52,6 +54,7 @@ type API =    "accounts" :> AuthGet [Account]
          :<|> "fills" :> QueryParam "product_id" ProductId :> QueryParam "order_id" OrderId :> AuthGet [Fill]
          :<|> "fees" :> AuthGet Fees
          :<|> "users" :> "self" :> "trailing-volume" :> AuthGet [TrailingVolume]
+         :<|> "users" :> "self" :> "exchange-limits" :> AuthGet Limits
 
 
 api :: Proxy API
@@ -71,4 +74,5 @@ cancelAll :: Maybe ProductId -> AuthenticatedRequest (AuthProtect "CBAuth") -> C
 fills :: Maybe ProductId -> Maybe OrderId -> AuthenticatedRequest (AuthProtect "CBAuth") -> ClientM [Fill]
 fees :: AuthenticatedRequest (AuthProtect "CBAuth") -> ClientM Fees
 trailingVolume :: AuthenticatedRequest (AuthProtect "CBAuth") -> ClientM [TrailingVolume]
-accounts :<|> singleAccount :<|> accountHistory :<|> accountHolds :<|> listOrders :<|> getOrder :<|> getClientOrder :<|> placeOrder :<|> cancelOrder :<|> cancelAll :<|> fills :<|> fees :<|> trailingVolume = client api
+limits :: AuthenticatedRequest (AuthProtect "CBAuth") -> ClientM Limits
+accounts :<|> singleAccount :<|> accountHistory :<|> accountHolds :<|> listOrders :<|> getOrder :<|> getClientOrder :<|> placeOrder :<|> cancelOrder :<|> cancelAll :<|> fills :<|> fees :<|> trailingVolume :<|> limits = client api

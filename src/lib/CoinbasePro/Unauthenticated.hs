@@ -59,7 +59,7 @@ stats :: ProductId -> ClientM TwentyFourHourStats
 stats prid = API.stats prid userAgent
 
 
--- | https://docs.pro.coinbase.com/?javascript#get-currencies
+-- | https://docs.pro.coinbase.com/#get-currencies
 currencies :: ClientM [Currency]
 currencies = API.currencies userAgent
 

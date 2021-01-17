@@ -17,6 +17,7 @@ module CoinbasePro.Authenticated
   , fills
   , fees
   , trailingVolume
+  , limits
   ) where
 
 import           Control.Monad                      (void)
@@ -41,6 +42,7 @@ import           CoinbasePro.Authenticated.Accounts (Account, AccountHistory,
                                                      AccountId (..), Fees, Hold,
                                                      TrailingVolume (..))
 import           CoinbasePro.Authenticated.Fills    (Fill)
+import           CoinbasePro.Authenticated.Limits   (Limits)
 import           CoinbasePro.Authenticated.Orders   (Order, PlaceOrderBody (..),
                                                      STP, Status (..),
                                                      Statuses (..), TimeInForce,
@@ -66,14 +68,14 @@ encodeRequestPath :: [Text] -> RequestPath
 encodeRequestPath = LC8.toStrict . BB.toLazyByteString . encodePathSegments
 
 
--- | https://docs.pro.coinbase.com/?javascript#accounts
+-- | https://docs.pro.coinbase.com/#accounts
 accounts :: CBAuthT ClientM [Account]
 accounts = authRequest methodGet requestPath emptyBody API.accounts
   where
     requestPath = encodeRequestPath [accountsPath]
 
 
--- | https://docs.pro.coinbase.com/?javascript#get-an-account
+-- | https://docs.pro.coinbase.com/#get-an-account
 account :: AccountId -> CBAuthT ClientM Account
 account aid@(AccountId t) = authRequest methodGet requestPath emptyBody $ API.singleAccount aid
   where
@@ -96,7 +98,7 @@ accountHolds aid@(AccountId t) = authRequest methodGet requestPath emptyBody $ A
     requestPath = encodeRequestPath [accountsPath, t, holdsPath]
 
 
--- | https://docs.pro.coinbase.com/?javascript#list-orders
+-- | https://docs.pro.coinbase.com/#list-orders
 listOrders :: Maybe [Status] -> Maybe ProductId -> CBAuthT ClientM [Order]
 listOrders st prid = authRequest methodGet requestPath emptyBody $ API.listOrders (defaultStatus st) prid
   where
@@ -128,7 +130,7 @@ getClientOrder cloid = authRequest methodGet requestPath emptyBody $ API.getClie
     requestPath = encodeRequestPath [ordersPath, "client:" <> oid]
 
 
--- | https://docs.pro.coinbase.com/?javascript#place-a-new-order
+-- | https://docs.pro.coinbase.com/#place-a-new-order
 placeOrder :: Maybe ClientOrderId
            -> ProductId
            -> Side
@@ -147,14 +149,14 @@ placeOrder clordid prid sd sz price po ot stp tif =
     seBody      = LC8.toStrict $ encode body
 
 
--- | https://docs.pro.coinbase.com/?javascript#cancel-an-order
+-- | https://docs.pro.coinbase.com/#cancel-an-order
 cancelOrder :: OrderId -> CBAuthT ClientM ()
 cancelOrder oid = void . authRequest methodDelete requestPath emptyBody $ API.cancelOrder oid
   where
     requestPath = encodeRequestPath [ordersPath, unOrderId oid]
 
 
--- | https://docs.pro.coinbase.com/?javascript#cancel-all
+-- | https://docs.pro.coinbase.com/#cancel-all
 cancelAll :: Maybe ProductId -> CBAuthT ClientM [OrderId]
 cancelAll prid = authRequest methodDelete requestPath emptyBody (API.cancelAll prid)
   where
@@ -162,7 +164,7 @@ cancelAll prid = authRequest methodDelete requestPath emptyBody (API.cancelAll p
     requestPath = encodeRequestPath [ordersPath] <> query
 
 
--- | https://docs.pro.coinbase.com/?javascript#fills
+-- | https://docs.pro.coinbase.com/#fills
 fills :: Maybe ProductId -> Maybe OrderId -> CBAuthT ClientM [Fill]
 fills prid oid = authRequest methodGet requestPath emptyBody (API.fills prid oid)
   where
@@ -174,7 +176,7 @@ fills prid oid = authRequest methodGet requestPath emptyBody (API.fills prid oid
     mkSimpleQuery p o = mkProductQuery p <> mkOrderIdQuery o
 
 
--- | https://docs.pro.coinbase.com/?javascript#get-current-fees
+-- | https://docs.pro.coinbase.com/#get-current-fees
 fees :: CBAuthT ClientM Fees
 fees = authRequest methodGet feesRequestPath emptyBody API.fees
   where
@@ -182,11 +184,18 @@ fees = authRequest methodGet feesRequestPath emptyBody API.fees
     feesRequestPath = encodeRequestPath [feesPath]
 
 
--- | https://docs.pro.coinbase.com/?javascript#trailing-volume
+-- | https://docs.pro.coinbase.com/#trailing-volume
 trailingVolume :: CBAuthT ClientM [TrailingVolume]
 trailingVolume = authRequest methodGet requestPath emptyBody API.trailingVolume
   where
     requestPath = encodeRequestPath ["users", "self", "trailing-volume"]
+
+
+-- | https://docs.pro.coinbase.com/#get-current-exchange-limits
+limits :: CBAuthT ClientM Limits
+limits = authRequest methodGet requestPath emptyBody API.limits
+  where
+    requestPath = encodeRequestPath ["users", "self", "exchange-limits"]
 
 
 mkSimpleQueryItem :: Text -> Text -> SimpleQueryItem
