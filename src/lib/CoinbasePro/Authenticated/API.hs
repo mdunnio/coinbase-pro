@@ -18,9 +18,11 @@ module CoinbasePro.Authenticated.API
     , trailingVolume
     , limits
     , deposits
+    , deposit
     ) where
 
 import           Data.Proxy                         (Proxy (..))
+import           Data.UUID                          (UUID)
 import           Servant.API                        (AuthProtect, Capture, JSON,
                                                      NoContent, QueryParam,
                                                      QueryParams, ReqBody,
@@ -58,6 +60,7 @@ type API =    "accounts" :> AuthGet [Account]
          :<|> "users" :> "self" :> "trailing-volume" :> AuthGet [TrailingVolume]
          :<|> "users" :> "self" :> "exchange-limits" :> AuthGet Limits
          :<|> "transfers" :> AuthGet [Deposit]
+         :<|> "transfers" :> Capture "transfer_id" UUID :> AuthGet Deposit
 
 
 api :: Proxy API
@@ -79,4 +82,5 @@ fees :: AuthenticatedRequest (AuthProtect "CBAuth") -> ClientM Fees
 trailingVolume :: AuthenticatedRequest (AuthProtect "CBAuth") -> ClientM [TrailingVolume]
 limits :: AuthenticatedRequest (AuthProtect "CBAuth") -> ClientM Limits
 deposits :: AuthenticatedRequest (AuthProtect "CBAuth") -> ClientM [Deposit]
-accounts :<|> singleAccount :<|> accountHistory :<|> accountHolds :<|> listOrders :<|> getOrder :<|> getClientOrder :<|> placeOrder :<|> cancelOrder :<|> cancelAll :<|> fills :<|> fees :<|> trailingVolume :<|> limits :<|> deposits = client api
+deposit :: UUID -> AuthenticatedRequest (AuthProtect "CBAuth") -> ClientM Deposit
+accounts :<|> singleAccount :<|> accountHistory :<|> accountHolds :<|> listOrders :<|> getOrder :<|> getClientOrder :<|> placeOrder :<|> cancelOrder :<|> cancelAll :<|> fills :<|> fees :<|> trailingVolume :<|> limits :<|> deposits :<|> deposit = client api

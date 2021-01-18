@@ -19,6 +19,7 @@ module CoinbasePro.Authenticated
   , trailingVolume
   , limits
   , deposits
+  , deposit
   ) where
 
 import           Control.Monad                      (void)
@@ -30,7 +31,7 @@ import qualified Data.Set                           as S
 import           Data.Text                          (Text, pack)
 import           Data.Text.Encoding                 (encodeUtf8)
 import           Data.Time.Clock                    (UTCTime)
-import           Data.UUID                          (toText)
+import           Data.UUID                          (UUID, toText)
 import           Network.HTTP.Types                 (SimpleQuery,
                                                      SimpleQueryItem,
                                                      encodePathSegments,
@@ -232,3 +233,10 @@ deposits prof before after lm = authRequest methodGet requestPath emptyBody API.
 
     query       = renderQuery True . simpleQueryToQuery $ profQ <> beforeQ <> afterQ <> lmQ
     requestPath = encodeRequestPath ["transfers"] <> query
+
+
+-- | https://docs.pro.coinbase.com/#single-deposit
+deposit :: UUID -> CBAuthT ClientM Deposit
+deposit d = authRequest methodGet requestPath emptyBody $ API.deposit d
+  where
+    requestPath = encodeRequestPath ["transfers", toText d]

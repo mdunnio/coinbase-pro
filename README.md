@@ -33,7 +33,7 @@ Here is a list of implemented/unimplemented features:
 		- [x] Get Current Exchange Limits
     - [ ] Deposits
 		- [x] List Deposits
-		- [ ] Single Deposit
+		- [x] Single Deposit
         - [ ] Payment Method
         - [ ] Coinbase
 		- [ ] Generate a Crypto Deposit Address
