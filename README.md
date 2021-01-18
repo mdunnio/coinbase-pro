@@ -32,7 +32,7 @@ Here is a list of implemented/unimplemented features:
 	- [x] Limits
 		- [x] Get Current Exchange Limits
     - [ ] Deposits
-		- [ ] List Deposits
+		- [x] List Deposits
 		- [ ] Single Deposit
         - [ ] Payment Method
         - [ ] Coinbase

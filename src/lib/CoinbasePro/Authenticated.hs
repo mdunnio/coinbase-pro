@@ -18,6 +18,7 @@ module CoinbasePro.Authenticated
   , fees
   , trailingVolume
   , limits
+  , deposits
   ) where
 
 import           Control.Monad                      (void)
@@ -28,6 +29,7 @@ import           Data.Maybe                         (fromMaybe)
 import qualified Data.Set                           as S
 import           Data.Text                          (Text, pack, toLower)
 import           Data.Text.Encoding                 (encodeUtf8)
+import           Data.Time.Clock                    (UTCTime)
 import           Data.UUID                          (toText)
 import           Network.HTTP.Types                 (SimpleQuery,
                                                      SimpleQueryItem,
@@ -41,6 +43,7 @@ import qualified CoinbasePro.Authenticated.API      as API
 import           CoinbasePro.Authenticated.Accounts (Account, AccountHistory,
                                                      AccountId (..), Fees, Hold,
                                                      TrailingVolume (..))
+import           CoinbasePro.Authenticated.Deposit  (Deposit)
 import           CoinbasePro.Authenticated.Fills    (Fill)
 import           CoinbasePro.Authenticated.Limits   (Limits)
 import           CoinbasePro.Authenticated.Orders   (Order, PlaceOrderBody (..),
@@ -54,7 +57,7 @@ import           CoinbasePro.Request                (RequestPath, emptyBody)
 import           CoinbasePro.Types                  (ClientOrderId (..),
                                                      OrderId (..), OrderType,
                                                      Price, ProductId (..),
-                                                     Side, Size)
+                                                     ProfileId, Side, Size)
 
 accountsPath :: Text
 accountsPath = "accounts"
@@ -66,6 +69,22 @@ ordersPath = "orders"
 
 encodeRequestPath :: [Text] -> RequestPath
 encodeRequestPath = LC8.toStrict . BB.toLazyByteString . encodePathSegments
+
+
+mkSimpleQueryItem :: Show a => Text -> a -> SimpleQueryItem
+mkSimpleQueryItem s a = (encodeUtf8 s, encodeUtf8 $ pack (show a))
+
+
+optionalQuery :: Show a => Text -> Maybe a -> [SimpleQueryItem]
+optionalQuery t = maybe [] (return . mkSimpleQueryItem t)
+
+
+mkProductQuery :: Maybe ProductId -> [SimpleQueryItem]
+mkProductQuery = optionalQuery "product_id"
+
+
+mkOrderIdQuery :: Maybe OrderId -> SimpleQuery
+mkOrderIdQuery = optionalQuery "order_id"
 
 
 -- | https://docs.pro.coinbase.com/#accounts
@@ -198,13 +217,18 @@ limits = authRequest methodGet requestPath emptyBody API.limits
     requestPath = encodeRequestPath ["users", "self", "exchange-limits"]
 
 
-mkSimpleQueryItem :: Text -> Text -> SimpleQueryItem
-mkSimpleQueryItem s t = (encodeUtf8 s, encodeUtf8 t)
+-- | https://docs.pro.coinbase.com/#list-deposits
+deposits :: Maybe ProfileId
+         -> Maybe UTCTime
+         -> Maybe UTCTime
+         -> Maybe Int
+         -> CBAuthT ClientM [Deposit]
+deposits prof before after lm = authRequest methodGet requestPath emptyBody API.deposits
+  where
+    profQ   = optionalQuery "profile_id" prof
+    beforeQ = optionalQuery "before" before
+    afterQ  = optionalQuery "after" after
+    lmQ     = optionalQuery "limit" lm
 
-
-mkProductQuery :: Maybe ProductId -> [SimpleQueryItem]
-mkProductQuery = maybe [] (return . mkSimpleQueryItem "product_id" . unProductId)
-
-
-mkOrderIdQuery :: Maybe OrderId -> SimpleQuery
-mkOrderIdQuery = maybe [] (return . mkSimpleQueryItem "order_id" . unOrderId)
+    query       = renderQuery True . simpleQueryToQuery $ profQ <> beforeQ <> afterQ <> lmQ
+    requestPath = encodeRequestPath ["transfers"] <> query

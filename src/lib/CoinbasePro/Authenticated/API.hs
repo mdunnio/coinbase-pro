@@ -17,6 +17,7 @@ module CoinbasePro.Authenticated.API
     , fees
     , trailingVolume
     , limits
+    , deposits
     ) where
 
 import           Data.Proxy                         (Proxy (..))
@@ -30,6 +31,7 @@ import           Servant.Client.Core                (AuthenticatedRequest)
 import           CoinbasePro.Authenticated.Accounts (Account, AccountHistory,
                                                      AccountId (..), Fees, Hold,
                                                      TrailingVolume)
+import           CoinbasePro.Authenticated.Deposit  (Deposit)
 import           CoinbasePro.Authenticated.Fills    (Fill)
 import           CoinbasePro.Authenticated.Limits   (Limits)
 import           CoinbasePro.Authenticated.Orders   (Order, PlaceOrderBody (..),
@@ -55,6 +57,7 @@ type API =    "accounts" :> AuthGet [Account]
          :<|> "fees" :> AuthGet Fees
          :<|> "users" :> "self" :> "trailing-volume" :> AuthGet [TrailingVolume]
          :<|> "users" :> "self" :> "exchange-limits" :> AuthGet Limits
+         :<|> "transfers" :> AuthGet [Deposit]
 
 
 api :: Proxy API
@@ -75,4 +78,5 @@ fills :: Maybe ProductId -> Maybe OrderId -> AuthenticatedRequest (AuthProtect "
 fees :: AuthenticatedRequest (AuthProtect "CBAuth") -> ClientM Fees
 trailingVolume :: AuthenticatedRequest (AuthProtect "CBAuth") -> ClientM [TrailingVolume]
 limits :: AuthenticatedRequest (AuthProtect "CBAuth") -> ClientM Limits
-accounts :<|> singleAccount :<|> accountHistory :<|> accountHolds :<|> listOrders :<|> getOrder :<|> getClientOrder :<|> placeOrder :<|> cancelOrder :<|> cancelAll :<|> fills :<|> fees :<|> trailingVolume :<|> limits = client api
+deposits :: AuthenticatedRequest (AuthProtect "CBAuth") -> ClientM [Deposit]
+accounts :<|> singleAccount :<|> accountHistory :<|> accountHolds :<|> listOrders :<|> getOrder :<|> getClientOrder :<|> placeOrder :<|> cancelOrder :<|> cancelAll :<|> fills :<|> fees :<|> trailingVolume :<|> limits :<|> deposits = client api

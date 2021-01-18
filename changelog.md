@@ -1,5 +1,4 @@
-
-# Version 0.8.3.0
+# Version 0.9.0.0
 
 - Upgraded to nightly-2020-01-17 (ghc 8.10.3) in preparation for a new 8.10 LTS.
 - Added hie.yaml for use with haskell-language-server (hls)
@@ -12,6 +11,7 @@
 - Support exchange limits endpoint
 - Added `min_market_funds` and `max_market_funds` to `Product`
 - Made several explicit `Show` instances
+- Support list deposits endpoint
 
 # Version 0.8.2.0
 
