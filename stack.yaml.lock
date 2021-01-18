@@ -5,6 +5,17 @@
 
 packages:
 - completed:
+    name: unagi-streams
+    version: 0.2.7
+    git: https://github.com/mdunnio/unagi-streams.git
+    pantry-tree:
+      size: 530
+      sha256: 35c5faaeb2fb952cf3e810493624dadcb4df254aed89a72f4d9244d88fb65f41
+    commit: 72a4480febd5ef345253cce33ad0c98d25cf3acb
+  original:
+    git: https://github.com/mdunnio/unagi-streams.git
+    commit: 72a4480febd5ef345253cce33ad0c98d25cf3acb
+- completed:
     hackage: base64-bytestring-1.0.0.3@sha256:6c82d900465345e30ff0eeb9a1374fbd2955c8e5ca6206e03669f04575830f88,2242
     pantry-tree:
       size: 848
@@ -34,7 +45,7 @@ packages:
     hackage: unagi-chan-0.4.1.3
 snapshots:
 - completed:
-    size: 554192
-    url: https://raw.githubusercontent.com/commercialhaskell/stackage-snapshots/master/nightly/2020/11/22.yaml
-    sha256: fd51ee29ff5c7fa83060a2189570e078e59ddaefd4a44f3cf23667b8b903e780
-  original: nightly-2020-11-22
+    size: 562473
+    url: https://raw.githubusercontent.com/commercialhaskell/stackage-snapshots/master/nightly/2021/1/17.yaml
+    sha256: 217ab7f1d59382a906fa39845ccf245759df4564846bcc4cfc859424a8f2d9e0
+  original: nightly-2021-01-17
