@@ -14,6 +14,7 @@ import           Data.Aeson.TH                      (defaultOptions, deriveJSON,
                                                      fieldLabelModifier)
 import           Data.Text                          (Text)
 import           Data.Time.Clock                    (UTCTime)
+import           Data.UUID                          (UUID)
 
 import           CoinbasePro.Authenticated.Accounts (AccountId)
 import           CoinbasePro.Types                  (CreatedAt, UserId)
@@ -37,7 +38,8 @@ newtype UserNonce = UserNonce Int
 
 
 data Deposit = Deposit
-    { dType        :: Text
+    { dId          :: UUID
+    , dType        :: Text
     , dCreatedAt   :: CreatedAt
     , dCompletedAt :: UTCTime
     , dCanceledAt  :: Maybe UTCTime
@@ -52,7 +54,8 @@ data Deposit = Deposit
 
 instance FromJSON Deposit where
   parseJSON = withObject "deposit" $ \o -> Deposit
-    <$> (o .: "type")
+    <$> (o .: "id")
+    <*> (o .: "type")
     <*> (o .: "created_at")
     <*> (o .: "completed_at")
     <*> (o .:? "canceled_at")
