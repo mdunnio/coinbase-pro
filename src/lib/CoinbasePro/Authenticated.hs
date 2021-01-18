@@ -27,7 +27,7 @@ import qualified Data.ByteString.Builder            as BB
 import qualified Data.ByteString.Lazy.Char8         as LC8
 import           Data.Maybe                         (fromMaybe)
 import qualified Data.Set                           as S
-import           Data.Text                          (Text, pack, toLower)
+import           Data.Text                          (Text, pack)
 import           Data.Text.Encoding                 (encodeUtf8)
 import           Data.Time.Clock                    (UTCTime)
 import           Data.UUID                          (toText)
@@ -128,7 +128,7 @@ listOrders st prid = authRequest methodGet requestPath emptyBody $ API.listOrder
     orderQuery ss p = statusQuery ss <> mkProductQuery p
 
     statusQuery :: Maybe [Status] -> [SimpleQueryItem]
-    statusQuery ss = mkSimpleQueryItem "status" . toLower . pack . show <$> S.toList (unStatuses . statuses $ defaultStatus ss)
+    statusQuery ss = mkSimpleQueryItem "status" <$> S.toList (unStatuses . statuses $ defaultStatus ss)
 
     defaultStatus :: Maybe [Status] -> [Status]
     defaultStatus = fromMaybe [All]

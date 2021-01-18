@@ -30,12 +30,20 @@ import           CoinbasePro.Types (ClientOrderId, CreatedAt, OrderId,
 
 -- TODO: All is not a status
 data Status = Open | Pending | Active | Done | All
-    deriving (Eq, Ord, Show)
+    deriving (Eq, Ord)
+
+
+instance Show Status where
+  show Open    = "open"
+  show Pending = "pending"
+  show Active  = "active"
+  show Done    = "done"
+  show All     = "all"
 
 
 instance ToHttpApiData Status where
-    toUrlPiece   = toLower . pack . show
-    toQueryParam = toLower . pack . show
+    toUrlPiece   = pack . show
+    toQueryParam = pack . show
 
 
 newtype Statuses = Statuses { unStatuses :: Set Status }
