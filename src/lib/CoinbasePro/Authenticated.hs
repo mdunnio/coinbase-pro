@@ -20,6 +20,7 @@ module CoinbasePro.Authenticated
   , limits
   , deposits
   , deposit
+  , makeDeposit
   ) where
 
 import           Control.Monad                      (void)
@@ -31,7 +32,7 @@ import qualified Data.Set                           as S
 import           Data.Text                          (Text, pack)
 import           Data.Text.Encoding                 (encodeUtf8)
 import           Data.Time.Clock                    (UTCTime)
-import           Data.UUID                          (UUID, toText)
+import           Data.UUID                          (toText)
 import           Network.HTTP.Types                 (SimpleQuery,
                                                      SimpleQueryItem,
                                                      encodePathSegments,
@@ -44,7 +45,10 @@ import qualified CoinbasePro.Authenticated.API      as API
 import           CoinbasePro.Authenticated.Accounts (Account, AccountHistory,
                                                      AccountId (..), Fees, Hold,
                                                      TrailingVolume (..))
-import           CoinbasePro.Authenticated.Deposit  (Deposit)
+import           CoinbasePro.Authenticated.Deposit  (Deposit,
+                                                     DepositRequest (..),
+                                                     DepositResponse,
+                                                     PaymentMethodId)
 import           CoinbasePro.Authenticated.Fills    (Fill)
 import           CoinbasePro.Authenticated.Limits   (Limits)
 import           CoinbasePro.Authenticated.Orders   (Order, PlaceOrderBody (..),
@@ -236,7 +240,20 @@ deposits prof before after lm = authRequest methodGet requestPath emptyBody API.
 
 
 -- | https://docs.pro.coinbase.com/#single-deposit
-deposit :: UUID -> CBAuthT ClientM Deposit
+deposit :: PaymentMethodId -> CBAuthT ClientM Deposit
 deposit d = authRequest methodGet requestPath emptyBody $ API.deposit d
   where
-    requestPath = encodeRequestPath ["transfers", toText d]
+    requestPath = encodeRequestPath ["transfers", pack $ show d]
+
+
+-- | https://docs.pro.coinbase.com/#payment-method
+makeDeposit :: Double
+            -> Text
+            -> PaymentMethodId
+            -> CBAuthT ClientM DepositResponse
+makeDeposit amt cur pmi =
+    authRequest methodPost requestPath seBody $ API.makeDeposit body
+  where
+    requestPath = encodeRequestPath ["deposits", "payment-method"]
+    body        = DepositRequest amt cur pmi
+    seBody      = LC8.toStrict $ encode body

@@ -13,6 +13,7 @@
 - Made several explicit `Show` instances
 - Support list deposits endpoint
 - Support get deposit request
+- Support make deposit request
 
 # Version 0.8.2.0
 

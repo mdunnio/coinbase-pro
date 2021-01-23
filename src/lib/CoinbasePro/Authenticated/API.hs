@@ -19,10 +19,10 @@ module CoinbasePro.Authenticated.API
     , limits
     , deposits
     , deposit
+    , makeDeposit
     ) where
 
 import           Data.Proxy                         (Proxy (..))
-import           Data.UUID                          (UUID)
 import           Servant.API                        (AuthProtect, Capture, JSON,
                                                      NoContent, QueryParam,
                                                      QueryParams, ReqBody,
@@ -33,7 +33,9 @@ import           Servant.Client.Core                (AuthenticatedRequest)
 import           CoinbasePro.Authenticated.Accounts (Account, AccountHistory,
                                                      AccountId (..), Fees, Hold,
                                                      TrailingVolume)
-import           CoinbasePro.Authenticated.Deposit  (Deposit)
+import           CoinbasePro.Authenticated.Deposit  (Deposit, DepositRequest,
+                                                     DepositResponse,
+                                                     PaymentMethodId)
 import           CoinbasePro.Authenticated.Fills    (Fill)
 import           CoinbasePro.Authenticated.Limits   (Limits)
 import           CoinbasePro.Authenticated.Orders   (Order, PlaceOrderBody (..),
@@ -60,7 +62,8 @@ type API =    "accounts" :> AuthGet [Account]
          :<|> "users" :> "self" :> "trailing-volume" :> AuthGet [TrailingVolume]
          :<|> "users" :> "self" :> "exchange-limits" :> AuthGet Limits
          :<|> "transfers" :> AuthGet [Deposit]
-         :<|> "transfers" :> Capture "transfer_id" UUID :> AuthGet Deposit
+         :<|> "transfers" :> Capture "transfer_id" PaymentMethodId :> AuthGet Deposit
+         :<|> "deposits" :> "payment-method" :> ReqBody '[JSON] DepositRequest :> AuthPost DepositResponse
 
 
 api :: Proxy API
@@ -82,5 +85,6 @@ fees :: AuthenticatedRequest (AuthProtect "CBAuth") -> ClientM Fees
 trailingVolume :: AuthenticatedRequest (AuthProtect "CBAuth") -> ClientM [TrailingVolume]
 limits :: AuthenticatedRequest (AuthProtect "CBAuth") -> ClientM Limits
 deposits :: AuthenticatedRequest (AuthProtect "CBAuth") -> ClientM [Deposit]
-deposit :: UUID -> AuthenticatedRequest (AuthProtect "CBAuth") -> ClientM Deposit
-accounts :<|> singleAccount :<|> accountHistory :<|> accountHolds :<|> listOrders :<|> getOrder :<|> getClientOrder :<|> placeOrder :<|> cancelOrder :<|> cancelAll :<|> fills :<|> fees :<|> trailingVolume :<|> limits :<|> deposits :<|> deposit = client api
+deposit :: PaymentMethodId -> AuthenticatedRequest (AuthProtect "CBAuth") -> ClientM Deposit
+makeDeposit :: DepositRequest -> AuthenticatedRequest (AuthProtect "CBAuth") -> ClientM DepositResponse
+accounts :<|> singleAccount :<|> accountHistory :<|> accountHolds :<|> listOrders :<|> getOrder :<|> getClientOrder :<|> placeOrder :<|> cancelOrder :<|> cancelAll :<|> fills :<|> fees :<|> trailingVolume :<|> limits :<|> deposits :<|> deposit :<|> makeDeposit = client api
