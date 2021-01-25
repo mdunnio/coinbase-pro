@@ -15,12 +15,12 @@ import           Data.Aeson                         (FromJSON, ToJSON,
 import           Data.Aeson.Casing                  (snakeCase)
 import           Data.Aeson.TH                      (defaultOptions, deriveJSON,
                                                      fieldLabelModifier)
-import           Data.Text                          (Text, pack, toLower)
+import           Data.Text                          (Text)
 import           Data.Time.Clock                    (UTCTime)
 import           Data.UUID                          (UUID)
-import           Servant.API
 
 import           CoinbasePro.Authenticated.Accounts (AccountId)
+import           CoinbasePro.Authenticated.Payment  (PaymentMethodId (..))
 import           CoinbasePro.Types                  (CreatedAt, UserId)
 
 
@@ -35,22 +35,6 @@ data DepositDetails = DepositDetails
 
 
 deriveJSON defaultOptions { fieldLabelModifier = snakeCase } ''DepositDetails
-
-
-newtype PaymentMethodId = PaymentMethodId UUID
-  deriving (Eq)
-
-
-instance Show PaymentMethodId where
-  show (PaymentMethodId p) = show p
-
-
-deriveJSON defaultOptions { fieldLabelModifier = snakeCase } ''PaymentMethodId
-
-
-instance ToHttpApiData PaymentMethodId where
-    toUrlPiece   = toLower . pack . show
-    toQueryParam = toLower . pack . show
 
 
 newtype UserNonce = UserNonce Int

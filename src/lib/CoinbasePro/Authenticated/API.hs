@@ -20,6 +20,7 @@ module CoinbasePro.Authenticated.API
     , deposits
     , deposit
     , makeDeposit
+    , paymentMethods
     ) where
 
 import           Data.Proxy                         (Proxy (..))
@@ -40,6 +41,7 @@ import           CoinbasePro.Authenticated.Fills    (Fill)
 import           CoinbasePro.Authenticated.Limits   (Limits)
 import           CoinbasePro.Authenticated.Orders   (Order, PlaceOrderBody (..),
                                                      Status (..))
+import           CoinbasePro.Authenticated.Payment  (PaymentMethod (..))
 import           CoinbasePro.Authenticated.Request  (AuthDelete, AuthGet,
                                                      AuthPost)
 import           CoinbasePro.Types                  (ClientOrderId (..),
@@ -64,6 +66,7 @@ type API =    "accounts" :> AuthGet [Account]
          :<|> "transfers" :> AuthGet [Deposit]
          :<|> "transfers" :> Capture "transfer_id" PaymentMethodId :> AuthGet Deposit
          :<|> "deposits" :> "payment-method" :> ReqBody '[JSON] DepositRequest :> AuthPost DepositResponse
+         :<|> "payment-methods" :> AuthGet [PaymentMethod]
 
 
 api :: Proxy API
@@ -87,4 +90,5 @@ limits :: AuthenticatedRequest (AuthProtect "CBAuth") -> ClientM Limits
 deposits :: AuthenticatedRequest (AuthProtect "CBAuth") -> ClientM [Deposit]
 deposit :: PaymentMethodId -> AuthenticatedRequest (AuthProtect "CBAuth") -> ClientM Deposit
 makeDeposit :: DepositRequest -> AuthenticatedRequest (AuthProtect "CBAuth") -> ClientM DepositResponse
-accounts :<|> singleAccount :<|> accountHistory :<|> accountHolds :<|> listOrders :<|> getOrder :<|> getClientOrder :<|> placeOrder :<|> cancelOrder :<|> cancelAll :<|> fills :<|> fees :<|> trailingVolume :<|> limits :<|> deposits :<|> deposit :<|> makeDeposit = client api
+paymentMethods :: AuthenticatedRequest (AuthProtect "CBAuth") -> ClientM [PaymentMethod]
+accounts :<|> singleAccount :<|> accountHistory :<|> accountHolds :<|> listOrders :<|> getOrder :<|> getClientOrder :<|> placeOrder :<|> cancelOrder :<|> cancelAll :<|> fills :<|> fees :<|> trailingVolume :<|> limits :<|> deposits :<|> deposit :<|> makeDeposit :<|> paymentMethods = client api

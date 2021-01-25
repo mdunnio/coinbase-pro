@@ -47,8 +47,8 @@ Here is a list of implemented/unimplemented features:
 		- [ ] Fee Estimate
     - [ ] Stablecoin Conversions
         - [ ] Create Conversion
-    - [ ] Payment Methods
-        - [ ] List Payment Methods
+    - [x] Payment Methods
+        - [x] List Payment Methods
     - [x] Fees
         - [x] Get Current Fees
     - [ ] Reports

@@ -21,6 +21,7 @@ module CoinbasePro.Authenticated
   , deposits
   , deposit
   , makeDeposit
+  , paymentMethods
   ) where
 
 import           Control.Monad                      (void)
@@ -55,6 +56,7 @@ import           CoinbasePro.Authenticated.Orders   (Order, PlaceOrderBody (..),
                                                      STP, Status (..),
                                                      Statuses (..), TimeInForce,
                                                      statuses)
+import           CoinbasePro.Authenticated.Payment  (PaymentMethod)
 import           CoinbasePro.Authenticated.Request  (CBAuthT (..), authRequest)
 import           CoinbasePro.Request                (RequestPath, emptyBody)
 
@@ -257,3 +259,10 @@ makeDeposit amt cur pmi =
     requestPath = encodeRequestPath ["deposits", "payment-method"]
     body        = DepositRequest amt cur pmi
     seBody      = LC8.toStrict $ encode body
+
+
+-- | https://docs.pro.coinbase.com/#list-payment-methods
+paymentMethods :: CBAuthT ClientM [PaymentMethod]
+paymentMethods = authRequest methodGet requestPath emptyBody API.paymentMethods
+  where
+    requestPath = encodeRequestPath ["payment-methods"]

@@ -14,6 +14,7 @@
 - Support list deposits endpoint
 - Support get deposit request
 - Support make deposit request
+- Support list payment methods
 
 # Version 0.8.2.0
 
