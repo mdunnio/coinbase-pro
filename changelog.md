@@ -1,6 +1,6 @@
 # Version 0.9.0.0
 
-- Upgraded to nightly-2020-01-17 (ghc 8.10.3) in preparation for a new 8.10 LTS.
+- Upgraded to lts-17.0 (ghc 8.10.3)
 - Added hie.yaml for use with haskell-language-server (hls)
 - Removed `taker_fee_rate` from `Activate` websocket message
 - Support account history endpoint

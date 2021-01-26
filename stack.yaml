@@ -1,4 +1,4 @@
-resolver: nightly-2021-01-17
+resolver: lts-17.0
 
 ghc-options:
   "$locals": -Wall

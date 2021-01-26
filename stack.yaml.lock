@@ -45,7 +45,7 @@ packages:
     hackage: unagi-chan-0.4.1.3
 snapshots:
 - completed:
-    size: 562473
-    url: https://raw.githubusercontent.com/commercialhaskell/stackage-snapshots/master/nightly/2021/1/17.yaml
-    sha256: 217ab7f1d59382a906fa39845ccf245759df4564846bcc4cfc859424a8f2d9e0
-  original: nightly-2021-01-17
+    size: 563100
+    url: https://raw.githubusercontent.com/commercialhaskell/stackage-snapshots/master/lts/17/0.yaml
+    sha256: e93a85871577ea3423d5f3454b2b6bd37c2c2123c79faf511dfb64f5b49a9f8b
+  original: lts-17.0
