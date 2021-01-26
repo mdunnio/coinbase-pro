@@ -6,7 +6,7 @@ module CoinbasePro.Authenticated.Deposit
     ( Deposit (..)
     , DepositRequest (..)
     , DepositResponse (..)
-    , PaymentMethodId
+    , CoinbaseDepositRequest (..)
     ) where
 
 import           Data.Aeson                         (FromJSON, ToJSON,
@@ -79,6 +79,16 @@ data DepositRequest = DepositRequest
 
 
 deriveJSON defaultOptions { fieldLabelModifier = snakeCase } ''DepositRequest
+
+
+data CoinbaseDepositRequest = CoinbaseDepositRequest
+    { cAmount            :: Double
+    , cCurrency          :: Text
+    , cCoinbaseAccountId :: AccountId
+    } deriving (Eq, Show)
+
+
+deriveJSON defaultOptions { fieldLabelModifier = snakeCase . drop 1 } ''CoinbaseDepositRequest
 
 
 data DepositResponse = DepositResponse

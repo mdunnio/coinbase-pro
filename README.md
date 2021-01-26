@@ -35,7 +35,7 @@ Here is a list of implemented/unimplemented features:
 		- [x] List Deposits
 		- [x] Single Deposit
         - [x] Payment Method
-        - [ ] Coinbase
+        - [x] Coinbase
 		- [ ] Generate a Crypto Deposit Address
     - [ ] Withdrawals
 		- [ ] List Withdrawals

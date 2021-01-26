@@ -20,6 +20,7 @@ module CoinbasePro.Authenticated.API
     , deposits
     , deposit
     , makeDeposit
+    , makeCoinbaseDeposit
     , paymentMethods
     ) where
 
@@ -34,14 +35,15 @@ import           Servant.Client.Core                (AuthenticatedRequest)
 import           CoinbasePro.Authenticated.Accounts (Account, AccountHistory,
                                                      AccountId (..), Fees, Hold,
                                                      TrailingVolume)
-import           CoinbasePro.Authenticated.Deposit  (Deposit, DepositRequest,
-                                                     DepositResponse,
-                                                     PaymentMethodId)
+import           CoinbasePro.Authenticated.Deposit  (CoinbaseDepositRequest,
+                                                     Deposit, DepositRequest,
+                                                     DepositResponse)
 import           CoinbasePro.Authenticated.Fills    (Fill)
 import           CoinbasePro.Authenticated.Limits   (Limits)
 import           CoinbasePro.Authenticated.Orders   (Order, PlaceOrderBody (..),
                                                      Status (..))
-import           CoinbasePro.Authenticated.Payment  (PaymentMethod (..))
+import           CoinbasePro.Authenticated.Payment  (PaymentMethod (..),
+                                                     PaymentMethodId)
 import           CoinbasePro.Authenticated.Request  (AuthDelete, AuthGet,
                                                      AuthPost)
 import           CoinbasePro.Types                  (ClientOrderId (..),
@@ -66,6 +68,7 @@ type API =    "accounts" :> AuthGet [Account]
          :<|> "transfers" :> AuthGet [Deposit]
          :<|> "transfers" :> Capture "transfer_id" PaymentMethodId :> AuthGet Deposit
          :<|> "deposits" :> "payment-method" :> ReqBody '[JSON] DepositRequest :> AuthPost DepositResponse
+         :<|> "deposits" :> "coinbase-account" :> ReqBody '[JSON] CoinbaseDepositRequest :> AuthPost DepositResponse
          :<|> "payment-methods" :> AuthGet [PaymentMethod]
 
 
@@ -90,5 +93,6 @@ limits :: AuthenticatedRequest (AuthProtect "CBAuth") -> ClientM Limits
 deposits :: AuthenticatedRequest (AuthProtect "CBAuth") -> ClientM [Deposit]
 deposit :: PaymentMethodId -> AuthenticatedRequest (AuthProtect "CBAuth") -> ClientM Deposit
 makeDeposit :: DepositRequest -> AuthenticatedRequest (AuthProtect "CBAuth") -> ClientM DepositResponse
+makeCoinbaseDeposit :: CoinbaseDepositRequest -> AuthenticatedRequest (AuthProtect "CBAuth") -> ClientM DepositResponse
 paymentMethods :: AuthenticatedRequest (AuthProtect "CBAuth") -> ClientM [PaymentMethod]
-accounts :<|> singleAccount :<|> accountHistory :<|> accountHolds :<|> listOrders :<|> getOrder :<|> getClientOrder :<|> placeOrder :<|> cancelOrder :<|> cancelAll :<|> fills :<|> fees :<|> trailingVolume :<|> limits :<|> deposits :<|> deposit :<|> makeDeposit :<|> paymentMethods = client api
+accounts :<|> singleAccount :<|> accountHistory :<|> accountHolds :<|> listOrders :<|> getOrder :<|> getClientOrder :<|> placeOrder :<|> cancelOrder :<|> cancelAll :<|> fills :<|> fees :<|> trailingVolume :<|> limits :<|> deposits :<|> deposit :<|> makeDeposit :<|> makeCoinbaseDeposit :<|> paymentMethods = client api

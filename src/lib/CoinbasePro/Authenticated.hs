@@ -21,6 +21,7 @@ module CoinbasePro.Authenticated
   , deposits
   , deposit
   , makeDeposit
+  , makeCoinbaseDeposit
   , paymentMethods
   ) where
 
@@ -46,17 +47,18 @@ import qualified CoinbasePro.Authenticated.API      as API
 import           CoinbasePro.Authenticated.Accounts (Account, AccountHistory,
                                                      AccountId (..), Fees, Hold,
                                                      TrailingVolume (..))
-import           CoinbasePro.Authenticated.Deposit  (Deposit,
+import           CoinbasePro.Authenticated.Deposit  (CoinbaseDepositRequest (..),
+                                                     Deposit,
                                                      DepositRequest (..),
-                                                     DepositResponse,
-                                                     PaymentMethodId)
+                                                     DepositResponse)
 import           CoinbasePro.Authenticated.Fills    (Fill)
 import           CoinbasePro.Authenticated.Limits   (Limits)
 import           CoinbasePro.Authenticated.Orders   (Order, PlaceOrderBody (..),
                                                      STP, Status (..),
                                                      Statuses (..), TimeInForce,
                                                      statuses)
-import           CoinbasePro.Authenticated.Payment  (PaymentMethod)
+import           CoinbasePro.Authenticated.Payment  (PaymentMethod,
+                                                     PaymentMethodId)
 import           CoinbasePro.Authenticated.Request  (CBAuthT (..), authRequest)
 import           CoinbasePro.Request                (RequestPath, emptyBody)
 
@@ -258,6 +260,19 @@ makeDeposit amt cur pmi =
   where
     requestPath = encodeRequestPath ["deposits", "payment-method"]
     body        = DepositRequest amt cur pmi
+    seBody      = LC8.toStrict $ encode body
+
+
+-- | https://docs.pro.coinbase.com/#coinbase
+makeCoinbaseDeposit :: Double
+                    -> Text
+                    -> AccountId
+                    -> CBAuthT ClientM DepositResponse
+makeCoinbaseDeposit amt cur act =
+    authRequest methodPost requestPath seBody $ API.makeCoinbaseDeposit body
+  where
+    requestPath = encodeRequestPath ["deposits", "coinbase-account"]
+    body        = CoinbaseDepositRequest amt cur act
     seBody      = LC8.toStrict $ encode body
 
 
