@@ -81,13 +81,13 @@ Here is a list of implemented/unimplemented features:
 ### Market Data Requests
 
 ```haskell
-run (trades (ProductId "BTC-USD")) >>= print
+run Sandbox (trades (ProductId "BTC-USD")) >>= print
 ```
 
 ### Authenticated Private Requests
 
 ```haskell
-runCbAuthT cpc $ do
+runCbAuthT (run Sandbox) cpc $ do
     fills (Just btcusd) Nothing >>= liftIO . print
   where
     accessKey  = CBAccessKey "<access-key>"
