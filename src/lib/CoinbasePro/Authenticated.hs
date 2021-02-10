@@ -19,7 +19,8 @@ module CoinbasePro.Authenticated
   , trailingVolume
   , limits
   , deposits
-  , deposit
+  , withdrawals
+  , transfer
   , makeDeposit
   , makeCoinbaseDeposit
   , cryptoDepositAddress
@@ -56,7 +57,6 @@ import           CoinbasePro.Authenticated.Accounts         (Account,
 import           CoinbasePro.Authenticated.CoinbaseAccounts (CoinbaseAccount)
 import           CoinbasePro.Authenticated.Deposit          (CoinbaseDepositRequest (..),
                                                              CryptoDepositAddress,
-                                                             Deposit,
                                                              DepositRequest (..),
                                                              DepositResponse)
 import           CoinbasePro.Authenticated.Fills            (Fill)
@@ -71,6 +71,8 @@ import           CoinbasePro.Authenticated.Payment          (PaymentMethod,
                                                              PaymentMethodId)
 import           CoinbasePro.Authenticated.Request          (CBAuthT (..),
                                                              authRequest)
+import           CoinbasePro.Authenticated.Transfer         (Transfer,
+                                                             TransferType (..))
 import           CoinbasePro.Request                        (RequestPath,
                                                              emptyBody)
 
@@ -245,21 +247,42 @@ deposits :: Maybe ProfileId
          -> Maybe UTCTime
          -> Maybe UTCTime
          -> Maybe Int
-         -> CBAuthT ClientM [Deposit]
-deposits prof before after lm = authRequest methodGet requestPath emptyBody API.deposits
+         -> CBAuthT ClientM [Transfer]
+deposits = transfers DepositTransferType
+
+
+-- | https://docs.pro.coinbase.com/#list-withdrawals
+withdrawals :: Maybe ProfileId
+            -> Maybe UTCTime
+            -> Maybe UTCTime
+            -> Maybe Int
+            -> CBAuthT ClientM [Transfer]
+withdrawals = transfers WithdrawTransferType
+
+
+transfers :: TransferType
+          -> Maybe ProfileId
+          -> Maybe UTCTime
+          -> Maybe UTCTime
+          -> Maybe Int
+          -> CBAuthT ClientM [Transfer]
+transfers tt prof before after lm = authRequest methodGet requestPath emptyBody $
+    API.transfers tt prof before after lm
   where
+    typeQ   = return $ mkSimpleQueryItem "type" tt
     profQ   = optionalQuery "profile_id" prof
     beforeQ = optionalQuery "before" before
     afterQ  = optionalQuery "after" after
     lmQ     = optionalQuery "limit" lm
 
-    query       = renderQuery True . simpleQueryToQuery $ profQ <> beforeQ <> afterQ <> lmQ
+    query       = renderQuery True . simpleQueryToQuery $ typeQ <> profQ <> beforeQ <> afterQ <> lmQ
     requestPath = encodeRequestPath ["transfers"] <> query
 
 
 -- | https://docs.pro.coinbase.com/#single-deposit
-deposit :: PaymentMethodId -> CBAuthT ClientM Deposit
-deposit d = authRequest methodGet requestPath emptyBody $ API.deposit d
+-- | https://docs.pro.coinbase.com/#single-withdrawal
+transfer :: PaymentMethodId -> CBAuthT ClientM Transfer
+transfer d = authRequest methodGet requestPath emptyBody $ API.transfer d
   where
     requestPath = encodeRequestPath ["transfers", pack $ show d]
 

@@ -11,13 +11,13 @@
 - Support exchange limits endpoint
 - Added `min_market_funds` and `max_market_funds` to `Product`
 - Made several explicit `Show` instances
-- Support list deposits endpoint
-- Support get deposit request
 - Support make deposit request
 - Support list payment methods
 - Support coinbase account deposits
 - Support generate a crypto deposit address
 - Support listing coinbase accounts
+- Support list tranfers endpoint
+- Support get deposit/withdrawal request
 
 # Version 0.8.2.0
 

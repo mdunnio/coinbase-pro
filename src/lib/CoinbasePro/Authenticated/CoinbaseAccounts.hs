@@ -11,9 +11,7 @@ import           Data.Aeson        (FromJSON (..), Value (..), withObject, (.:),
 import           Data.Aeson.Casing (snakeCase)
 import           Data.Aeson.TH     (defaultOptions, deriveJSON,
                                     fieldLabelModifier)
-import           Data.Aeson.Types  (parseMaybe)
 import           Data.Text         (Text)
-import           Data.UUID         (UUID)
 
 
 data BankCountry = BankCountry
@@ -49,11 +47,6 @@ instance FromJSON WireDepositInformation where
     <*> o .: "account_name"
     <*> o .: "account_address"
     <*> o .: "reference"
-
-
--- deriveJSON defaultOptions
---     { fieldLabelModifier = snakeCase
---     } ''WireDepositInformation
 
 
 data SepaDepositInformation = SepaDepositInformation

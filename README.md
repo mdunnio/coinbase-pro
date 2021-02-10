@@ -38,8 +38,8 @@ Here is a list of implemented/unimplemented features:
         - [x] Coinbase
 		- [x] Generate a Crypto Deposit Address
     - [ ] Withdrawals
-		- [ ] List Withdrawals
-		- [ ] Single Withdrawal
+		- [x] List Withdrawals
+		- [x] Single Withdrawal
 		- [ ] Canceled Withdrawal
         - [ ] Payment Method
         - [ ] Coinbase

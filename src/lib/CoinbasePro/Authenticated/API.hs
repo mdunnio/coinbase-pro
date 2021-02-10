@@ -17,8 +17,8 @@ module CoinbasePro.Authenticated.API
     , fees
     , trailingVolume
     , limits
-    , deposits
-    , deposit
+    , transfers
+    , transfer
     , makeDeposit
     , makeCoinbaseDeposit
     , cryptoDepositAddress
@@ -27,12 +27,14 @@ module CoinbasePro.Authenticated.API
     ) where
 
 import           Data.Proxy                                 (Proxy (..))
+import           Data.Time.Clock                            (UTCTime)
 import           Servant.API                                (AuthProtect,
                                                              Capture, JSON,
                                                              NoContent,
                                                              QueryParam,
+                                                             QueryParam',
                                                              QueryParams,
-                                                             ReqBody,
+                                                             ReqBody, Required,
                                                              (:<|>) (..), (:>))
 import           Servant.Client
 import           Servant.Client.Core                        (AuthenticatedRequest)
@@ -45,7 +47,6 @@ import           CoinbasePro.Authenticated.Accounts         (Account,
 import           CoinbasePro.Authenticated.CoinbaseAccounts (CoinbaseAccount)
 import           CoinbasePro.Authenticated.Deposit          (CoinbaseDepositRequest,
                                                              CryptoDepositAddress,
-                                                             Deposit,
                                                              DepositRequest,
                                                              DepositResponse)
 import           CoinbasePro.Authenticated.Fills            (Fill)
@@ -57,13 +58,16 @@ import           CoinbasePro.Authenticated.Payment          (PaymentMethod (..),
                                                              PaymentMethodId)
 import           CoinbasePro.Authenticated.Request          (AuthDelete,
                                                              AuthGet, AuthPost)
+import           CoinbasePro.Authenticated.Transfer         (Transfer,
+                                                             TransferType)
 import           CoinbasePro.Types                          (ClientOrderId (..),
                                                              OrderId (..),
-                                                             ProductId (..))
+                                                             ProductId (..),
+                                                             ProfileId)
 
 
 type API =    "accounts" :> AuthGet [Account]
-         :<|> "accounts" :> Capture "account-id" AccountId :> AuthGet Account
+         :<|> "accounts" :> Capture "account_id" AccountId :> AuthGet Account
          :<|> "accounts" :> Capture "account_id" AccountId :> "ledger" :> AuthGet [AccountHistory]
          :<|> "accounts" :> Capture "account_id" AccountId :> "holds" :> AuthGet [Hold]
          :<|> "orders" :> QueryParams "status" Status :> QueryParam "product_id" ProductId :> AuthGet [Order]
@@ -76,8 +80,14 @@ type API =    "accounts" :> AuthGet [Account]
          :<|> "fees" :> AuthGet Fees
          :<|> "users" :> "self" :> "trailing-volume" :> AuthGet [TrailingVolume]
          :<|> "users" :> "self" :> "exchange-limits" :> AuthGet Limits
-         :<|> "transfers" :> AuthGet [Deposit]
-         :<|> "transfers" :> Capture "transfer_id" PaymentMethodId :> AuthGet Deposit
+         :<|> "transfers"
+             :> QueryParam' '[Required] "type" TransferType
+             :> QueryParam "profile_id" ProfileId
+             :> QueryParam "before" UTCTime
+             :> QueryParam "after" UTCTime
+             :> QueryParam "limit" Int
+             :> AuthGet [Transfer]
+         :<|> "transfers" :> Capture "transfer_id" PaymentMethodId :> AuthGet Transfer
          :<|> "deposits" :> "payment-method" :> ReqBody '[JSON] DepositRequest :> AuthPost DepositResponse
          :<|> "deposits" :> "coinbase-account" :> ReqBody '[JSON] CoinbaseDepositRequest :> AuthPost DepositResponse
          :<|> "coinbase-accounts" :> Capture "account_id" AccountId :> "addresses" :> AuthPost CryptoDepositAddress
@@ -103,8 +113,8 @@ fills :: Maybe ProductId -> Maybe OrderId -> AuthenticatedRequest (AuthProtect "
 fees :: AuthenticatedRequest (AuthProtect "CBAuth") -> ClientM Fees
 trailingVolume :: AuthenticatedRequest (AuthProtect "CBAuth") -> ClientM [TrailingVolume]
 limits :: AuthenticatedRequest (AuthProtect "CBAuth") -> ClientM Limits
-deposits :: AuthenticatedRequest (AuthProtect "CBAuth") -> ClientM [Deposit]
-deposit :: PaymentMethodId -> AuthenticatedRequest (AuthProtect "CBAuth") -> ClientM Deposit
+transfers :: TransferType -> Maybe ProfileId -> Maybe UTCTime -> Maybe UTCTime -> Maybe Int -> AuthenticatedRequest (AuthProtect "CBAuth") -> ClientM [Transfer]
+transfer :: PaymentMethodId -> AuthenticatedRequest (AuthProtect "CBAuth") -> ClientM Transfer
 makeDeposit :: DepositRequest -> AuthenticatedRequest (AuthProtect "CBAuth") -> ClientM DepositResponse
 makeCoinbaseDeposit :: CoinbaseDepositRequest -> AuthenticatedRequest (AuthProtect "CBAuth") -> ClientM DepositResponse
 cryptoDepositAddress :: AccountId -> AuthenticatedRequest (AuthProtect "CBAuth") -> ClientM CryptoDepositAddress
@@ -112,5 +122,5 @@ paymentMethods :: AuthenticatedRequest (AuthProtect "CBAuth") -> ClientM [Paymen
 coinbaseAccounts :: AuthenticatedRequest (AuthProtect "CBAuth") -> ClientM [CoinbaseAccount]
 accounts
   :<|> singleAccount :<|> accountHistory :<|> accountHolds :<|> listOrders :<|> getOrder :<|> getClientOrder :<|> placeOrder
-  :<|> cancelOrder :<|> cancelAll :<|> fills :<|> fees :<|> trailingVolume :<|> limits :<|> deposits :<|> deposit
+  :<|> cancelOrder :<|> cancelAll :<|> fills :<|> fees :<|> trailingVolume :<|> limits :<|> transfers :<|> transfer
   :<|> makeDeposit :<|> makeCoinbaseDeposit :<|> cryptoDepositAddress :<|> paymentMethods :<|> coinbaseAccounts = client api
