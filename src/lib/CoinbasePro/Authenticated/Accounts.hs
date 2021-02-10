@@ -31,7 +31,11 @@ import           CoinbasePro.Types (CreatedAt (..), OrderId, ProductId,
 
 
 newtype AccountId = AccountId Text
-    deriving (Eq, Show)
+    deriving Eq
+
+
+instance Show AccountId where
+  show (AccountId t) = unpack t
 
 
 deriveJSON defaultOptions

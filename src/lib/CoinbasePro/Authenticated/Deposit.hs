@@ -7,6 +7,7 @@ module CoinbasePro.Authenticated.Deposit
     , DepositRequest (..)
     , DepositResponse (..)
     , CoinbaseDepositRequest (..)
+    , CryptoDepositAddress (..)
     ) where
 
 import           Data.Aeson                         (FromJSON, ToJSON,
@@ -100,3 +101,29 @@ data DepositResponse = DepositResponse
 
 
 deriveJSON defaultOptions { fieldLabelModifier = snakeCase . drop 1 } ''DepositResponse
+
+
+data AddressInfo = AddressInfo
+    { aiAddress        :: Text
+    , aiDestinationTag :: Maybe Int
+    } deriving Show
+
+
+deriveJSON defaultOptions { fieldLabelModifier = snakeCase . drop 2 } ''AddressInfo
+
+
+data CryptoDepositAddress = CryptoDepositAddress
+    { cdaId                     :: UUID
+    , cdaAddress                :: Text
+    , cdaDestinationTag         :: Maybe Int
+    , cdaAddressInfo            :: AddressInfo
+    , cdaCreatedAt              :: CreatedAt
+    , cdaUpdatedAt              :: UTCTime
+    , cdaNetwork                :: Text
+    , cdaResource               :: Text
+    , cdaDepositUri             :: Text
+    , cdaExchangeDepositAddress :: Bool
+    } deriving Show
+
+
+deriveJSON defaultOptions { fieldLabelModifier = snakeCase . drop 3 } ''CryptoDepositAddress

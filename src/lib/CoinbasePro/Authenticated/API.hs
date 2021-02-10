@@ -21,34 +21,45 @@ module CoinbasePro.Authenticated.API
     , deposit
     , makeDeposit
     , makeCoinbaseDeposit
+    , cryptoDepositAddress
     , paymentMethods
+    , coinbaseAccounts
     ) where
 
-import           Data.Proxy                         (Proxy (..))
-import           Servant.API                        (AuthProtect, Capture, JSON,
-                                                     NoContent, QueryParam,
-                                                     QueryParams, ReqBody,
-                                                     (:<|>) (..), (:>))
+import           Data.Proxy                                 (Proxy (..))
+import           Servant.API                                (AuthProtect,
+                                                             Capture, JSON,
+                                                             NoContent,
+                                                             QueryParam,
+                                                             QueryParams,
+                                                             ReqBody,
+                                                             (:<|>) (..), (:>))
 import           Servant.Client
-import           Servant.Client.Core                (AuthenticatedRequest)
+import           Servant.Client.Core                        (AuthenticatedRequest)
 
-import           CoinbasePro.Authenticated.Accounts (Account, AccountHistory,
-                                                     AccountId (..), Fees, Hold,
-                                                     TrailingVolume)
-import           CoinbasePro.Authenticated.Deposit  (CoinbaseDepositRequest,
-                                                     Deposit, DepositRequest,
-                                                     DepositResponse)
-import           CoinbasePro.Authenticated.Fills    (Fill)
-import           CoinbasePro.Authenticated.Limits   (Limits)
-import           CoinbasePro.Authenticated.Orders   (Order, PlaceOrderBody (..),
-                                                     Status (..))
-import           CoinbasePro.Authenticated.Payment  (PaymentMethod (..),
-                                                     PaymentMethodId)
-import           CoinbasePro.Authenticated.Request  (AuthDelete, AuthGet,
-                                                     AuthPost)
-import           CoinbasePro.Types                  (ClientOrderId (..),
-                                                     OrderId (..),
-                                                     ProductId (..))
+import           CoinbasePro.Authenticated.Accounts         (Account,
+                                                             AccountHistory,
+                                                             AccountId (..),
+                                                             Fees, Hold,
+                                                             TrailingVolume)
+import           CoinbasePro.Authenticated.CoinbaseAccounts (CoinbaseAccount)
+import           CoinbasePro.Authenticated.Deposit          (CoinbaseDepositRequest,
+                                                             CryptoDepositAddress,
+                                                             Deposit,
+                                                             DepositRequest,
+                                                             DepositResponse)
+import           CoinbasePro.Authenticated.Fills            (Fill)
+import           CoinbasePro.Authenticated.Limits           (Limits)
+import           CoinbasePro.Authenticated.Orders           (Order,
+                                                             PlaceOrderBody (..),
+                                                             Status (..))
+import           CoinbasePro.Authenticated.Payment          (PaymentMethod (..),
+                                                             PaymentMethodId)
+import           CoinbasePro.Authenticated.Request          (AuthDelete,
+                                                             AuthGet, AuthPost)
+import           CoinbasePro.Types                          (ClientOrderId (..),
+                                                             OrderId (..),
+                                                             ProductId (..))
 
 
 type API =    "accounts" :> AuthGet [Account]
@@ -69,7 +80,9 @@ type API =    "accounts" :> AuthGet [Account]
          :<|> "transfers" :> Capture "transfer_id" PaymentMethodId :> AuthGet Deposit
          :<|> "deposits" :> "payment-method" :> ReqBody '[JSON] DepositRequest :> AuthPost DepositResponse
          :<|> "deposits" :> "coinbase-account" :> ReqBody '[JSON] CoinbaseDepositRequest :> AuthPost DepositResponse
+         :<|> "coinbase-accounts" :> Capture "account_id" AccountId :> "addresses" :> AuthPost CryptoDepositAddress
          :<|> "payment-methods" :> AuthGet [PaymentMethod]
+         :<|> "coinbase-accounts" :> AuthGet [CoinbaseAccount]
 
 
 api :: Proxy API
@@ -94,5 +107,10 @@ deposits :: AuthenticatedRequest (AuthProtect "CBAuth") -> ClientM [Deposit]
 deposit :: PaymentMethodId -> AuthenticatedRequest (AuthProtect "CBAuth") -> ClientM Deposit
 makeDeposit :: DepositRequest -> AuthenticatedRequest (AuthProtect "CBAuth") -> ClientM DepositResponse
 makeCoinbaseDeposit :: CoinbaseDepositRequest -> AuthenticatedRequest (AuthProtect "CBAuth") -> ClientM DepositResponse
+cryptoDepositAddress :: AccountId -> AuthenticatedRequest (AuthProtect "CBAuth") -> ClientM CryptoDepositAddress
 paymentMethods :: AuthenticatedRequest (AuthProtect "CBAuth") -> ClientM [PaymentMethod]
-accounts :<|> singleAccount :<|> accountHistory :<|> accountHolds :<|> listOrders :<|> getOrder :<|> getClientOrder :<|> placeOrder :<|> cancelOrder :<|> cancelAll :<|> fills :<|> fees :<|> trailingVolume :<|> limits :<|> deposits :<|> deposit :<|> makeDeposit :<|> makeCoinbaseDeposit :<|> paymentMethods = client api
+coinbaseAccounts :: AuthenticatedRequest (AuthProtect "CBAuth") -> ClientM [CoinbaseAccount]
+accounts
+  :<|> singleAccount :<|> accountHistory :<|> accountHolds :<|> listOrders :<|> getOrder :<|> getClientOrder :<|> placeOrder
+  :<|> cancelOrder :<|> cancelAll :<|> fills :<|> fees :<|> trailingVolume :<|> limits :<|> deposits :<|> deposit
+  :<|> makeDeposit :<|> makeCoinbaseDeposit :<|> cryptoDepositAddress :<|> paymentMethods :<|> coinbaseAccounts = client api

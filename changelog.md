@@ -16,6 +16,8 @@
 - Support make deposit request
 - Support list payment methods
 - Support coinbase account deposits
+- Support generate a crypto deposit address
+- Support listing coinbase accounts
 
 # Version 0.8.2.0
 

@@ -31,12 +31,12 @@ Here is a list of implemented/unimplemented features:
         - [x] List Fills
 	- [x] Limits
 		- [x] Get Current Exchange Limits
-    - [ ] Deposits
+    - [x] Deposits
 		- [x] List Deposits
 		- [x] Single Deposit
         - [x] Payment Method
         - [x] Coinbase
-		- [ ] Generate a Crypto Deposit Address
+		- [x] Generate a Crypto Deposit Address
     - [ ] Withdrawals
 		- [ ] List Withdrawals
 		- [ ] Single Withdrawal
@@ -49,6 +49,8 @@ Here is a list of implemented/unimplemented features:
         - [ ] Create Conversion
     - [x] Payment Methods
         - [x] List Payment Methods
+	- [x] Coinbase Accounts
+		- [x] List Accounts
     - [x] Fees
         - [x] Get Current Fees
     - [ ] Reports

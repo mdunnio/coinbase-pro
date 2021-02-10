@@ -22,51 +22,65 @@ module CoinbasePro.Authenticated
   , deposit
   , makeDeposit
   , makeCoinbaseDeposit
+  , cryptoDepositAddress
   , paymentMethods
+  , coinbaseAccounts
   ) where
 
-import           Control.Monad                      (void)
-import           Data.Aeson                         (encode)
-import qualified Data.ByteString.Builder            as BB
-import qualified Data.ByteString.Lazy.Char8         as LC8
-import           Data.Maybe                         (fromMaybe)
-import qualified Data.Set                           as S
-import           Data.Text                          (Text, pack)
-import           Data.Text.Encoding                 (encodeUtf8)
-import           Data.Time.Clock                    (UTCTime)
-import           Data.UUID                          (toText)
-import           Network.HTTP.Types                 (SimpleQuery,
-                                                     SimpleQueryItem,
-                                                     encodePathSegments,
-                                                     methodDelete, methodGet,
-                                                     methodPost, renderQuery,
-                                                     simpleQueryToQuery)
-import           Servant.Client                     (ClientM)
+import           Control.Monad                              (void)
+import           Data.Aeson                                 (encode)
+import qualified Data.ByteString.Builder                    as BB
+import qualified Data.ByteString.Lazy.Char8                 as LC8
+import           Data.Maybe                                 (fromMaybe)
+import qualified Data.Set                                   as S
+import           Data.Text                                  (Text, pack)
+import           Data.Text.Encoding                         (encodeUtf8)
+import           Data.Time.Clock                            (UTCTime)
+import           Data.UUID                                  (toText)
+import           Network.HTTP.Types                         (SimpleQuery,
+                                                             SimpleQueryItem,
+                                                             encodePathSegments,
+                                                             methodDelete,
+                                                             methodGet,
+                                                             methodPost,
+                                                             renderQuery,
+                                                             simpleQueryToQuery)
+import           Servant.Client                             (ClientM)
 
-import qualified CoinbasePro.Authenticated.API      as API
-import           CoinbasePro.Authenticated.Accounts (Account, AccountHistory,
-                                                     AccountId (..), Fees, Hold,
-                                                     TrailingVolume (..))
-import           CoinbasePro.Authenticated.Deposit  (CoinbaseDepositRequest (..),
-                                                     Deposit,
-                                                     DepositRequest (..),
-                                                     DepositResponse)
-import           CoinbasePro.Authenticated.Fills    (Fill)
-import           CoinbasePro.Authenticated.Limits   (Limits)
-import           CoinbasePro.Authenticated.Orders   (Order, PlaceOrderBody (..),
-                                                     STP, Status (..),
-                                                     Statuses (..), TimeInForce,
-                                                     statuses)
-import           CoinbasePro.Authenticated.Payment  (PaymentMethod,
-                                                     PaymentMethodId)
-import           CoinbasePro.Authenticated.Request  (CBAuthT (..), authRequest)
-import           CoinbasePro.Request                (RequestPath, emptyBody)
+import qualified CoinbasePro.Authenticated.API              as API
+import           CoinbasePro.Authenticated.Accounts         (Account,
+                                                             AccountHistory,
+                                                             AccountId (..),
+                                                             Fees, Hold,
+                                                             TrailingVolume (..))
+import           CoinbasePro.Authenticated.CoinbaseAccounts (CoinbaseAccount)
+import           CoinbasePro.Authenticated.Deposit          (CoinbaseDepositRequest (..),
+                                                             CryptoDepositAddress,
+                                                             Deposit,
+                                                             DepositRequest (..),
+                                                             DepositResponse)
+import           CoinbasePro.Authenticated.Fills            (Fill)
+import           CoinbasePro.Authenticated.Limits           (Limits)
+import           CoinbasePro.Authenticated.Orders           (Order,
+                                                             PlaceOrderBody (..),
+                                                             STP, Status (..),
+                                                             Statuses (..),
+                                                             TimeInForce,
+                                                             statuses)
+import           CoinbasePro.Authenticated.Payment          (PaymentMethod,
+                                                             PaymentMethodId)
+import           CoinbasePro.Authenticated.Request          (CBAuthT (..),
+                                                             authRequest)
+import           CoinbasePro.Request                        (RequestPath,
+                                                             emptyBody)
 
 
-import           CoinbasePro.Types                  (ClientOrderId (..),
-                                                     OrderId (..), OrderType,
-                                                     Price, ProductId (..),
-                                                     ProfileId, Side, Size)
+import           CoinbasePro.Types                          (ClientOrderId (..),
+                                                             OrderId (..),
+                                                             OrderType, Price,
+                                                             ProductId (..),
+                                                             ProfileId, Side,
+                                                             Size)
 
 accountsPath :: Text
 accountsPath = "accounts"
@@ -276,8 +290,23 @@ makeCoinbaseDeposit amt cur act =
     seBody      = LC8.toStrict $ encode body
 
 
+-- | https://docs.pro.coinbase.com/#generate-a-crypto-deposit-address
+cryptoDepositAddress :: AccountId -> CBAuthT ClientM CryptoDepositAddress
+cryptoDepositAddress act =
+    authRequest methodPost requestPath emptyBody $ API.cryptoDepositAddress act
+  where
+    requestPath = encodeRequestPath ["coinbase-accounts", pack $ show act, "addresses"]
+
+
 -- | https://docs.pro.coinbase.com/#list-payment-methods
 paymentMethods :: CBAuthT ClientM [PaymentMethod]
 paymentMethods = authRequest methodGet requestPath emptyBody API.paymentMethods
   where
     requestPath = encodeRequestPath ["payment-methods"]
+
+
+-- | https://docs.pro.coinbase.com/#list-accounts64
+coinbaseAccounts :: CBAuthT ClientM [CoinbaseAccount]
+coinbaseAccounts = authRequest methodGet requestPath emptyBody API.coinbaseAccounts
+  where
+    requestPath = encodeRequestPath ["coinbase-accounts"]
