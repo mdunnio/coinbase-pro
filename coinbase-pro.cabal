@@ -68,12 +68,12 @@ library
     , http-api-data   ^>= 0.4.2
     , http-client     ^>= 0.6.4.1
     , http-client-tls ^>= 0.3.5.3
-    , http-types      ^>=0.12.3
+    , http-types      ^>= 0.12.3
     , io-streams      ^>= 1.5.2.0
     , memory          ^>= 0.15
     , network         ^>= 3.0.1.1
     , servant         ^>= 0.18.2
-    , servant-client  ^>=0.18.2
+    , servant-client  ^>= 0.18.2
     , servant-client-core ^>= 0.18.2
     , text            ^>= 1.2
     , time            ^>= 1.9.3
