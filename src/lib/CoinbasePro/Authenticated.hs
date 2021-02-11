@@ -68,7 +68,7 @@ import           CoinbasePro.Authenticated.Orders           (Order,
                                                              TimeInForce,
                                                              statuses)
 import           CoinbasePro.Authenticated.Payment          (PaymentMethod,
-                                                             PaymentMethodId)
+                                                             PaymentMethodId (..))
 import           CoinbasePro.Authenticated.Request          (CBAuthT (..),
                                                              authRequest)
 import           CoinbasePro.Authenticated.Transfer         (Transfer,
@@ -282,9 +282,9 @@ transfers tt prof before after lm = authRequest methodGet requestPath emptyBody 
 -- | https://docs.pro.coinbase.com/#single-deposit
 -- | https://docs.pro.coinbase.com/#single-withdrawal
 transfer :: PaymentMethodId -> CBAuthT ClientM Transfer
-transfer d = authRequest methodGet requestPath emptyBody $ API.transfer d
+transfer pmt@(PaymentMethodId p) = authRequest methodGet requestPath emptyBody $ API.transfer pmt
   where
-    requestPath = encodeRequestPath ["transfers", pack $ show d]
+    requestPath = encodeRequestPath ["transfers", p]
 
 
 -- | https://docs.pro.coinbase.com/#payment-method

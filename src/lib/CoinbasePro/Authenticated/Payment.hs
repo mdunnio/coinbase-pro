@@ -10,7 +10,7 @@ module CoinbasePro.Authenticated.Payment
 import           Data.Aeson.Casing (snakeCase)
 import           Data.Aeson.TH     (defaultOptions, deriveJSON,
                                     fieldLabelModifier)
-import           Data.Text         (Text, pack, toLower)
+import           Data.Text         (Text, toLower, unpack)
 import           Servant.API
 
 
@@ -19,15 +19,15 @@ newtype PaymentMethodId = PaymentMethodId Text
 
 
 instance Show PaymentMethodId where
-  show (PaymentMethodId p) = show p
+  show (PaymentMethodId p) = unpack p
 
 
 deriveJSON defaultOptions { fieldLabelModifier = snakeCase } ''PaymentMethodId
 
 
 instance ToHttpApiData PaymentMethodId where
-    toUrlPiece   = toLower . pack . show
-    toQueryParam = toLower . pack . show
+    toUrlPiece   (PaymentMethodId p) = toLower p
+    toQueryParam (PaymentMethodId p) = toLower p
 
 
 data LimitTotal = LimitTotal
