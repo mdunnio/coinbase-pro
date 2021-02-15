@@ -1,23 +1,22 @@
 # Version 0.9.0.0
 
-- Upgraded to lts-17.0 (ghc 8.10.3)
+- Upgraded to lts-17.4 (ghc 8.10.4)
 - Added hie.yaml for use with haskell-language-server (hls)
 - Removed `taker_fee_rate` from `Activate` websocket message
-- Support account history endpoint
 - Added `max_withdrawal_amount` to `CurrencyDetails`
-- Support account holds endpoint
 - Changed `example/test-request` to `Sandbox` instead of `Production`
 - Use `Network.HTTP.Types.encodePathSegments` when making `RequestPath` in authenticated requests
-- Support exchange limits endpoint
 - Added `min_market_funds` and `max_market_funds` to `Product`
 - Made several explicit `Show` instances
-- Support make deposit request
-- Support list payment methods
-- Support coinbase account deposits
-- Support generate a crypto deposit address
-- Support listing coinbase accounts
-- Support list tranfers endpoint
-- Support get deposit/withdrawal requests
+- Added support for the following endpoints:
+  - account history
+  - account holds
+  - exchange limits
+  - deposits
+  - withdrawals
+  - list payment methods
+  - listing coinbase accounts
+  - list tranfers endpoint
 
 # Version 0.8.2.0
 
