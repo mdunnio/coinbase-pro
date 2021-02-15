@@ -21,7 +21,9 @@ module CoinbasePro.Types
     , Candle (..)
     , CandleGranularity (..)
     , TwentyFourHourStats (..)
+    , CurrencyType (..)
     , Currency (..)
+    , CryptoAddress (..)
 
     , filterOrderFieldName
     ) where
@@ -288,6 +290,14 @@ instance FromJSON CurrencyDetails where
         <*> o .:? "max_withdrawal_amount"
 
 
+newtype CurrencyType = CurrencyType Text
+    deriving ToHttpApiData
+
+
+instance Show CurrencyType where
+    show (CurrencyType c) = unpack c
+
+
 data Currency = Currency
     { id      :: Text
     , name    :: Text
@@ -306,3 +316,11 @@ instance FromJSON Currency where
         <*> o .: "status"
         <*> o .:? "message"
         <*> o .: "details"
+
+
+newtype CryptoAddress = CryptoAddress Text
+    deriving ToHttpApiData
+
+
+instance Show CryptoAddress where
+    show (CryptoAddress ca) = unpack ca

@@ -17,7 +17,7 @@
 - Support generate a crypto deposit address
 - Support listing coinbase accounts
 - Support list tranfers endpoint
-- Support get deposit/withdrawal request
+- Support get deposit/withdrawal requests
 
 # Version 0.8.2.0
 

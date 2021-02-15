@@ -24,6 +24,10 @@ module CoinbasePro.Authenticated
   , makeDeposit
   , makeCoinbaseDeposit
   , cryptoDepositAddress
+  , makeWithdrawal
+  , makeCoinbaseWithdrawal
+  , makeCryptoWithdrawal
+  , withdrawalFeeEstimate
   , paymentMethods
   , coinbaseAccounts
   ) where
@@ -73,11 +77,19 @@ import           CoinbasePro.Authenticated.Request          (CBAuthT (..),
                                                              authRequest)
 import           CoinbasePro.Authenticated.Transfer         (Transfer,
                                                              TransferType (..))
+import           CoinbasePro.Authenticated.Withdrawal       (CoinbaseWithdrawalRequest (..),
+                                                             CryptoWithdrawalRequest (..),
+                                                             CryptoWithdrawalResponse,
+                                                             WithdrawalFeeEstimateResponse (..),
+                                                             WithdrawalRequest (..),
+                                                             WithdrawalResponse)
 import           CoinbasePro.Request                        (RequestPath,
                                                              emptyBody)
 
 
 import           CoinbasePro.Types                          (ClientOrderId (..),
+                                                             CryptoAddress (..),
+                                                             CurrencyType (..),
                                                              OrderId (..),
                                                              OrderType, Price,
                                                              ProductId (..),
@@ -319,6 +331,59 @@ cryptoDepositAddress act =
     authRequest methodPost requestPath emptyBody $ API.cryptoDepositAddress act
   where
     requestPath = encodeRequestPath ["coinbase-accounts", pack $ show act, "addresses"]
+
+
+-- | https://docs.pro.coinbase.com/#payment-method55
+makeWithdrawal :: Double
+               -> Text
+               -> PaymentMethodId
+               -> CBAuthT ClientM WithdrawalResponse
+makeWithdrawal amt cur pmi =
+    authRequest methodPost requestPath seBody $ API.makeWithdrawal body
+  where
+    requestPath = encodeRequestPath ["withdrawals", "payment-method"]
+    body        = WithdrawalRequest amt cur pmi
+    seBody      = LC8.toStrict $ encode body
+
+
+-- | https://docs.pro.coinbase.com/#coinbase56
+makeCoinbaseWithdrawal :: Double
+                       -> Text
+                       -> AccountId
+                       -> CBAuthT ClientM WithdrawalResponse
+makeCoinbaseWithdrawal amt cur act =
+    authRequest methodPost requestPath seBody $ API.makeCoinbaseWithdrawal body
+  where
+    requestPath = encodeRequestPath ["withdrawals", "coinbase-account"]
+    body        = CoinbaseWithdrawalRequest amt cur act
+    seBody      = LC8.toStrict $ encode body
+
+
+-- | https://docs.pro.coinbase.com/#crypto
+makeCryptoWithdrawal :: Double
+                     -> Text
+                     -> Text
+                     -> CBAuthT ClientM CryptoWithdrawalResponse
+makeCryptoWithdrawal amt cur addr =
+    authRequest methodPost requestPath seBody $ API.makeCryptoWithdrawal body
+  where
+    requestPath = encodeRequestPath ["withdrawals", "crypto"]
+    body        = CryptoWithdrawalRequest amt cur addr
+    seBody      = LC8.toStrict $ encode body
+
+
+-- | https://docs.pro.coinbase.com/#fee-estimate
+withdrawalFeeEstimate :: CurrencyType
+                      -> CryptoAddress
+                      -> CBAuthT ClientM WithdrawalFeeEstimateResponse
+withdrawalFeeEstimate cur addr =
+    authRequest methodGet requestPath emptyBody $ API.withdrawalFeeEstimate cur addr
+  where
+    curQ  = return $ mkSimpleQueryItem "currency" cur
+    addrQ = return $ mkSimpleQueryItem "crypto_address" addr
+
+    query       = renderQuery True . simpleQueryToQuery $ curQ <> addrQ
+    requestPath = encodeRequestPath ["withdrawals", "fee-estimate"] <> query
 
 
 -- | https://docs.pro.coinbase.com/#list-payment-methods

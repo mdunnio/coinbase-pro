@@ -22,6 +22,10 @@ module CoinbasePro.Authenticated.API
     , makeDeposit
     , makeCoinbaseDeposit
     , cryptoDepositAddress
+    , makeWithdrawal
+    , makeCoinbaseWithdrawal
+    , makeCryptoWithdrawal
+    , withdrawalFeeEstimate
     , paymentMethods
     , coinbaseAccounts
     ) where
@@ -60,7 +64,15 @@ import           CoinbasePro.Authenticated.Request          (AuthDelete,
                                                              AuthGet, AuthPost)
 import           CoinbasePro.Authenticated.Transfer         (Transfer,
                                                              TransferType)
+import           CoinbasePro.Authenticated.Withdrawal       (CoinbaseWithdrawalRequest (..),
+                                                             CryptoWithdrawalRequest,
+                                                             CryptoWithdrawalResponse,
+                                                             WithdrawalFeeEstimateResponse,
+                                                             WithdrawalRequest,
+                                                             WithdrawalResponse)
 import           CoinbasePro.Types                          (ClientOrderId (..),
+                                                             CryptoAddress,
+                                                             CurrencyType,
                                                              OrderId (..),
                                                              ProductId (..),
                                                              ProfileId)
@@ -91,6 +103,13 @@ type API =    "accounts" :> AuthGet [Account]
          :<|> "deposits" :> "payment-method" :> ReqBody '[JSON] DepositRequest :> AuthPost DepositResponse
          :<|> "deposits" :> "coinbase-account" :> ReqBody '[JSON] CoinbaseDepositRequest :> AuthPost DepositResponse
          :<|> "coinbase-accounts" :> Capture "account_id" AccountId :> "addresses" :> AuthPost CryptoDepositAddress
+         :<|> "withdrawals" :> "payment-method" :> ReqBody '[JSON] WithdrawalRequest :> AuthPost WithdrawalResponse
+         :<|> "withdrawals" :> "coinbase-account" :> ReqBody '[JSON] CoinbaseWithdrawalRequest :> AuthPost WithdrawalResponse
+         :<|> "withdrawals" :> "crypto" :> ReqBody '[JSON] CryptoWithdrawalRequest :> AuthPost CryptoWithdrawalResponse
+         :<|> "withdrawals" :> "fee-estimate"
+             :> QueryParam' '[Required] "currency" CurrencyType
+             :> QueryParam' '[Required] "crypto_address" CryptoAddress
+             :> AuthGet WithdrawalFeeEstimateResponse
          :<|> "payment-methods" :> AuthGet [PaymentMethod]
          :<|> "coinbase-accounts" :> AuthGet [CoinbaseAccount]
 
@@ -118,9 +137,14 @@ transfer :: PaymentMethodId -> AuthenticatedRequest (AuthProtect "CBAuth") -> Cl
 makeDeposit :: DepositRequest -> AuthenticatedRequest (AuthProtect "CBAuth") -> ClientM DepositResponse
 makeCoinbaseDeposit :: CoinbaseDepositRequest -> AuthenticatedRequest (AuthProtect "CBAuth") -> ClientM DepositResponse
 cryptoDepositAddress :: AccountId -> AuthenticatedRequest (AuthProtect "CBAuth") -> ClientM CryptoDepositAddress
+makeWithdrawal :: WithdrawalRequest -> AuthenticatedRequest (AuthProtect "CBAuth") -> ClientM WithdrawalResponse
+makeCoinbaseWithdrawal :: CoinbaseWithdrawalRequest -> AuthenticatedRequest (AuthProtect "CBAuth") -> ClientM WithdrawalResponse
+makeCryptoWithdrawal :: CryptoWithdrawalRequest -> AuthenticatedRequest (AuthProtect "CBAuth") -> ClientM CryptoWithdrawalResponse
+withdrawalFeeEstimate :: CurrencyType -> CryptoAddress -> AuthenticatedRequest (AuthProtect "CBAuth") -> ClientM WithdrawalFeeEstimateResponse
 paymentMethods :: AuthenticatedRequest (AuthProtect "CBAuth") -> ClientM [PaymentMethod]
 coinbaseAccounts :: AuthenticatedRequest (AuthProtect "CBAuth") -> ClientM [CoinbaseAccount]
 accounts
   :<|> singleAccount :<|> accountHistory :<|> accountHolds :<|> listOrders :<|> getOrder :<|> getClientOrder :<|> placeOrder
   :<|> cancelOrder :<|> cancelAll :<|> fills :<|> fees :<|> trailingVolume :<|> limits :<|> transfers :<|> transfer
-  :<|> makeDeposit :<|> makeCoinbaseDeposit :<|> cryptoDepositAddress :<|> paymentMethods :<|> coinbaseAccounts = client api
+  :<|> makeDeposit :<|> makeCoinbaseDeposit :<|> cryptoDepositAddress :<|> makeWithdrawal :<|> makeCoinbaseWithdrawal
+  :<|> makeCryptoWithdrawal :<|> withdrawalFeeEstimate :<|> paymentMethods :<|> coinbaseAccounts = client api

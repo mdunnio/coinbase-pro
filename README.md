@@ -41,10 +41,10 @@ Here is a list of implemented/unimplemented features:
 		- [x] List Withdrawals
 		- [x] Single Withdrawal
 		- [ ] Canceled Withdrawal
-        - [ ] Payment Method
-        - [ ] Coinbase
-        - [ ] Crypto
-		- [ ] Fee Estimate
+        - [x] Payment Method
+        - [x] Coinbase
+        - [x] Crypto
+		- [x] Fee Estimate
     - [ ] Stablecoin Conversions
         - [ ] Create Conversion
     - [x] Payment Methods
