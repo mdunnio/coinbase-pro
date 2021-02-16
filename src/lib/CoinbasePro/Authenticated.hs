@@ -32,7 +32,8 @@ module CoinbasePro.Authenticated
   ) where
 
 import           Control.Monad                              (void)
-import           Data.Aeson                                 (encode)
+import           Data.Aeson                                 (ToJSON, encode)
+import           Data.ByteString                            (ByteString)
 import qualified Data.ByteString.Lazy.Char8                 as LC8
 import           Data.Maybe                                 (fromMaybe)
 import qualified Data.Set                                   as S
@@ -93,6 +94,7 @@ import           CoinbasePro.Types                          (ClientOrderId (..),
                                                              ProfileId, Side,
                                                              Size)
 
+
 accountsPath :: Text
 accountsPath = "accounts"
 
@@ -115,6 +117,10 @@ mkProductQuery = optionalQuery "product_id"
 
 mkOrderIdQuery :: Maybe OrderId -> SimpleQuery
 mkOrderIdQuery = optionalQuery "order_id"
+
+
+encodeBody :: (ToJSON b) => b -> ByteString
+encodeBody = LC8.toStrict . encode
 
 
 -- | https://docs.pro.coinbase.com/#accounts
@@ -191,11 +197,10 @@ placeOrder :: Maybe ClientOrderId
            -> Maybe TimeInForce
            -> CBAuthT ClientM Order
 placeOrder clordid prid sd sz price po ot stp tif =
-    authRequest methodPost requestPath seBody $ API.placeOrder body
+    authRequest methodPost requestPath (encodeBody body) $ API.placeOrder body
   where
     requestPath = encodeRequestPath [ordersPath]
     body        = PlaceOrderBody clordid prid sd sz price po ot stp tif
-    seBody      = LC8.toStrict $ encode body
 
 
 -- | https://docs.pro.coinbase.com/#cancel-an-order
@@ -298,11 +303,10 @@ makeDeposit :: Double
             -> PaymentMethodId
             -> CBAuthT ClientM DepositResponse
 makeDeposit amt cur pmi =
-    authRequest methodPost requestPath seBody $ API.makeDeposit body
+    authRequest methodPost requestPath (encodeBody body) $ API.makeDeposit body
   where
     requestPath = encodeRequestPath ["deposits", "payment-method"]
     body        = DepositRequest amt cur pmi
-    seBody      = LC8.toStrict $ encode body
 
 
 -- | https://docs.pro.coinbase.com/#coinbase
@@ -311,11 +315,10 @@ makeCoinbaseDeposit :: Double
                     -> AccountId
                     -> CBAuthT ClientM DepositResponse
 makeCoinbaseDeposit amt cur act =
-    authRequest methodPost requestPath seBody $ API.makeCoinbaseDeposit body
+    authRequest methodPost requestPath (encodeBody body) $ API.makeCoinbaseDeposit body
   where
     requestPath = encodeRequestPath ["deposits", "coinbase-account"]
     body        = CoinbaseDepositRequest amt cur act
-    seBody      = LC8.toStrict $ encode body
 
 
 -- | https://docs.pro.coinbase.com/#generate-a-crypto-deposit-address
@@ -332,11 +335,10 @@ makeWithdrawal :: Double
                -> PaymentMethodId
                -> CBAuthT ClientM WithdrawalResponse
 makeWithdrawal amt cur pmi =
-    authRequest methodPost requestPath seBody $ API.makeWithdrawal body
+    authRequest methodPost requestPath (encodeBody body) $ API.makeWithdrawal body
   where
     requestPath = encodeRequestPath ["withdrawals", "payment-method"]
     body        = WithdrawalRequest amt cur pmi
-    seBody      = LC8.toStrict $ encode body
 
 
 -- | https://docs.pro.coinbase.com/#coinbase56
@@ -345,11 +347,10 @@ makeCoinbaseWithdrawal :: Double
                        -> AccountId
                        -> CBAuthT ClientM WithdrawalResponse
 makeCoinbaseWithdrawal amt cur act =
-    authRequest methodPost requestPath seBody $ API.makeCoinbaseWithdrawal body
+    authRequest methodPost requestPath (encodeBody body) $ API.makeCoinbaseWithdrawal body
   where
     requestPath = encodeRequestPath ["withdrawals", "coinbase-account"]
     body        = CoinbaseWithdrawalRequest amt cur act
-    seBody      = LC8.toStrict $ encode body
 
 
 -- | https://docs.pro.coinbase.com/#crypto
@@ -358,11 +359,10 @@ makeCryptoWithdrawal :: Double
                      -> Text
                      -> CBAuthT ClientM CryptoWithdrawalResponse
 makeCryptoWithdrawal amt cur addr =
-    authRequest methodPost requestPath seBody $ API.makeCryptoWithdrawal body
+    authRequest methodPost requestPath (encodeBody body) $ API.makeCryptoWithdrawal body
   where
     requestPath = encodeRequestPath ["withdrawals", "crypto"]
     body        = CryptoWithdrawalRequest amt cur addr
-    seBody      = LC8.toStrict $ encode body
 
 
 -- | https://docs.pro.coinbase.com/#fee-estimate
