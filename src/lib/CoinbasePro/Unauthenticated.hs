@@ -1,5 +1,4 @@
-{-# LANGUAGE DataKinds     #-}
-{-# LANGUAGE TypeOperators #-}
+{-# LANGUAGE DataKinds #-}
 
 module CoinbasePro.Unauthenticated
    ( products

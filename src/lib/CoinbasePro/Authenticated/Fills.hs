@@ -1,3 +1,4 @@
+{-# LANGUAGE LambdaCase        #-}
 {-# LANGUAGE OverloadedStrings #-}
 
 module CoinbasePro.Authenticated.Fills
@@ -17,8 +18,8 @@ data Liquidity = Maker | Taker
 
 
 instance FromJSON Liquidity where
-    parseJSON = withText "liquidity" $ \t ->
-      case t of
+    parseJSON = withText "liquidity" $
+      \case
         "M" -> return Maker
         "T" -> return Taker
         _   -> fail "parse error"

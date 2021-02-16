@@ -1,3 +1,4 @@
+{-# LANGUAGE LambdaCase        #-}
 {-# LANGUAGE OverloadedStrings #-}
 
 module CoinbasePro.WebSocketFeed.Response
@@ -24,8 +25,8 @@ instance Show ResponseMessageType where
 
 
 instance FromJSON ResponseMessageType where
-    parseJSON v = withText "response message type" (\t ->
-      case t of
+    parseJSON v = withText "response message type" (
+      \case
         "subscriptions" -> return Subscriptions
         _               -> typeMismatch "response message type" v) v
 
