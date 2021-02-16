@@ -7,27 +7,22 @@ module CoinbasePro.WebSocketFeed
 import           Control.Concurrent                 (forkIO)
 import           Control.Exception                  (Exception, throwIO)
 import           Control.Monad                      (forever)
-import           Control.Monad.IO.Class             (liftIO)
 import           Data.Aeson                         (decode', encode)
-import           Network.HTTP.Types                 (methodGet)
 import qualified Network.WebSockets                 as WS
 import qualified System.IO.Streams                  as Streams
 import           System.IO.Streams.Concurrent.Unagi (makeChanPipe)
 import qualified Wuss                               as WU
 
-import           CoinbasePro.Authenticated.Request  (CoinbaseProCredentials (..),
-                                                     mkCBAccessSign,
-                                                     mkCBAccessTimeStamp)
+import           CoinbasePro.Authenticated.Request  (CoinbaseProCredentials (..))
 import           CoinbasePro.Environment            (Environment,
                                                      WSConnection (..),
                                                      wsEndpoint)
-import           CoinbasePro.Request                (emptyBody)
 import           CoinbasePro.Types                  (ProductId)
 import           CoinbasePro.WebSocketFeed.Channel  (ChannelMessage (..))
-import           CoinbasePro.WebSocketFeed.Request  (AuthenticatedWebSocketFeedRequest (..),
-                                                     ChannelName (..),
+import           CoinbasePro.WebSocketFeed.Request  (ChannelName (..),
                                                      RequestMessageType (..),
-                                                     WebSocketFeedRequest (..))
+                                                     WebSocketFeedRequest (..),
+                                                     authenticatedWebSocketFeedRequest)
 
 
 data ParseException = ParseException deriving Show
@@ -52,18 +47,11 @@ subscribe wsConn prids channels cpc = do
     wsHost = host wsConn
     wsPort = port wsConn
 
-    mkWsRequest = maybe (return $ encode wsRequest) (fmap encode . authWsRequest)
-
-    wsRequest = WebSocketFeedRequest Subscribe prids channels
-
-    authWsRequest cpc' = do
-        ts <- liftIO mkCBAccessTimeStamp
-        let cbs = mkCBAccessSign (cbSecretKey cpc') ts methodGet authSubscriptionPath emptyBody
-        return $ AuthenticatedWebSocketFeedRequest wsRequest cbs (cbAccessKey cpc') (cbAccessPassphrase cpc') ts
-
-    authSubscriptionPath = "/users/self/verify"
+    mkWsRequest   = maybe (return $ encode wsRequest) (fmap encode . authWsRequest)
+    wsRequest     = WebSocketFeedRequest Subscribe prids channels
+    authWsRequest = authenticatedWebSocketFeedRequest wsRequest
 
 
 parseFeed :: WS.Connection -> IO ChannelMessage
-parseFeed conn = maybe err return =<< (decode' <$> WS.receiveData conn)
+parseFeed conn = WS.receiveData conn >>= maybe err return . decode'
   where err = throwIO ParseException

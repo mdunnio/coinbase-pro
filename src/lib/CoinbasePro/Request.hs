@@ -18,19 +18,23 @@ module CoinbasePro.Request
     , Runner
 
     , emptyBody
+    , encodeRequestPath
     ) where
 
-import           Control.Exception       (throw)
-import           Control.Monad           (void)
-import           Data.ByteString         (ByteString)
-import           Data.Text               (unpack)
-import           Network.HTTP.Client     (Manager, newManager)
-import           Network.HTTP.Client.TLS (tlsManagerSettings)
-import           Servant.API             (Get, JSON, (:>))
+import           Control.Exception          (throw)
+import           Control.Monad              (void)
+import           Data.ByteString            (ByteString)
+import qualified Data.ByteString.Builder    as BB
+import qualified Data.ByteString.Lazy.Char8 as LC8
+import           Data.Text                  (Text, unpack)
+import           Network.HTTP.Client        (Manager, newManager)
+import           Network.HTTP.Client.TLS    (tlsManagerSettings)
+import           Network.HTTP.Types         (encodePathSegments)
+import           Servant.API                (Get, JSON, (:>))
 import           Servant.Client
 
-import           CoinbasePro.Environment (Environment, apiEndpoint)
-import           CoinbasePro.Headers     (UserAgent, UserAgentHeader)
+import           CoinbasePro.Environment    (Environment, apiEndpoint)
+import           CoinbasePro.Headers        (UserAgent, UserAgentHeader)
 
 
 type CBGet a = UserAgentHeader :> Get '[JSON] a
@@ -85,3 +89,7 @@ runWithManager mgr env f = either throw return =<<
 
 emptyBody :: ByteString
 emptyBody = ""
+
+
+encodeRequestPath :: [Text] -> RequestPath
+encodeRequestPath = LC8.toStrict . BB.toLazyByteString . encodePathSegments

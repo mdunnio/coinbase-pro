@@ -5,16 +5,25 @@ module CoinbasePro.WebSocketFeed.Request
   ( RequestMessageType (..)
   , ChannelName(..)
   , WebSocketFeedRequest (..)
-  , AuthenticatedWebSocketFeedRequest (..)
+  , AuthenticatedWebSocketFeedRequest
+
+  , authenticatedWebSocketFeedRequest
   ) where
 
+import           Control.Monad.IO.Class            (liftIO)
 import           Data.Aeson                        (FromJSON (..), ToJSON (..),
                                                     object, withText, (.=))
+import           Network.HTTP.Types                (methodGet)
 
 import           CoinbasePro.Authenticated.Headers (CBAccessKey (..),
                                                     CBAccessPassphrase (..),
                                                     CBAccessSign (..),
                                                     CBAccessTimeStamp (..))
+import           CoinbasePro.Authenticated.Request (CoinbaseProCredentials (..),
+                                                    mkCBAccessSign,
+                                                    mkCBAccessTimeStamp)
+import           CoinbasePro.Request               (emptyBody,
+                                                    encodeRequestPath)
 import           CoinbasePro.Types                 (ProductId)
 
 
@@ -74,13 +83,8 @@ instance ToJSON WebSocketFeedRequest where
         , "channels" .= rc
         ]
 
-data AuthenticatedWebSocketFeedRequest = AuthenticatedWebSocketFeedRequest
-    { request      :: WebSocketFeedRequest
-    , cbSig        :: CBAccessSign
-    , cbKey        :: CBAccessKey
-    , cbPassphrase :: CBAccessPassphrase
-    , cbTimestamp  :: CBAccessTimeStamp
-    } deriving (Eq)
+data AuthenticatedWebSocketFeedRequest =
+  AuthenticatedWebSocketFeedRequest WebSocketFeedRequest CBAccessSign CBAccessKey CBAccessPassphrase CBAccessTimeStamp
 
 
 instance ToJSON AuthenticatedWebSocketFeedRequest where
@@ -93,3 +97,13 @@ instance ToJSON AuthenticatedWebSocketFeedRequest where
         , "passphrase" .= p
         , "timestamp" .= t
         ]
+
+authenticatedWebSocketFeedRequest :: WebSocketFeedRequest
+                                  -> CoinbaseProCredentials
+                                  -> IO AuthenticatedWebSocketFeedRequest
+authenticatedWebSocketFeedRequest wsRequest cpc = do
+    ts <- liftIO mkCBAccessTimeStamp
+    let cbs = mkCBAccessSign (cbSecretKey cpc) ts methodGet authSubscriptionPath emptyBody
+    return $ AuthenticatedWebSocketFeedRequest wsRequest cbs (cbAccessKey cpc) (cbAccessPassphrase cpc) ts
+  where
+    authSubscriptionPath = encodeRequestPath ["users", "self", "verify"]

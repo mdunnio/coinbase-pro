@@ -34,7 +34,6 @@ module CoinbasePro.Authenticated
 
 import           Control.Monad                              (void)
 import           Data.Aeson                                 (encode)
-import qualified Data.ByteString.Builder                    as BB
 import qualified Data.ByteString.Lazy.Char8                 as LC8
 import           Data.Maybe                                 (fromMaybe)
 import qualified Data.Set                                   as S
@@ -44,7 +43,6 @@ import           Data.Time.Clock                            (UTCTime)
 import           Data.UUID                                  (toText)
 import           Network.HTTP.Types                         (SimpleQuery,
                                                              SimpleQueryItem,
-                                                             encodePathSegments,
                                                              methodDelete,
                                                              methodGet,
                                                              methodPost,
@@ -83,8 +81,8 @@ import           CoinbasePro.Authenticated.Withdrawal       (CoinbaseWithdrawalR
                                                              WithdrawalFeeEstimateResponse (..),
                                                              WithdrawalRequest (..),
                                                              WithdrawalResponse)
-import           CoinbasePro.Request                        (RequestPath,
-                                                             emptyBody)
+import           CoinbasePro.Request                        (emptyBody,
+                                                             encodeRequestPath)
 
 
 import           CoinbasePro.Types                          (ClientOrderId (..),
@@ -102,10 +100,6 @@ accountsPath = "accounts"
 
 ordersPath :: Text
 ordersPath = "orders"
-
-
-encodeRequestPath :: [Text] -> RequestPath
-encodeRequestPath = LC8.toStrict . BB.toLazyByteString . encodePathSegments
 
 
 mkSimpleQueryItem :: Show a => Text -> a -> SimpleQueryItem
