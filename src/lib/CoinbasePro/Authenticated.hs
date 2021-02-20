@@ -29,6 +29,9 @@ module CoinbasePro.Authenticated
   , withdrawalFeeEstimate
   , paymentMethods
   , coinbaseAccounts
+  , profiles
+  , profile
+  , profileTransfer
   ) where
 
 import           Control.Monad                              (void)
@@ -71,10 +74,13 @@ import           CoinbasePro.Authenticated.Orders           (Order,
                                                              statuses)
 import           CoinbasePro.Authenticated.Payment          (PaymentMethod,
                                                              PaymentMethodId (..))
+import           CoinbasePro.Authenticated.Profile          (Profile,
+                                                             ProfileTransfer (..))
 import           CoinbasePro.Authenticated.Request          (CBAuthT (..),
                                                              authRequest)
 import           CoinbasePro.Authenticated.Transfer         (Transfer,
                                                              TransferType (..))
+
 import           CoinbasePro.Authenticated.Withdrawal       (CoinbaseWithdrawalRequest (..),
                                                              CryptoWithdrawalRequest (..),
                                                              CryptoWithdrawalResponse,
@@ -391,3 +397,32 @@ coinbaseAccounts :: CBAuthT ClientM [CoinbaseAccount]
 coinbaseAccounts = authRequest methodGet requestPath emptyBody API.coinbaseAccounts
   where
     requestPath = encodeRequestPath ["coinbase-accounts"]
+
+
+-- | https://docs.pro.coinbase.com/#list-profiles
+profiles :: Maybe Bool -> CBAuthT ClientM [Profile]
+profiles active = authRequest methodGet requestPath emptyBody $ API.profiles active
+  where
+    activeQ  = optionalQuery "active" active
+
+    query       = renderQuery True . simpleQueryToQuery $ activeQ
+    requestPath = encodeRequestPath ["profiles"] <> query
+
+
+-- | https://docs.pro.coinbase.com/#get-a-profile
+profile :: ProfileId -> CBAuthT ClientM Profile
+profile profId = authRequest methodGet requestPath emptyBody $ API.profile profId
+  where
+    requestPath = encodeRequestPath ["profiles", profId]
+
+
+-- | https://docs.pro.coinbase.com/#create-profile-transfer
+profileTransfer :: ProfileId
+                -> ProfileId
+                -> CurrencyType
+                -> String
+                -> CBAuthT ClientM ()
+profileTransfer fromProf toProf cur amt = void . authRequest methodPost requestPath (encodeBody body) $ API.profileTransfer body
+  where
+    requestPath = encodeRequestPath ["profiles", "transfer"]
+    body        = ProfileTransfer fromProf toProf cur amt

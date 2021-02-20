@@ -28,9 +28,13 @@ module CoinbasePro.Authenticated.API
     , withdrawalFeeEstimate
     , paymentMethods
     , coinbaseAccounts
+    , profiles
+    , profile
+    , profileTransfer
     ) where
 
 import           Data.Proxy                                 (Proxy (..))
+import           Data.Text                                  (Text)
 import           Data.Time.Clock                            (UTCTime)
 import           Servant.API                                (AuthProtect,
                                                              Capture, JSON,
@@ -60,6 +64,8 @@ import           CoinbasePro.Authenticated.Orders           (Order,
                                                              Status (..))
 import           CoinbasePro.Authenticated.Payment          (PaymentMethod (..),
                                                              PaymentMethodId)
+import           CoinbasePro.Authenticated.Profile          (Profile,
+                                                             ProfileTransfer)
 import           CoinbasePro.Authenticated.Request          (AuthDelete,
                                                              AuthGet, AuthPost)
 import           CoinbasePro.Authenticated.Transfer         (Transfer,
@@ -112,6 +118,9 @@ type API =    "accounts" :> AuthGet [Account]
              :> AuthGet WithdrawalFeeEstimateResponse
          :<|> "payment-methods" :> AuthGet [PaymentMethod]
          :<|> "coinbase-accounts" :> AuthGet [CoinbaseAccount]
+         :<|> "profiles" :> QueryParam "active" Bool :> AuthGet [Profile]
+         :<|> "profiles" :> Capture "profile_id" ProfileId :> AuthGet Profile
+         :<|> "profiles" :> "transfer" :> ReqBody '[JSON] ProfileTransfer :> AuthPost NoContent
 
 
 api :: Proxy API
@@ -143,8 +152,12 @@ makeCryptoWithdrawal :: CryptoWithdrawalRequest -> AuthenticatedRequest (AuthPro
 withdrawalFeeEstimate :: CurrencyType -> CryptoAddress -> AuthenticatedRequest (AuthProtect "CBAuth") -> ClientM WithdrawalFeeEstimateResponse
 paymentMethods :: AuthenticatedRequest (AuthProtect "CBAuth") -> ClientM [PaymentMethod]
 coinbaseAccounts :: AuthenticatedRequest (AuthProtect "CBAuth") -> ClientM [CoinbaseAccount]
+profiles :: Maybe Bool -> AuthenticatedRequest (AuthProtect "CBAuth") -> ClientM [Profile]
+profile :: ProfileId -> AuthenticatedRequest (AuthProtect "CBAuth") -> ClientM Profile
+profileTransfer :: ProfileTransfer -> AuthenticatedRequest (AuthProtect "CBAuth") -> ClientM NoContent
 accounts
   :<|> singleAccount :<|> accountHistory :<|> accountHolds :<|> listOrders :<|> getOrder :<|> getClientOrder :<|> placeOrder
   :<|> cancelOrder :<|> cancelAll :<|> fills :<|> fees :<|> trailingVolume :<|> limits :<|> transfers :<|> transfer
   :<|> makeDeposit :<|> makeCoinbaseDeposit :<|> cryptoDepositAddress :<|> makeWithdrawal :<|> makeCoinbaseWithdrawal
-  :<|> makeCryptoWithdrawal :<|> withdrawalFeeEstimate :<|> paymentMethods :<|> coinbaseAccounts = client api
+  :<|> makeCryptoWithdrawal :<|> withdrawalFeeEstimate :<|> paymentMethods :<|> coinbaseAccounts :<|> profiles :<|> profile
+  :<|> profileTransfer = client api

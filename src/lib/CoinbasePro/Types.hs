@@ -298,6 +298,12 @@ instance Show CurrencyType where
     show (CurrencyType c) = unpack c
 
 
+deriveJSON defaultOptions
+    { fieldLabelModifier = snakeCase
+    , unwrapUnaryRecords = True
+    } ''CurrencyType
+
+
 data Currency = Currency
     { id      :: Text
     , name    :: Text
@@ -324,3 +330,9 @@ newtype CryptoAddress = CryptoAddress Text
 
 instance Show CryptoAddress where
     show (CryptoAddress ca) = unpack ca
+
+
+deriveJSON defaultOptions
+    { fieldLabelModifier = snakeCase
+    , unwrapUnaryRecords = True
+    } ''CryptoAddress
