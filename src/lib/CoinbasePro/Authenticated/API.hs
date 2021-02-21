@@ -34,7 +34,6 @@ module CoinbasePro.Authenticated.API
     ) where
 
 import           Data.Proxy                                 (Proxy (..))
-import           Data.Text                                  (Text)
 import           Data.Time.Clock                            (UTCTime)
 import           Servant.API                                (AuthProtect,
                                                              Capture, JSON,
