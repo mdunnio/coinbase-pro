@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 6d5d68b6e7e2760dac46a876ebbca9195bb32e0cb846b290d8db552d28a24647
+-- hash: b7a3d129f956cdcb94f75c79fa0e02f7347ed3d87a3812e84acccadbba57023f
 
 name:           coinbase-pro
 version:        0.9.0.0
@@ -39,6 +39,8 @@ library
       CoinbasePro.Authenticated.Limits
       CoinbasePro.Authenticated.Orders
       CoinbasePro.Authenticated.Payment
+      CoinbasePro.Authenticated.Profile
+      CoinbasePro.Authenticated.Report
       CoinbasePro.Authenticated.Request
       CoinbasePro.Authenticated.Transfer
       CoinbasePro.Authenticated.Withdrawal

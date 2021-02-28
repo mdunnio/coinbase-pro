@@ -32,6 +32,7 @@ module CoinbasePro.Authenticated
   , profiles
   , profile
   , profileTransfer
+  , createReport
   ) where
 
 import           Control.Monad                              (void)
@@ -76,6 +77,7 @@ import           CoinbasePro.Authenticated.Payment          (PaymentMethod,
                                                              PaymentMethodId (..))
 import           CoinbasePro.Authenticated.Profile          (Profile,
                                                              ProfileTransfer (..))
+import           CoinbasePro.Authenticated.Report           (ReportResponse)
 import           CoinbasePro.Authenticated.Request          (CBAuthT (..),
                                                              authRequest)
 import           CoinbasePro.Authenticated.Transfer         (Transfer,
@@ -426,3 +428,8 @@ profileTransfer fromProf toProf cur amt = void . authRequest methodPost requestP
   where
     requestPath = encodeRequestPath ["profiles", "transfer"]
     body        = ProfileTransfer fromProf toProf cur amt
+
+
+-- | https://docs.pro.coinbase.com/#create-a-new-report
+createReport :: CBAuthT ClientM ReportResponse
+createReport = undefined
