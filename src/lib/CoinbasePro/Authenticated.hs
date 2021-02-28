@@ -109,6 +109,34 @@ ordersPath :: Text
 ordersPath = "orders"
 
 
+depositsPath :: Text
+depositsPath = "deposits"
+
+
+withdrawalsPath :: Text
+withdrawalsPath = "withdrawals"
+
+
+coinbaseAccountPath :: Text
+coinbaseAccountPath = "coinbase-account"
+
+
+profilesPath :: Text
+profilesPath = "profiles"
+
+
+transferPath :: Text
+transferPath = "transfer"
+
+
+usersPath :: Text
+usersPath = "users"
+
+
+selfPath :: Text
+selfPath = "self"
+
+
 mkSimpleQueryItem :: Show a => Text -> a -> SimpleQueryItem
 mkSimpleQueryItem s a = (encodeUtf8 s, encodeUtf8 $ pack (show a))
 
@@ -248,14 +276,14 @@ fees = authRequest methodGet feesRequestPath emptyBody API.fees
 trailingVolume :: CBAuthT ClientM [TrailingVolume]
 trailingVolume = authRequest methodGet requestPath emptyBody API.trailingVolume
   where
-    requestPath = encodeRequestPath ["users", "self", "trailing-volume"]
+    requestPath = encodeRequestPath [usersPath, selfPath, "trailing-volume"]
 
 
 -- | https://docs.pro.coinbase.com/#get-current-exchange-limits
 limits :: CBAuthT ClientM Limits
 limits = authRequest methodGet requestPath emptyBody API.limits
   where
-    requestPath = encodeRequestPath ["users", "self", "exchange-limits"]
+    requestPath = encodeRequestPath [usersPath, selfPath, "exchange-limits"]
 
 
 -- | https://docs.pro.coinbase.com/#list-deposits
@@ -292,7 +320,7 @@ transfers tt prof before after lm = authRequest methodGet requestPath emptyBody 
     lmQ     = optionalQuery "limit" lm
 
     query       = renderQuery True . simpleQueryToQuery $ typeQ <> profQ <> beforeQ <> afterQ <> lmQ
-    requestPath = encodeRequestPath ["transfers"] <> query
+    requestPath = encodeRequestPath [transferPath <> "s"] <> query
 
 
 -- | https://docs.pro.coinbase.com/#single-deposit
@@ -300,7 +328,7 @@ transfers tt prof before after lm = authRequest methodGet requestPath emptyBody 
 transfer :: PaymentMethodId -> CBAuthT ClientM Transfer
 transfer pmt@(PaymentMethodId p) = authRequest methodGet requestPath emptyBody $ API.transfer pmt
   where
-    requestPath = encodeRequestPath ["transfers", p]
+    requestPath = encodeRequestPath [transferPath <> "s", p]
 
 
 -- | https://docs.pro.coinbase.com/#payment-method
@@ -311,7 +339,7 @@ makeDeposit :: Double
 makeDeposit amt cur pmi =
     authRequest methodPost requestPath (encodeBody body) $ API.makeDeposit body
   where
-    requestPath = encodeRequestPath ["deposits", "payment-method"]
+    requestPath = encodeRequestPath [depositsPath, "payment-method"]
     body        = DepositRequest amt cur pmi
 
 
@@ -323,7 +351,7 @@ makeCoinbaseDeposit :: Double
 makeCoinbaseDeposit amt cur act =
     authRequest methodPost requestPath (encodeBody body) $ API.makeCoinbaseDeposit body
   where
-    requestPath = encodeRequestPath ["deposits", "coinbase-account"]
+    requestPath = encodeRequestPath [depositsPath, coinbaseAccountPath]
     body        = CoinbaseDepositRequest amt cur act
 
 
@@ -332,7 +360,7 @@ cryptoDepositAddress :: AccountId -> CBAuthT ClientM CryptoDepositAddress
 cryptoDepositAddress act =
     authRequest methodPost requestPath emptyBody $ API.cryptoDepositAddress act
   where
-    requestPath = encodeRequestPath ["coinbase-accounts", pack $ show act, "addresses"]
+    requestPath = encodeRequestPath [coinbaseAccountPath <> "s", pack $ show act, "addresses"]
 
 
 -- | https://docs.pro.coinbase.com/#payment-method55
@@ -343,7 +371,7 @@ makeWithdrawal :: Double
 makeWithdrawal amt cur pmi =
     authRequest methodPost requestPath (encodeBody body) $ API.makeWithdrawal body
   where
-    requestPath = encodeRequestPath ["withdrawals", "payment-method"]
+    requestPath = encodeRequestPath [withdrawalsPath, "payment-method"]
     body        = WithdrawalRequest amt cur pmi
 
 
@@ -355,7 +383,7 @@ makeCoinbaseWithdrawal :: Double
 makeCoinbaseWithdrawal amt cur act =
     authRequest methodPost requestPath (encodeBody body) $ API.makeCoinbaseWithdrawal body
   where
-    requestPath = encodeRequestPath ["withdrawals", "coinbase-account"]
+    requestPath = encodeRequestPath [withdrawalsPath, coinbaseAccountPath]
     body        = CoinbaseWithdrawalRequest amt cur act
 
 
@@ -367,7 +395,7 @@ makeCryptoWithdrawal :: Double
 makeCryptoWithdrawal amt cur addr =
     authRequest methodPost requestPath (encodeBody body) $ API.makeCryptoWithdrawal body
   where
-    requestPath = encodeRequestPath ["withdrawals", "crypto"]
+    requestPath = encodeRequestPath [withdrawalsPath, "crypto"]
     body        = CryptoWithdrawalRequest amt cur addr
 
 
@@ -382,7 +410,7 @@ withdrawalFeeEstimate cur addr =
     addrQ = return $ mkSimpleQueryItem "crypto_address" addr
 
     query       = renderQuery True . simpleQueryToQuery $ curQ <> addrQ
-    requestPath = encodeRequestPath ["withdrawals", "fee-estimate"] <> query
+    requestPath = encodeRequestPath [withdrawalsPath, "fee-estimate"] <> query
 
 
 -- | https://docs.pro.coinbase.com/#list-payment-methods
@@ -396,7 +424,7 @@ paymentMethods = authRequest methodGet requestPath emptyBody API.paymentMethods
 coinbaseAccounts :: CBAuthT ClientM [CoinbaseAccount]
 coinbaseAccounts = authRequest methodGet requestPath emptyBody API.coinbaseAccounts
   where
-    requestPath = encodeRequestPath ["coinbase-accounts"]
+    requestPath = encodeRequestPath [coinbaseAccountPath <> "s"]
 
 
 -- | https://docs.pro.coinbase.com/#list-profiles
@@ -406,14 +434,14 @@ profiles active = authRequest methodGet requestPath emptyBody $ API.profiles act
     activeQ  = optionalQuery "active" active
 
     query       = renderQuery True . simpleQueryToQuery $ activeQ
-    requestPath = encodeRequestPath ["profiles"] <> query
+    requestPath = encodeRequestPath [profilesPath] <> query
 
 
 -- | https://docs.pro.coinbase.com/#get-a-profile
 profile :: ProfileId -> CBAuthT ClientM Profile
 profile profId = authRequest methodGet requestPath emptyBody $ API.profile profId
   where
-    requestPath = encodeRequestPath ["profiles", profId]
+    requestPath = encodeRequestPath [profilesPath, profId]
 
 
 -- | https://docs.pro.coinbase.com/#create-profile-transfer
@@ -424,5 +452,5 @@ profileTransfer :: ProfileId
                 -> CBAuthT ClientM ()
 profileTransfer fromProf toProf cur amt = void . authRequest methodPost requestPath (encodeBody body) $ API.profileTransfer body
   where
-    requestPath = encodeRequestPath ["profiles", "transfer"]
+    requestPath = encodeRequestPath [profilesPath, transferPath]
     body        = ProfileTransfer fromProf toProf cur amt
