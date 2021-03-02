@@ -8,6 +8,9 @@ module CoinbasePro.Authenticated.Report
 
   , FillsReportRequest
   , AccountsReportRequest
+
+  , accountsReportRequest
+  , fillsReportRequest
   ) where
 
 import           Data.Aeson                         (ToJSON (..), object, (.=))
@@ -63,36 +66,64 @@ data ReportRequest = Fills FillsReportRequest | Accounts AccountsReportRequest
     deriving Show
 
 
+accountsReportRequest :: AccountId
+                      -> Maybe ProductId
+                      -- ^ start date
+                      -> UTCTime
+                      -- ^ end date
+                      -> UTCTime
+                      -- ^ pdf or csv
+                      -> Maybe ReportFormat
+                      -> Maybe Email
+                      -> ReportRequest
+accountsReportRequest aid prid start end format =
+  Accounts . AccountsReportRequest aid prid . Request start end format
+
+
+fillsReportRequest :: ProductId
+                   -> Maybe AccountId
+                   -- ^ start date
+                   -> UTCTime
+                   -- ^ end date
+                   -> UTCTime
+                   -- ^ pdf or csv
+                   -> Maybe ReportFormat
+                   -> Maybe Email
+                   -> ReportRequest
+fillsReportRequest prid aid start end format =
+  Fills . FillsReportRequest prid aid . Request start end format
+
+
 instance ToJSON ReportRequest where
     toJSON (Fills frr) =
       object ([ "type"       .= ("fills" :: Text)
               , "start_date" .= rStartDate (frRequest frr)
               , "end_date"   .= rEndDate (frRequest frr)
-              , "format"     .= rFormat (frRequest frr)
-              , "email"      .= rEmail (frRequest frr)
               , "product_id" .= frProductId frr
               ] <> maybe mempty (\aid -> ["account_id" .= aid]) (frAccountId frr)
+                <> maybe mempty (\em  -> ["email" .= em]) (rEmail (frRequest frr))
+                <> maybe mempty (\fmt -> ["format" .= fmt]) (rFormat (frRequest frr))
              )
     toJSON (Accounts arr) =
-      object ([ "type"       .= ("accounts" :: Text)
+      object ([ "type"       .= ("account" :: Text)
               , "start_date" .= rStartDate (arRequest arr)
               , "end_date"   .= rEndDate (arRequest arr)
-              , "format"     .= rFormat (arRequest arr)
-              , "email"      .= rEmail (arRequest arr)
               , "account_id" .= arAccountId arr
               ] <> maybe mempty (\prid -> ["product_id" .= prid]) (arProductId arr)
+                <> maybe mempty (\em   -> ["email" .= em]) (rEmail (arRequest arr))
+                <> maybe mempty (\fmt  -> ["format" .= fmt]) (rFormat (arRequest arr))
              )
 
 
-data ReportRequestType = FillsType | AccountsType
+data ReportRequestType = FillsType | AccountType
 
 
 instance Show ReportRequestType where
-    show FillsType    = "fills"
-    show AccountsType = "accounts"
+    show FillsType   = "fills"
+    show AccountType = "account"
 
 
-deriveJSON defaultOptions { fieldLabelModifier = snakeCase . init . init . init . init } ''ReportRequestType
+deriveJSON defaultOptions { constructorTagModifier = snakeCase . init . init . init . init } ''ReportRequestType
 
 
 -- instance FromJSON ReportRequestType where
@@ -145,11 +176,11 @@ data ReportResponse = ReportResponse
     { rrId          :: Text
     , rrType        :: ReportRequestType
     , rrStatus      :: ReportStatus
-    , rrCreatedAt   :: CreatedAt
-    , rrCompletedAt :: UTCTime
-    , rrExpiresAt   :: UTCTime
-    , rrFileUrl     :: Text
-    , rrParams      :: ReportParams
+    , rrCreatedAt   :: Maybe CreatedAt
+    , rrCompletedAt :: Maybe UTCTime
+    , rrExpiresAt   :: Maybe UTCTime
+    , rrFileUrl     :: Maybe Text
+    , rrParams      :: Maybe ReportParams
     } deriving Show
 
 

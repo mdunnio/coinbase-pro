@@ -77,7 +77,8 @@ import           CoinbasePro.Authenticated.Payment          (PaymentMethod,
                                                              PaymentMethodId (..))
 import           CoinbasePro.Authenticated.Profile          (Profile,
                                                              ProfileTransfer (..))
-import           CoinbasePro.Authenticated.Report           (ReportResponse)
+import           CoinbasePro.Authenticated.Report           (ReportRequest (..),
+                                                             ReportResponse)
 import           CoinbasePro.Authenticated.Request          (CBAuthT (..),
                                                              authRequest)
 import           CoinbasePro.Authenticated.Transfer         (Transfer,
@@ -459,5 +460,7 @@ profileTransfer fromProf toProf cur amt = void . authRequest methodPost requestP
 
 
 -- | https://docs.pro.coinbase.com/#create-a-new-report
-createReport :: CBAuthT ClientM ReportResponse
-createReport = undefined
+createReport :: ReportRequest -> CBAuthT ClientM ReportResponse
+createReport req = authRequest methodPost requestPath (encodeBody req) $ API.createReport req
+  where
+    requestPath = encodeRequestPath ["reports"]
