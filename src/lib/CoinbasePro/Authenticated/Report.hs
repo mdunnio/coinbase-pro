@@ -1,9 +1,11 @@
-{-# LANGUAGE LambdaCase        #-}
-{-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE TemplateHaskell   #-}
+{-# LANGUAGE GeneralizedNewtypeDeriving #-}
+{-# LANGUAGE LambdaCase                 #-}
+{-# LANGUAGE OverloadedStrings          #-}
+{-# LANGUAGE TemplateHaskell            #-}
 
 module CoinbasePro.Authenticated.Report
-  ( ReportRequest (..)
+  ( ReportId (..)
+  , ReportRequest (..)
   , ReportResponse (..)
 
   , FillsReportRequest
@@ -17,13 +19,26 @@ import           Data.Aeson                         (ToJSON (..), object, (.=))
 import           Data.Aeson.Casing                  (snakeCase)
 import           Data.Aeson.TH                      (constructorTagModifier,
                                                      defaultOptions, deriveJSON,
-                                                     fieldLabelModifier)
+                                                     fieldLabelModifier,
+                                                     unwrapUnaryRecords)
 import qualified Data.Char                          as Char
 import           Data.Text                          (Text)
 import           Data.Time.Clock                    (UTCTime)
+import           Data.UUID                          (UUID)
+import           Servant.API                        (ToHttpApiData)
 
 import           CoinbasePro.Authenticated.Accounts (AccountId)
 import           CoinbasePro.Types                  (CreatedAt, ProductId)
+
+
+newtype ReportId = ReportId { unReportId:: UUID }
+  deriving (Eq, Show, ToHttpApiData)
+
+
+deriveJSON defaultOptions
+    { fieldLabelModifier = snakeCase
+    , unwrapUnaryRecords = True
+    } ''ReportId
 
 
 data ReportFormat = PDF | CSV
@@ -126,14 +141,6 @@ instance Show ReportRequestType where
 deriveJSON defaultOptions { constructorTagModifier = snakeCase . init . init . init . init } ''ReportRequestType
 
 
--- instance FromJSON ReportRequestType where
---     parseJSON = withText "report request type" $
---       \case
---         "fills"    -> return FillsType
---         "accounts" -> return AccountsType
---         _          -> fail "parse error"
-
-
 data ReportStatus = Pending | Creating | Ready
 
 
@@ -158,6 +165,7 @@ deriveJSON defaultOptions { fieldLabelModifier = snakeCase } ''ReportParams
 
 
 {-|
+  Example JSON Response:
   {
     "id": "0428b97b-bec1-429e-a94c-59232926778d",
     "type": "fills",
@@ -173,7 +181,7 @@ deriveJSON defaultOptions { fieldLabelModifier = snakeCase } ''ReportParams
   }
 -}
 data ReportResponse = ReportResponse
-    { rrId          :: Text
+    { rrId          :: ReportId
     , rrType        :: ReportRequestType
     , rrStatus      :: ReportStatus
     , rrCreatedAt   :: Maybe CreatedAt

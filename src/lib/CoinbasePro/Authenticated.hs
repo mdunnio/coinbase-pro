@@ -33,6 +33,7 @@ module CoinbasePro.Authenticated
   , profile
   , profileTransfer
   , createReport
+  , getReport
   ) where
 
 import           Control.Monad                              (void)
@@ -77,7 +78,8 @@ import           CoinbasePro.Authenticated.Payment          (PaymentMethod,
                                                              PaymentMethodId (..))
 import           CoinbasePro.Authenticated.Profile          (Profile,
                                                              ProfileTransfer (..))
-import           CoinbasePro.Authenticated.Report           (ReportRequest (..),
+import           CoinbasePro.Authenticated.Report           (ReportId (..),
+                                                             ReportRequest (..),
                                                              ReportResponse)
 import           CoinbasePro.Authenticated.Request          (CBAuthT (..),
                                                              authRequest)
@@ -138,6 +140,10 @@ usersPath = "users"
 
 selfPath :: Text
 selfPath = "self"
+
+
+reportsPath :: Text
+reportsPath = "reports"
 
 
 mkSimpleQueryItem :: Show a => Text -> a -> SimpleQueryItem
@@ -463,4 +469,11 @@ profileTransfer fromProf toProf cur amt = void . authRequest methodPost requestP
 createReport :: ReportRequest -> CBAuthT ClientM ReportResponse
 createReport req = authRequest methodPost requestPath (encodeBody req) $ API.createReport req
   where
-    requestPath = encodeRequestPath ["reports"]
+    requestPath = encodeRequestPath [reportsPath]
+
+
+-- | https://docs.pro.coinbase.com/#get-report-status
+getReport :: ReportId -> CBAuthT ClientM ReportResponse
+getReport rid = authRequest methodGet requestPath emptyBody $ API.getReport rid
+  where
+    requestPath = encodeRequestPath [reportsPath, toText $ unReportId rid]

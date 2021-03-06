@@ -32,6 +32,7 @@ module CoinbasePro.Authenticated.API
     , profile
     , profileTransfer
     , createReport
+    , getReport
     ) where
 
 import           Data.Proxy                                 (Proxy (..))
@@ -66,7 +67,8 @@ import           CoinbasePro.Authenticated.Payment          (PaymentMethod (..),
                                                              PaymentMethodId)
 import           CoinbasePro.Authenticated.Profile          (Profile,
                                                              ProfileTransfer)
-import           CoinbasePro.Authenticated.Report           (ReportRequest (..),
+import           CoinbasePro.Authenticated.Report           (ReportId,
+                                                             ReportRequest (..),
                                                              ReportResponse (..))
 import           CoinbasePro.Authenticated.Request          (AuthDelete,
                                                              AuthGet, AuthPost)
@@ -124,6 +126,7 @@ type API =    "accounts" :> AuthGet [Account]
          :<|> "profiles" :> Capture "profile_id" ProfileId :> AuthGet Profile
          :<|> "profiles" :> "transfer" :> ReqBody '[JSON] ProfileTransfer :> AuthPost NoContent
          :<|> "reports" :> ReqBody '[JSON] ReportRequest :> AuthPost ReportResponse
+         :<|> "reports" :> Capture "report_id" ReportId :> AuthGet ReportResponse
 
 
 api :: Proxy API
@@ -159,9 +162,10 @@ profiles :: Maybe Bool -> AuthenticatedRequest (AuthProtect "CBAuth") -> ClientM
 profile :: ProfileId -> AuthenticatedRequest (AuthProtect "CBAuth") -> ClientM Profile
 profileTransfer :: ProfileTransfer -> AuthenticatedRequest (AuthProtect "CBAuth") -> ClientM NoContent
 createReport :: ReportRequest -> AuthenticatedRequest (AuthProtect "CBAuth") -> ClientM ReportResponse
+getReport :: ReportId -> AuthenticatedRequest (AuthProtect "CBAuth") -> ClientM ReportResponse
 accounts
   :<|> singleAccount :<|> accountHistory :<|> accountHolds :<|> listOrders :<|> getOrder :<|> getClientOrder :<|> placeOrder
   :<|> cancelOrder :<|> cancelAll :<|> fills :<|> fees :<|> trailingVolume :<|> limits :<|> transfers :<|> transfer
   :<|> makeDeposit :<|> makeCoinbaseDeposit :<|> cryptoDepositAddress :<|> makeWithdrawal :<|> makeCoinbaseWithdrawal
   :<|> makeCryptoWithdrawal :<|> withdrawalFeeEstimate :<|> paymentMethods :<|> coinbaseAccounts :<|> profiles :<|> profile
-  :<|> profileTransfer :<|> createReport = client api
+  :<|> profileTransfer :<|> createReport :<|> getReport = client api
