@@ -1,3 +1,13 @@
+# Version 0.9.1.0
+
+- Minor refactors + linting.
+
+## Additional Features
+
+- Added support for the following endpoints:
+  - `Profiles`
+  - `Reports`
+
 # Version 0.9.0.0
 
 - Upgraded to lts-17.4 (ghc 8.10.4)

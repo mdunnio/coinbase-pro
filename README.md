@@ -37,10 +37,9 @@ Here is a list of implemented/unimplemented features:
         - [x] Payment Method
         - [x] Coinbase
 		- [x] Generate a Crypto Deposit Address
-    - [ ] Withdrawals
+    - [x] Withdrawals
 		- [x] List Withdrawals
 		- [x] Single Withdrawal
-		- [ ] Canceled Withdrawal
         - [x] Payment Method
         - [x] Coinbase
         - [x] Crypto
@@ -53,16 +52,16 @@ Here is a list of implemented/unimplemented features:
 		- [x] List Accounts
     - [x] Fees
         - [x] Get Current Fees
-    - [ ] Reports
-        - [ ] Create a new report
-        - [ ] Get report status
-	- [ ] Profiles
-		- [ ] List Profiles
-		- [ ] Get a Profile
-		- [ ] Create a Profile Transfer
+    - [x] Reports
+        - [x] Create a new report
+        - [x] Get report status
+	- [x] Profiles
+		- [x] List Profiles
+		- [x] Get a Profile
+		- [x] Create a Profile Transfer
     - [x] User Account
         - [x] Trailing Volume
-	- [ ] Margin
+	- ~~[ ] Margin~~ (Disabled)[https://blog.coinbase.com/coinbase-pro-disables-margin-trading-42f5862f8a66]
 	- [ ] Oracle
 		- [ ] Get Oracle
 - Websocket Feed
