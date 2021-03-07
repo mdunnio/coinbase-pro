@@ -44,8 +44,8 @@ Here is a list of implemented/unimplemented features:
         - [x] Coinbase
         - [x] Crypto
 		- [x] Fee Estimate
-    - [ ] Stablecoin Conversions
-        - [ ] Create Conversion
+    - [x] Stablecoin Conversions
+        - [x] Create Conversion
     - [x] Payment Methods
         - [x] List Payment Methods
 	- [x] Coinbase Accounts
