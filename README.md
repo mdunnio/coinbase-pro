@@ -62,8 +62,8 @@ Here is a list of implemented/unimplemented features:
     - [x] User Account
         - [x] Trailing Volume
 	- ~~[ ] Margin~~ (Disabled)[https://blog.coinbase.com/coinbase-pro-disables-margin-trading-42f5862f8a66]
-	- [ ] Oracle
-		- [ ] Get Oracle
+	- [x] Oracle
+		- [x] Get Oracle
 - Websocket Feed
     - [x] Channels
         - [x] The heartbeat channel

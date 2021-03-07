@@ -35,6 +35,7 @@ module CoinbasePro.Authenticated
   , profileTransfer
   , createReport
   , getReport
+  , getOracle
   ) where
 
 import           Control.Monad                              (void)
@@ -71,6 +72,7 @@ import           CoinbasePro.Authenticated.Deposit          (CoinbaseDepositRequ
                                                              DepositResponse)
 import           CoinbasePro.Authenticated.Fills            (Fill)
 import           CoinbasePro.Authenticated.Limits           (Limits)
+import           CoinbasePro.Authenticated.Oracle           (OracleResponse)
 import           CoinbasePro.Authenticated.Orders           (Order,
                                                              PlaceOrderBody (..),
                                                              STP, Status (..),
@@ -488,3 +490,10 @@ getReport :: ReportId -> CBAuthT ClientM ReportResponse
 getReport rid = authRequest methodGet requestPath emptyBody $ API.getReport rid
   where
     requestPath = encodeRequestPath [reportsPath, toText $ unReportId rid]
+
+
+-- | https://docs.pro.coinbase.com/#oracle
+getOracle :: CBAuthT ClientM OracleResponse
+getOracle = authRequest methodGet requestPath emptyBody API.getOracle
+  where
+    requestPath = encodeRequestPath ["oracle"]

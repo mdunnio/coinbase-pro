@@ -291,7 +291,7 @@ instance FromJSON CurrencyDetails where
 
 
 newtype CurrencyType = CurrencyType Text
-    deriving ToHttpApiData
+    deriving (Eq, Ord, ToHttpApiData, FromJSONKey)
 
 
 instance Show CurrencyType where

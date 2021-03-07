@@ -34,6 +34,7 @@ module CoinbasePro.Authenticated.API
     , profileTransfer
     , createReport
     , getReport
+    , getOracle
     ) where
 
 import           Data.Proxy                                 (Proxy (..))
@@ -63,6 +64,7 @@ import           CoinbasePro.Authenticated.Deposit          (CoinbaseDepositRequ
                                                              DepositResponse)
 import           CoinbasePro.Authenticated.Fills            (Fill)
 import           CoinbasePro.Authenticated.Limits           (Limits)
+import           CoinbasePro.Authenticated.Oracle           (OracleResponse)
 import           CoinbasePro.Authenticated.Orders           (Order,
                                                              PlaceOrderBody (..),
                                                              Status (..))
@@ -131,6 +133,7 @@ type API =    "accounts" :> AuthGet [Account]
          :<|> "profiles" :> "transfer" :> ReqBody '[JSON] ProfileTransfer :> AuthPost NoContent
          :<|> "reports" :> ReqBody '[JSON] ReportRequest :> AuthPost ReportResponse
          :<|> "reports" :> Capture "report_id" ReportId :> AuthGet ReportResponse
+         :<|> "oracle" :> AuthGet OracleResponse
 
 
 api :: Proxy API
@@ -168,9 +171,10 @@ profile :: ProfileId -> AuthenticatedRequest (AuthProtect "CBAuth") -> ClientM P
 profileTransfer :: ProfileTransfer -> AuthenticatedRequest (AuthProtect "CBAuth") -> ClientM NoContent
 createReport :: ReportRequest -> AuthenticatedRequest (AuthProtect "CBAuth") -> ClientM ReportResponse
 getReport :: ReportId -> AuthenticatedRequest (AuthProtect "CBAuth") -> ClientM ReportResponse
+getOracle :: AuthenticatedRequest (AuthProtect "CBAuth") -> ClientM OracleResponse
 accounts
   :<|> singleAccount :<|> accountHistory :<|> accountHolds :<|> listOrders :<|> getOrder :<|> getClientOrder :<|> placeOrder
   :<|> cancelOrder :<|> cancelAll :<|> fills :<|> fees :<|> trailingVolume :<|> limits :<|> transfers :<|> transfer
   :<|> makeDeposit :<|> makeCoinbaseDeposit :<|> cryptoDepositAddress :<|> makeWithdrawal :<|> makeCoinbaseWithdrawal
-  :<|> makeCryptoWithdrawal :<|> withdrawalFeeEstimate :<|> createStablecoinConversion :<|> paymentMethods :<|>
-  coinbaseAccounts :<|> profiles :<|> profile :<|> profileTransfer :<|> createReport :<|> getReport = client api
+  :<|> makeCryptoWithdrawal :<|> withdrawalFeeEstimate :<|> createStablecoinConversion :<|> paymentMethods :<|> coinbaseAccounts
+  :<|> profiles :<|> profile :<|> profileTransfer :<|> createReport :<|> getReport :<|> getOracle = client api
