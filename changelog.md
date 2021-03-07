@@ -1,3 +1,13 @@
+# Version 0.9.2.0
+
+Feature complete! (except FIX)
+
+## Additional Features
+
+- Added support for the following endpoints:
+  - stablecoin conversions
+  - oracle
+
 # Version 0.9.1.0
 
 - Minor refactors + linting.
