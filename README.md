@@ -1,6 +1,6 @@
 # coinbase-pro
 
-Client for Coinabse Pro REST and Websocket APIS.
+Client for Coinbase Pro REST and Websocket APIs.
 
 Here is a list of implemented/unimplemented features:
 
