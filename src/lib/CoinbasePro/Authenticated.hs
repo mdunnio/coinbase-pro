@@ -27,6 +27,7 @@ module CoinbasePro.Authenticated
   , makeCoinbaseWithdrawal
   , makeCryptoWithdrawal
   , withdrawalFeeEstimate
+  , createStablecoinConversion
   , paymentMethods
   , coinbaseAccounts
   , profiles
@@ -62,6 +63,8 @@ import           CoinbasePro.Authenticated.Accounts         (Account,
                                                              Fees, Hold,
                                                              TrailingVolume (..))
 import           CoinbasePro.Authenticated.CoinbaseAccounts (CoinbaseAccount)
+import           CoinbasePro.Authenticated.Conversion       (StablecoinConversionRequest (..),
+                                                             StablecoinConversionResponse)
 import           CoinbasePro.Authenticated.Deposit          (CoinbaseDepositRequest (..),
                                                              CryptoDepositAddress,
                                                              DepositRequest (..),
@@ -85,7 +88,6 @@ import           CoinbasePro.Authenticated.Request          (CBAuthT (..),
                                                              authRequest)
 import           CoinbasePro.Authenticated.Transfer         (Transfer,
                                                              TransferType (..))
-
 import           CoinbasePro.Authenticated.Withdrawal       (CoinbaseWithdrawalRequest (..),
                                                              CryptoWithdrawalRequest (..),
                                                              CryptoWithdrawalResponse,
@@ -420,6 +422,15 @@ withdrawalFeeEstimate cur addr =
 
     query       = renderQuery True . simpleQueryToQuery $ curQ <> addrQ
     requestPath = encodeRequestPath [withdrawalsPath, "fee-estimate"] <> query
+
+
+-- | https://docs.pro.coinbase.com/#stablecoin-conversions
+createStablecoinConversion :: CurrencyType -> CurrencyType -> Double -> CBAuthT ClientM StablecoinConversionResponse
+createStablecoinConversion fromCur toCur amt =
+    authRequest methodPost requestPath (encodeBody body) $ API.createStablecoinConversion body
+  where
+    requestPath = encodeRequestPath ["conversions"]
+    body        = StablecoinConversionRequest fromCur toCur amt
 
 
 -- | https://docs.pro.coinbase.com/#list-payment-methods

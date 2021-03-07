@@ -26,6 +26,7 @@ module CoinbasePro.Authenticated.API
     , makeCoinbaseWithdrawal
     , makeCryptoWithdrawal
     , withdrawalFeeEstimate
+    , createStablecoinConversion
     , paymentMethods
     , coinbaseAccounts
     , profiles
@@ -54,6 +55,8 @@ import           CoinbasePro.Authenticated.Accounts         (Account,
                                                              Fees, Hold,
                                                              TrailingVolume)
 import           CoinbasePro.Authenticated.CoinbaseAccounts (CoinbaseAccount)
+import           CoinbasePro.Authenticated.Conversion       (StablecoinConversionRequest,
+                                                             StablecoinConversionResponse)
 import           CoinbasePro.Authenticated.Deposit          (CoinbaseDepositRequest,
                                                              CryptoDepositAddress,
                                                              DepositRequest,
@@ -120,6 +123,7 @@ type API =    "accounts" :> AuthGet [Account]
              :> QueryParam' '[Required] "currency" CurrencyType
              :> QueryParam' '[Required] "crypto_address" CryptoAddress
              :> AuthGet WithdrawalFeeEstimateResponse
+         :<|> "conversions" :> ReqBody '[JSON] StablecoinConversionRequest :> AuthPost StablecoinConversionResponse
          :<|> "payment-methods" :> AuthGet [PaymentMethod]
          :<|> "coinbase-accounts" :> AuthGet [CoinbaseAccount]
          :<|> "profiles" :> QueryParam "active" Bool :> AuthGet [Profile]
@@ -156,6 +160,7 @@ makeWithdrawal :: WithdrawalRequest -> AuthenticatedRequest (AuthProtect "CBAuth
 makeCoinbaseWithdrawal :: CoinbaseWithdrawalRequest -> AuthenticatedRequest (AuthProtect "CBAuth") -> ClientM WithdrawalResponse
 makeCryptoWithdrawal :: CryptoWithdrawalRequest -> AuthenticatedRequest (AuthProtect "CBAuth") -> ClientM CryptoWithdrawalResponse
 withdrawalFeeEstimate :: CurrencyType -> CryptoAddress -> AuthenticatedRequest (AuthProtect "CBAuth") -> ClientM WithdrawalFeeEstimateResponse
+createStablecoinConversion :: StablecoinConversionRequest -> AuthenticatedRequest (AuthProtect "CBAuth") -> ClientM StablecoinConversionResponse
 paymentMethods :: AuthenticatedRequest (AuthProtect "CBAuth") -> ClientM [PaymentMethod]
 coinbaseAccounts :: AuthenticatedRequest (AuthProtect "CBAuth") -> ClientM [CoinbaseAccount]
 profiles :: Maybe Bool -> AuthenticatedRequest (AuthProtect "CBAuth") -> ClientM [Profile]
@@ -167,5 +172,5 @@ accounts
   :<|> singleAccount :<|> accountHistory :<|> accountHolds :<|> listOrders :<|> getOrder :<|> getClientOrder :<|> placeOrder
   :<|> cancelOrder :<|> cancelAll :<|> fills :<|> fees :<|> trailingVolume :<|> limits :<|> transfers :<|> transfer
   :<|> makeDeposit :<|> makeCoinbaseDeposit :<|> cryptoDepositAddress :<|> makeWithdrawal :<|> makeCoinbaseWithdrawal
-  :<|> makeCryptoWithdrawal :<|> withdrawalFeeEstimate :<|> paymentMethods :<|> coinbaseAccounts :<|> profiles :<|> profile
-  :<|> profileTransfer :<|> createReport :<|> getReport = client api
+  :<|> makeCryptoWithdrawal :<|> withdrawalFeeEstimate :<|> createStablecoinConversion :<|> paymentMethods :<|>
+  coinbaseAccounts :<|> profiles :<|> profile :<|> profileTransfer :<|> createReport :<|> getReport = client api
