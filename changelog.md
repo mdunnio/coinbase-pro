@@ -1,3 +1,7 @@
+# Version 0.9.3.0
+
+- Pass desired environment into `runCbAuthT`.
+
 # Version 0.9.2.0
 
 Feature complete! (except FIX)

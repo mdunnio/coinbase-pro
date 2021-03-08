@@ -15,8 +15,6 @@ module CoinbasePro.Request
     , run_
     , runWithManager
 
-    , Runner
-
     , emptyBody
     , encodeRequestPath
     ) where
@@ -47,10 +45,6 @@ type RequestPath = ByteString
 
 -- ^ Serialized as a part of building CBAccessSign
 type Body        = ByteString
-
-
-type Runner a = ClientM a -> IO a
-
 
 ------------------------------------------------------------------------------
 -- | Runs a coinbase pro HTTPS request and returns the result `a`

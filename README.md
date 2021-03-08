@@ -88,7 +88,7 @@ run Sandbox (trades (ProductId "BTC-USD")) >>= print
 ### Authenticated Private Requests
 
 ```haskell
-runCbAuthT (run Sandbox) cpc $ do
+runCbAuthT Sandbox cpc $ do
     fills (Just btcusd) Nothing >>= liftIO . print
   where
     accessKey  = CBAccessKey "<access-key>"

@@ -26,7 +26,7 @@ main = do
     run Sandbox (aggregateOrderBook btcusd (Just Best)) >>= print
     run Sandbox (aggregateOrderBook btcusd (Just TopFifty)) >>= print
     run Sandbox (fullOrderBook btcusd) >>= print
-    runCbAuthT (run Sandbox) cpc $ do
+    runCbAuthT Sandbox cpc $ do
         accounts >>= liftIO . print
         account aid >>= liftIO . print
         accountHistory aid >>= liftIO . print
