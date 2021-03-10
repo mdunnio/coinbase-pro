@@ -7,6 +7,7 @@
 module CoinbasePro.Authenticated.Request
     ( CBAuthT (..)
     , runCbAuthT
+    , runDefCbAuthT
 
     , CoinbaseProCredentials (..)
     , CBSecretKey (..)
@@ -50,8 +51,10 @@ import           CoinbasePro.Authenticated.Headers (CBAccessKey (..),
                                                     CBAccessPassphrase (..),
                                                     CBAccessSign (..),
                                                     CBAccessTimeStamp (..))
+import           CoinbasePro.Environment           (Environment)
 import           CoinbasePro.Headers               (userAgent)
-import           CoinbasePro.Request               (Body, RequestPath, Runner)
+import           CoinbasePro.Request               (Body, RequestPath, Runner,
+                                                    run)
 
 
 newtype CBSecretKey = CBSecretKey String
@@ -69,8 +72,18 @@ newtype CBAuthT m a = CBAuthT { unCbAuth :: ReaderT CoinbaseProCredentials m a }
     deriving (Functor, Applicative, Monad, MonadIO, MonadTrans)
 
 
+-- | Sequences `ClientM` actions using the same auth credentials
+--
+-- This allows for custom `Runner`s to be used.
 runCbAuthT :: Runner a -> CoinbaseProCredentials -> CBAuthT ClientM a -> IO a
 runCbAuthT runEnv cpc = runEnv . flip runReaderT cpc . unCbAuth
+
+
+-- | Sequences `ClientM` actions using the same auth credentials
+--
+-- Should be used over `runCbAuthT` unless a bespoke `Runner` needs to be used.
+runDefCbAuthT :: Environment -> CoinbaseProCredentials -> CBAuthT ClientM a -> IO a
+runDefCbAuthT env = runCbAuthT (run env)
 
 
 type instance AuthClientData (AuthProtect "CBAuth") = (CBAccessKey, CBAccessSign, CBAccessTimeStamp, CBAccessPassphrase)
