@@ -48,7 +48,7 @@ type RequestPath = ByteString
 -- ^ Serialized as a part of building CBAccessSign
 type Body        = ByteString
 
-
+-- ^ Sequenced `ClientM a` that result in `IO a`
 type Runner a = ClientM a -> IO a
 
 
@@ -57,7 +57,7 @@ type Runner a = ClientM a -> IO a
 --
 -- > run Production products >>= print
 --
-run :: Environment -> ClientM a -> IO a
+run :: Environment -> Runner a
 run env f = do
     mgr <- newManager tlsManagerSettings
     runWithManager mgr env f
@@ -65,7 +65,7 @@ run env f = do
 
 ------------------------------------------------------------------------------
 -- | Same as 'run', except uses `()` instead of a type `a`
-run_ :: Environment -> ClientM a -> IO ()
+run_ :: Environment -> Runner ()
 run_ = (void .) . run
 
 
@@ -80,7 +80,7 @@ run_ = (void .) . run
 -- print prds
 -- @
 --
-runWithManager :: Manager -> Environment -> ClientM a -> IO a
+runWithManager :: Manager -> Environment -> Runner a
 runWithManager mgr env f = either throw return =<<
     runClientM f (mkClientEnv mgr (BaseUrl Https api 443 mempty))
   where
