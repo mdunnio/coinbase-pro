@@ -4,10 +4,10 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 0482a3909f589fcef459af8d11acc45ae48f1918d4659454f25b36f471e2764d
+-- hash: d5b9be9c9bd330a927bb5d859225384c5425281c318c04f4c60b2cd03fc7e7d2
 
 name:           coinbase-pro
-version:        0.9.1.0
+version:        0.9.2.1
 synopsis:       Client for Coinbase Pro
 description:    Client for Coinbase Pro REST and Websocket APIs
 category:       Web, Finance

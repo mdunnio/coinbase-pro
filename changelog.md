@@ -1,3 +1,10 @@
+# Version 0.9.2.1
+
+- Use `Runner` instead of `ClientM a -> IO a` where applicable
+- Added more documentation around `Runner`
+- Added `runDefCbAuthT` as a default for calling `runCbAuthT` without passing in a `Runner`
+- Updated `src/example/request/Main.hs` to reflect `runDefCbAuthT` and a minor refactor
+
 # Version 0.9.2.0
 
 Feature complete! (except FIX)
