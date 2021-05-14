@@ -53,7 +53,7 @@ newtype Currency = Currency Text
 
 
 newtype Balance = Balance Double
-    deriving (Eq, Show)
+    deriving (Eq, Show, Ord)
 
 
 instance ToJSON Balance where
@@ -90,7 +90,7 @@ instance FromJSON Account where
 
 
 newtype FeeRate = FeeRate { unFeeRate :: Double }
-    deriving (Eq, Show, FromJSON, ToJSON)
+    deriving (Eq, Show, Ord, FromJSON, ToJSON)
 
 
 data Fees = Fees

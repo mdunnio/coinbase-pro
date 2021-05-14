@@ -20,11 +20,11 @@ newtype LimitCurrency = LimitCurrency Text
 
 
 newtype Max = Max Double
-  deriving (Eq, Show, ToJSON, FromJSON)
+  deriving (Eq, Show, Ord, ToJSON, FromJSON)
 
 
 newtype Remaining = Remaining Double
-  deriving (Eq, Show, ToJSON, FromJSON)
+  deriving (Eq, Show, Ord, ToJSON, FromJSON)
 
 
 newtype PeriodInDays = PeriodInDays Int
