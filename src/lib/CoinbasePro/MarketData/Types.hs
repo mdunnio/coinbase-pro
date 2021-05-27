@@ -49,7 +49,7 @@ instance ToHttpApiData Product where
     toQueryParam = toQueryParam . productId
 
 
-newtype CBTime = CBTime { unCBTime :: UTCTime } deriving (Eq, Show)
+newtype CBTime = CBTime { unCBTime :: UTCTime } deriving (Eq, Show, Ord)
 
 
 instance FromJSON CBTime where
