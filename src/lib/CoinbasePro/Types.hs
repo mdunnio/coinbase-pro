@@ -128,7 +128,7 @@ instance ToJSON Price where
 
 
 newtype Size = Size { unSize :: Double }
-    deriving (Eq, Ord, ToHttpApiData)
+    deriving (Eq, Ord, Num, ToHttpApiData)
 
 
 instance Show Size where
