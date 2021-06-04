@@ -1,0 +1,25 @@
+on: [push]
+name: stack build
+jobs:
+  stack-build:
+    name: stack build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: haskell/actions/setup@v1
+        with:
+          ghc-version: "8.10.4"
+          enable-stack: true
+          stack-version: 'latest'
+      - uses: actions/cache@v2
+        name: cache stack build artifacts
+        env:
+          cache-name: stack-build-artifacts
+        with:
+          path: ~/.stack
+          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/stack.yaml.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-build-${{ env.cache-name }}-
+            ${{ runner.os }}-build-
+            ${{ runner.os }}-
+      - run: stack build
