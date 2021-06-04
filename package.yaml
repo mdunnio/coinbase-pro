@@ -16,7 +16,7 @@ extra-source-files:
 - README.md
 - changelog.md
 
-github: https://github.com/mdunnio/coinbase-pro
+github: mdunnio/coinbase-pro
 
 dependencies:
   - base                 >= 4.7  && < 5
