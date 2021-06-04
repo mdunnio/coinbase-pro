@@ -21,6 +21,7 @@ module CoinbasePro.Authenticated.Request
     , mkCBAccessTimeStamp
     ) where
 
+import           Control.Monad.Catch               (MonadCatch, MonadThrow, MonadMask)
 import           Control.Monad.IO.Class            (MonadIO, liftIO)
 import           Control.Monad.Trans.Class         (MonadTrans, lift)
 import           Control.Monad.Trans.Reader        (ReaderT, asks, runReaderT)
@@ -69,7 +70,7 @@ data CoinbaseProCredentials = CoinbaseProCredentials
 
 
 newtype CBAuthT m a = CBAuthT { unCbAuth :: ReaderT CoinbaseProCredentials m a }
-    deriving (Functor, Applicative, Monad, MonadIO, MonadTrans)
+    deriving (Functor, Applicative, Monad, MonadIO, MonadTrans, MonadThrow, MonadCatch, MonadMask)
 
 
 -- | Sequences `ClientM` actions using the same auth credentials
