@@ -53,7 +53,7 @@ newtype Currency = Currency Text
 
 
 newtype Balance = Balance Double
-    deriving (Eq, Show, Ord)
+    deriving (Eq, Show, Ord, Num)
 
 
 instance ToJSON Balance where

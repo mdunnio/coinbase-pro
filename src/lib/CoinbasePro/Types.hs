@@ -111,7 +111,7 @@ deriveJSON defaultOptions
 
 
 newtype Price = Price { unPrice :: Double }
-    deriving (Eq, Ord, ToHttpApiData)
+    deriving (Eq, Ord, Num, ToHttpApiData)
 
 
 instance Show Price where
