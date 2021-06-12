@@ -198,7 +198,7 @@ deriveJSON defaultOptions {constructorTagModifier = camelCase} ''OrderType
 
 
 newtype CreatedAt = CreatedAt UTCTime
-    deriving (Eq, Show)
+    deriving (Eq, Show, Ord)
 
 
 deriveJSON defaultOptions ''CreatedAt
