@@ -111,7 +111,7 @@ deriveJSON defaultOptions
 
 
 newtype Price = Price { unPrice :: Double }
-    deriving (Eq, Ord, ToHttpApiData)
+    deriving (Eq, Ord, Num, ToHttpApiData)
 
 
 instance Show Price where
@@ -128,7 +128,7 @@ instance ToJSON Price where
 
 
 newtype Size = Size { unSize :: Double }
-    deriving (Eq, Ord, ToHttpApiData)
+    deriving (Eq, Ord, Num, ToHttpApiData)
 
 
 instance Show Size where
@@ -198,7 +198,7 @@ deriveJSON defaultOptions {constructorTagModifier = camelCase} ''OrderType
 
 
 newtype CreatedAt = CreatedAt UTCTime
-    deriving (Eq, Show)
+    deriving (Eq, Show, Ord)
 
 
 deriveJSON defaultOptions ''CreatedAt
