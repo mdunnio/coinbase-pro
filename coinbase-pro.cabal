@@ -83,6 +83,7 @@ library
     , bytestring ==0.10.*
     , containers >=0.5 && <0.7
     , cryptonite >=0.24 && <0.30
+    , exceptions >=0.4 && <1.0
     , http-api-data >=0.3 && <0.5
     , http-client >=0.5 && <0.7
     , http-client-tls ==0.3.*
