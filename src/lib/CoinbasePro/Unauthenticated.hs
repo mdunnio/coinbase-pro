@@ -2,6 +2,7 @@
 
 module CoinbasePro.Unauthenticated
    ( products
+   , singleProduct
    , aggregateOrderBook
    , fullOrderBook
    , trades
@@ -31,6 +32,11 @@ import qualified CoinbasePro.Unauthenticated.API           as API
 -- | https://docs.pro.coinbase.com/#get-products
 products :: ClientM [Product]
 products = API.products userAgent
+
+
+-- | https://docs.pro.coinbase.com/#get-single-product
+singleProduct :: ProductId -> ClientM Product
+singleProduct prid = API.singleProduct prid userAgent
 
 
 -- | https://docs.pro.coinbase.com/#get-product-order-book
