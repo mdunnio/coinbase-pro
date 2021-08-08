@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: dbf0661dc50d070225ebb991ca629fb4e9314397426045b9f1e45f97e91ece92
+-- hash: 635d25226a9ae4dce20cd3c85601b8d5e1a2e82222509bff9dafcb9b33038013
 
 name:           coinbase-pro
 version:        0.9.2.1
@@ -82,7 +82,7 @@ library
     , binary ==0.8.*
     , bytestring ==0.10.*
     , containers >=0.5 && <0.7
-    , cryptonite >=0.24 && <0.29
+    , cryptonite >=0.24 && <0.30
     , http-api-data >=0.3 && <0.5
     , http-client >=0.5 && <0.7
     , http-client-tls ==0.3.*
@@ -121,7 +121,7 @@ executable test-request
     , bytestring ==0.10.*
     , coinbase-pro
     , containers >=0.5 && <0.7
-    , cryptonite >=0.24 && <0.29
+    , cryptonite >=0.24 && <0.30
     , http-api-data >=0.3 && <0.5
     , http-client >=0.5 && <0.7
     , http-client-tls ==0.3.*
@@ -160,7 +160,7 @@ executable test-stream
     , bytestring ==0.10.*
     , coinbase-pro
     , containers >=0.5 && <0.7
-    , cryptonite >=0.24 && <0.29
+    , cryptonite >=0.24 && <0.30
     , http-api-data >=0.3 && <0.5
     , http-client >=0.5 && <0.7
     , http-client-tls ==0.3.*
