@@ -33,6 +33,7 @@ import qualified CoinbasePro.Unauthenticated.API           as API
 products :: ClientM [Product]
 products = API.products userAgent
 
+
 -- | https://docs.pro.coinbase.com/#get-single-product
 singleProduct :: ProductId -> ClientM Product
 singleProduct prid = API.singleProduct prid userAgent
