@@ -1,3 +1,7 @@
+# Version 0.9.2.2
+
+- Added `CoinbasePro.Unauthenticated.singleProduct`
+
 # Version 0.9.2.1
 
 - Use `Runner` instead of `ClientM a -> IO a` where applicable
