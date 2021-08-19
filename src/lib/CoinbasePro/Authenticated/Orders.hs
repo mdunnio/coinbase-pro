@@ -8,6 +8,7 @@ module CoinbasePro.Authenticated.Orders
   , STP (..)
   , TimeInForce (..)
   , PlaceOrderBody (..)
+  , StopLossSide (..)
 
   , statuses
   ) where
@@ -94,6 +95,17 @@ instance FromJSON ExecutedValue where
     parseJSON = withText "executed_value" $ \t ->
       return . ExecutedValue . read $ unpack t
 
+data StopLossSide = Loss | Entry
+    deriving (Eq, Ord, Show)
+
+
+instance ToHttpApiData StopLossSide where
+    toUrlPiece   = toLower . pack . show
+    toQueryParam = toLower . pack . show
+
+
+deriveJSON defaultOptions {constructorTagModifier = fmap Char.toLower} ''StopLossSide
+
 
 -- TODO: This might need to be split up into different order types.
 data Order = Order
@@ -112,6 +124,8 @@ data Order = Order
     , executedValue :: Maybe ExecutedValue
     , status        :: Status
     , settled       :: Bool
+    , stop          :: Maybe StopLossSide
+    , stopPrice     :: Maybe Price
     } deriving (Eq, Show)
 
 
@@ -119,15 +133,17 @@ deriveJSON defaultOptions {fieldLabelModifier = filterOrderFieldName . snakeCase
 
 
 data PlaceOrderBody = PlaceOrderBody
-    { bClientOid :: Maybe ClientOrderId
-    , bProductId :: ProductId
-    , bSide      :: Side
-    , bSize      :: Size
-    , bPrice     :: Price
-    , bPostOnly  :: Bool
-    , bOrderType :: Maybe OrderType
-    , bStp       :: Maybe STP
-    , bTif       :: Maybe TimeInForce
+    { bClientOid   :: Maybe ClientOrderId
+    , bProductId   :: ProductId
+    , bSide        :: Side
+    , bSize        :: Size
+    , bPrice       :: Price
+    , bPostOnly    :: Bool
+    , bOrderType   :: Maybe OrderType
+    , bStp         :: Maybe STP
+    , bTimeInForce :: Maybe TimeInForce
+    , bStop        :: Maybe StopLossSide
+    , bStopPrice   :: Maybe Price
     } deriving (Eq, Show)
 
 

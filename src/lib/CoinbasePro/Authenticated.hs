@@ -11,6 +11,7 @@ module CoinbasePro.Authenticated
   , getOrder
   , getClientOrder
   , placeOrder
+  , placeOrderBody
   , cancelOrder
   , cancelAll
   , fills
@@ -247,7 +248,16 @@ placeOrder clordid prid sd sz price po ot stp tif =
     authRequest methodPost requestPath (encodeBody body) $ API.placeOrder body
   where
     requestPath = encodeRequestPath [ordersPath]
-    body        = PlaceOrderBody clordid prid sd sz price po ot stp tif
+    body        = PlaceOrderBody clordid prid sd sz price po ot stp tif Nothing Nothing
+
+
+-- | https://docs.pro.coinbase.com/#place-a-new-order
+-- Use the underlying post body record
+placeOrderBody :: PlaceOrderBody -> CBAuthT ClientM Order
+placeOrderBody body =
+    authRequest methodPost requestPath (encodeBody body) $ API.placeOrder body
+  where
+    requestPath = encodeRequestPath [ordersPath]
 
 
 -- | https://docs.pro.coinbase.com/#cancel-an-order
