@@ -1,3 +1,19 @@
+# Version 0.9.3.0
+
+- `Order` now has `Maybe Bool` instead of `Bool` for `postOnly`. Required to maintain spec compliance.
+  From https://docs.pro.coinbase.com/#upcoming-changes:
+
+```
+08/09/21
+
+    Orders with a "pending" status returned by the REST API endpoints GET /orders, GET /orders/<id>,
+	and GET /orders/client:<client_oid> will have a reduced set of fields. See the List Orders documentation
+	for more details. Orders with non-pending statuses will be unaffected by this change. The change will
+	take effect in Sandbox starting after August 12th, 2021 and in Production starting after August 19th, 2021.
+```
+
+- Added tests to test order parsing from json file
+
 # Version 0.9.2.2
 
 - Added `CoinbasePro.Unauthenticated.singleProduct`
