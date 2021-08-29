@@ -117,7 +117,7 @@ data Order = Order
     , stp           :: Maybe STP
     , orderType     :: OrderType
     , timeInForce   :: Maybe TimeInForce
-    , postOnly      :: Bool
+    , postOnly      :: Maybe Bool
     , createdAt     :: CreatedAt
     , fillFees      :: FillFees
     , filledSize    :: Size
