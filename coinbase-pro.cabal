@@ -93,6 +93,8 @@ library
     , servant >=0.14 && <0.19
     , servant-client >=0.14 && <0.19
     , servant-client-core >=0.14 && <0.19
+    , tasty >=1.2.2
+    , tasty-hunit >=0.10
     , text ==1.2.*
     , time >=1.8 && <2.0
     , transformers ==0.5.*
@@ -133,6 +135,8 @@ executable test-request
     , servant >=0.14 && <0.19
     , servant-client >=0.14 && <0.19
     , servant-client-core >=0.14 && <0.19
+    , tasty >=1.2.2
+    , tasty-hunit >=0.10
     , text ==1.2.*
     , time >=1.8 && <2.0
     , transformers ==0.5.*
@@ -173,6 +177,51 @@ executable test-stream
     , servant >=0.14 && <0.19
     , servant-client >=0.14 && <0.19
     , servant-client-core >=0.14 && <0.19
+    , tasty >=1.2.2
+    , tasty-hunit >=0.10
+    , text ==1.2.*
+    , time >=1.8 && <2.0
+    , transformers ==0.5.*
+    , unagi-streams ==0.2.*
+    , unordered-containers ==0.2.*
+    , uuid ==1.3.*
+    , vector ==0.12.*
+    , websockets ==0.12.*
+    , wuss ==1.1.*
+  default-language: Haskell2010
+
+test-suite coinbase-pro-test
+  type: exitcode-stdio-1.0
+  main-is: Test.hs
+  other-modules:
+      Paths_coinbase_pro
+  hs-source-dirs:
+      src/test
+  build-depends:
+      HsOpenSSL ==0.11.*
+    , aeson >=1.2 && <1.6
+    , aeson-casing >=0.1 && <0.3
+    , async >=2.1 && <2.3
+    , base >=4.7 && <5
+    , binary ==0.8.*
+    , bytestring ==0.10.*
+    , coinbase-pro
+    , containers >=0.5 && <0.7
+    , cryptonite >=0.24 && <0.30
+    , exceptions >=0.4 && <1.0
+    , http-api-data >=0.3 && <0.5
+    , http-client >=0.5 && <0.7
+    , http-client-tls ==0.3.*
+    , http-streams ==0.8.*
+    , http-types ==0.12.*
+    , io-streams ==1.5.*
+    , memory >=0.14 && <0.16
+    , network >=2.6 && <3.2
+    , servant >=0.14 && <0.19
+    , servant-client >=0.14 && <0.19
+    , servant-client-core >=0.14 && <0.19
+    , tasty >=1.2.2
+    , tasty-hunit >=0.10
     , text ==1.2.*
     , time >=1.8 && <2.0
     , transformers ==0.5.*

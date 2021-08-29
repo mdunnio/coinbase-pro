@@ -6,3 +6,5 @@ cradle:
       component: "coinbase-pro:exe:test-streame"
     - path: "./src/lib/"
       component: "coinbase-pro:lib"
+    - path: "./src/test/"
+      component: "coinbase-pro:test"
