@@ -135,18 +135,18 @@ deriveJSON defaultOptions {fieldLabelModifier = filterOrderFieldName . snakeCase
 
 
 data PlaceOrderBody = PlaceOrderBody
-    { bClientOid :: Maybe ClientOrderId
-    ,  bProductId :: ProductId
-    ,  bSide :: Side
-    ,  bSize :: Maybe Size
-    ,  bFunds :: Maybe Funds
-    ,  bPrice :: Maybe Price
-    ,  bPostOnly :: Maybe Bool
-    ,  bOrderType :: Maybe OrderType
-    ,  bStp :: Maybe STP
+    {  bClientOid   :: Maybe ClientOrderId
+    ,  bProductId   :: ProductId
+    ,  bSide        :: Side
+    ,  bSize        :: Maybe Size
+    ,  bFunds       :: Maybe Funds
+    ,  bPrice       :: Maybe Price
+    ,  bPostOnly    :: Maybe Bool
+    ,  bOrderType   :: Maybe OrderType
+    ,  bStp         :: Maybe STP
     ,  bTimeInForce :: Maybe TimeInForce
-    ,  bStop :: Maybe StopLossSide
-    ,  bStopPrice :: Maybe Price
+    ,  bStop        :: Maybe StopLossSide
+    ,  bStopPrice   :: Maybe Price
     } deriving (Eq, Show)
 
 deriveJSON defaultOptions {fieldLabelModifier = snakeCase . drop 1, omitNothingFields = True} ''PlaceOrderBody
