@@ -235,15 +235,15 @@ getClientOrder cloid = authRequest methodGet requestPath emptyBody $ API.getClie
 
 -- | https://docs.pro.coinbase.com/#place-a-new-order
 placeOrder :: Maybe ClientOrderId
-              -> ProductId
-              -> Side
-              -> Maybe Size
-              -> Maybe Price
-              -> Maybe Bool
-              -> Maybe OrderType
-              -> Maybe STP
-              -> Maybe TimeInForce
-              -> CBAuthT ClientM Order
+            -> ProductId
+            -> Side
+            -> Maybe Size
+            -> Maybe Price
+            -> Maybe Bool
+            -> Maybe OrderType
+            -> Maybe STP
+            -> Maybe TimeInForce
+            -> CBAuthT ClientM Order
 placeOrder clordid prid sd sz price po ot stp tif =
     authRequest methodPost requestPath (encodeBody body) $ API.placeOrder body
   where
