@@ -22,6 +22,7 @@ import           Data.UUID                          (UUID)
 
 import           CoinbasePro.Authenticated.Accounts (AccountId)
 import           CoinbasePro.Authenticated.Payment  (PaymentMethodId)
+import           Control.Applicative
 
 
 data WithdrawalDetails = WithdrawalDetails
@@ -110,7 +111,7 @@ instance FromJSON CryptoWithdrawalResponse where
     <$> o .: "id"
     <*> (read <$> o .: "amount")
     <*> o .: "currency"
-    <*> (read <$> o .: "fee")
+    <*> ((read <$> o .: "fee") <|> (o .: "fee"))
     <*> (read <$> o .: "subtotal")
 
 
