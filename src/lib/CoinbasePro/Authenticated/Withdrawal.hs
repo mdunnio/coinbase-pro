@@ -112,7 +112,8 @@ instance FromJSON CryptoWithdrawalResponse where
     <*> (read <$> o .: "amount")
     <*> o .: "currency"
     <*> ((read <$> o .: "fee") <|> (o .: "fee"))
-    <*> (read <$> o .: "subtotal")
+    <*> ((read <$> o .: "subtotal") <|> (o .: "subtotal"))
+    
 
 
 newtype WithdrawalFeeEstimateResponse = WithdrawalFeeEstimateResponse
