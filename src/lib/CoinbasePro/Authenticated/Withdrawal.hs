@@ -32,7 +32,7 @@ data WithdrawalDetails = WithdrawalDetails
     , destinationTagName    :: Maybe Text
     , coinbaseWithdrawalId  :: Maybe Text
     , coinbaseTransactionId :: Maybe Text
-    , cryptoPaymentMethodId :: Text
+    , coinbasePaymentMethodId :: Text
     , fee                   :: Maybe Double
     , subtotal              :: Maybe Double
     } deriving (Eq, Show)
