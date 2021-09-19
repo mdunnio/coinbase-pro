@@ -23,6 +23,7 @@ import           Data.UUID                          (UUID)
 import           CoinbasePro.Authenticated.Accounts (AccountId)
 import           CoinbasePro.Authenticated.Payment  (PaymentMethodId)
 import           Control.Applicative
+import Text.Read (readMaybe)
 
 
 data WithdrawalDetails = WithdrawalDetails
@@ -47,8 +48,8 @@ instance FromJSON WithdrawalDetails where
     <*> o .:? "coinbase_withdrawal_id"
     <*> o .:? "coinbase_transaction_id"
     <*> o .: "coinbase_payment_method_id"
-    <*> (maybe Nothing read <$> o .:? "fee")
-    <*> (maybe Nothing read <$> o .:? "subtotal")
+    <*> (maybe Nothing readMaybe <$> o .:? "fee")
+    <*> (maybe Nothing readMaybe <$> o .:? "subtotal")
 
 
 data WithdrawalRequest = WithdrawalRequest
