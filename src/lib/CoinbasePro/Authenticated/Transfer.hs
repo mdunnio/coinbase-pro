@@ -4,6 +4,7 @@
 module CoinbasePro.Authenticated.Transfer
     ( TransferType (..)
     , Transfer (..)
+    , TransferDetails (..)
     ) where
 
 import           Data.Aeson                           (FromJSON (..), ToJSON,
