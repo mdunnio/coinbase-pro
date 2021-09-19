@@ -40,7 +40,7 @@ data TransferDetails = TransferDetails
     { tId          :: Text
     , tType        :: Text
     , tCreatedAt   :: CreatedAt
-    , tCompletedAt :: UTCTime
+    , tCompletedAt :: Maybe UTCTime
     , tCanceledAt  :: Maybe UTCTime
     , tProcessedAt :: Maybe UTCTime
     , tAccountId   :: AccountId
@@ -55,7 +55,7 @@ instance FromJSON TransferDetails where
     <$> (o .: "id")
     <*> (o .: "type")
     <*> (o .: "created_at")
-    <*> (o .: "completed_at")
+    <*> (o .:? "completed_at")
     <*> (o .:? "canceled_at")
     <*> (o .:? "processed_at")
     <*> (o .: "account_id")

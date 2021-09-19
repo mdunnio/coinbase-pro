@@ -31,8 +31,8 @@ data WithdrawalDetails = WithdrawalDetails
     , coinbaseAccountId     :: Text
     , destinationTagName    :: Maybe Text
     , coinbaseWithdrawalId  :: Maybe Text
-    , coinbaseTransactionId :: Text
-    , cryptoPaymentMethodId :: Text
+    , coinbaseTransactionId :: Maybe Text
+    , coinbasePaymentMethodId :: Text
     , fee                   :: Maybe Double
     , subtotal              :: Maybe Double
     } deriving (Eq, Show)
@@ -45,7 +45,7 @@ instance FromJSON WithdrawalDetails where
     <*> o .: "coinbase_account_id"
     <*> o .:? "destination_tag_name"
     <*> o .:? "coinbase_withdrawal_id"
-    <*> o .: "coinbase_transaction_id"
+    <*> o .:? "coinbase_transaction_id"
     <*> o .: "coinbase_payment_method_id"
     <*> (maybe Nothing read <$> o .:? "fee")
     <*> (maybe Nothing read <$> o .:? "subtotal")
