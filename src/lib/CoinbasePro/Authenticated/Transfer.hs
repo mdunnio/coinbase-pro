@@ -5,6 +5,8 @@ module CoinbasePro.Authenticated.Transfer
     ( TransferType (..)
     , Transfer (..)
     , TransferDetails (..)
+    , WithdrawalTransfer (..)
+    , DepositTransfer (..)
     ) where
 
 import           Data.Aeson                           (FromJSON (..), ToJSON,
