@@ -112,8 +112,8 @@ instance FromJSON CryptoWithdrawalResponse where
     <$> o .: "id"
     <*> (read <$> o .: "amount")
     <*> o .: "currency"
-    <*> ((read <$> o .: "fee") <|> (o .: "fee"))
-    <*> ((read <$> o .: "subtotal") <|> (o .: "subtotal"))
+    <*> (read <$> o .: "fee")
+    <*> (read <$> o .: "subtotal")
     
 
 
