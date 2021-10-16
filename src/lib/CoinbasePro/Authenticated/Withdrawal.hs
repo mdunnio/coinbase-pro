@@ -23,19 +23,19 @@ import           Data.UUID                          (UUID)
 import           CoinbasePro.Authenticated.Accounts (AccountId)
 import           CoinbasePro.Authenticated.Payment  (PaymentMethodId)
 import           Control.Applicative
-import Text.Read (readMaybe)
+import           Text.Read                          (readMaybe)
 
 
 data WithdrawalDetails = WithdrawalDetails
-    { destinationTag        :: Maybe Text
-    , sentToAddress         :: Maybe Text
-    , coinbaseAccountId     :: Text
-    , destinationTagName    :: Maybe Text
-    , coinbaseWithdrawalId  :: Maybe Text
-    , coinbaseTransactionId :: Maybe Text
+    { destinationTag          :: Maybe Text
+    , sentToAddress           :: Maybe Text
+    , coinbaseAccountId       :: Text
+    , destinationTagName      :: Maybe Text
+    , coinbaseWithdrawalId    :: Maybe Text
+    , coinbaseTransactionId   :: Maybe Text
     , coinbasePaymentMethodId :: Text
-    , fee                   :: Maybe Double
-    , subtotal              :: Maybe Double
+    , fee                     :: Maybe Double
+    , subtotal                :: Maybe Double
     } deriving (Eq, Show)
 
 
@@ -114,7 +114,7 @@ instance FromJSON CryptoWithdrawalResponse where
     <*> o .: "currency"
     <*> ((read <$> o .: "fee") <|> (o .: "fee"))
     <*> ((read <$> o .: "subtotal") <|> (o .: "subtotal"))
-    
+
 
 
 newtype WithdrawalFeeEstimateResponse = WithdrawalFeeEstimateResponse

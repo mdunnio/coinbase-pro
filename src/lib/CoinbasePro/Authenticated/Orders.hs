@@ -24,8 +24,8 @@ import           Data.Set          (Set, fromList)
 import           Data.Text         (pack, toLower, unpack)
 import           Web.HttpApiData   (ToHttpApiData (..))
 
-import           CoinbasePro.Types (ClientOrderId, CreatedAt, OrderId,
-                                    OrderType, Price, ProductId, Side, Size, Funds,
+import           CoinbasePro.Types (ClientOrderId, CreatedAt, Funds, OrderId,
+                                    OrderType, Price, ProductId, Side, Size,
                                     filterOrderFieldName)
 
 

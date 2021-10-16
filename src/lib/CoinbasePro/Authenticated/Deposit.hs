@@ -10,8 +10,8 @@ module CoinbasePro.Authenticated.Deposit
     , CryptoDepositAddress (..)
     ) where
 
-import           Data.Aeson                         (FromJSON,
-                                                     parseJSON, withObject, (.:))
+import           Data.Aeson                         (FromJSON, parseJSON,
+                                                     withObject, (.:))
 import           Data.Aeson.Casing                  (snakeCase)
 import           Data.Aeson.TH                      (defaultOptions, deriveJSON,
                                                      fieldLabelModifier)
