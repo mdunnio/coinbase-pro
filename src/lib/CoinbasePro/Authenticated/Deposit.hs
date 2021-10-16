@@ -10,6 +10,8 @@ module CoinbasePro.Authenticated.Deposit
     , CryptoDepositAddress (..)
     ) where
 
+import           Data.Aeson                         (FromJSON, parseJSON,
+                                                     withObject, (.:))
 import           Data.Aeson.Casing                  (snakeCase)
 import           Data.Aeson.TH                      (defaultOptions, deriveJSON,
                                                      fieldLabelModifier)
@@ -62,9 +64,13 @@ data DepositResponse = DepositResponse
     , rPayoutAt :: UTCTime
     } deriving (Eq, Show)
 
-
-deriveJSON defaultOptions { fieldLabelModifier = snakeCase . drop 1 } ''DepositResponse
-
+instance FromJSON DepositResponse where
+    parseJSON = withObject "deposit response" $ \o ->
+        DepositResponse
+        <$> o .: "id"
+        <*> (read <$> o .: "amount")
+        <*> o .: "currency"
+        <*> o .: "payout_at"
 
 data AddressInfo = AddressInfo
     { aiAddress        :: Text

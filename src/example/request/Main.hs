@@ -33,8 +33,8 @@ main = do
         accountHistory aid >>= liftIO . print
         fills (Just btcusd) Nothing >>= liftIO . print
         listOrders (Just [All]) (Just btcusd) >>= liftIO . print
-        placeOrder Nothing btcusd Sell (Size 0.001) (Price 99999.00) True Nothing Nothing Nothing >>= liftIO . print
-        placeOrder Nothing btcusd Buy (Size 1.0) (Price 1.00) True Nothing Nothing Nothing >>= liftIO . print
+        placeOrder Nothing btcusd Sell (Just $ Size 0.001) (Just $ Price 99999.00) (Just True) Nothing Nothing Nothing >>= liftIO . print
+        placeOrder Nothing btcusd Buy (Just $ Size 1.0) (Just $ Price 1.00) (Just True) Nothing Nothing Nothing >>= liftIO . print
         cancelAll (Just btcusd) >>= liftIO . print
   where
     accessKey  = CBAccessKey "accesskey"

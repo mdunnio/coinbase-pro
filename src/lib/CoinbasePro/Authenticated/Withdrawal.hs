@@ -22,18 +22,20 @@ import           Data.UUID                          (UUID)
 
 import           CoinbasePro.Authenticated.Accounts (AccountId)
 import           CoinbasePro.Authenticated.Payment  (PaymentMethodId)
+import           Control.Applicative
+import           Text.Read                          (readMaybe)
 
 
 data WithdrawalDetails = WithdrawalDetails
-    { destinationTag        :: Maybe Text
-    , sentToAddress         :: Maybe Text
-    , coinbaseAccountId     :: Text
-    , destinationTagName    :: Maybe Text
-    , coinbaseWithdrawalId  :: Maybe Text
-    , coinbaseTransactionId :: Text
-    , cryptoPaymentMethodId :: Text
-    , fee                   :: Maybe Double
-    , subtotal              :: Maybe Double
+    { destinationTag          :: Maybe Text
+    , sentToAddress           :: Maybe Text
+    , coinbaseAccountId       :: Text
+    , destinationTagName      :: Maybe Text
+    , coinbaseWithdrawalId    :: Maybe Text
+    , coinbaseTransactionId   :: Maybe Text
+    , coinbasePaymentMethodId :: Text
+    , fee                     :: Maybe Double
+    , subtotal                :: Maybe Double
     } deriving (Eq, Show)
 
 
@@ -44,10 +46,10 @@ instance FromJSON WithdrawalDetails where
     <*> o .: "coinbase_account_id"
     <*> o .:? "destination_tag_name"
     <*> o .:? "coinbase_withdrawal_id"
-    <*> o .: "coinbase_transaction_id"
+    <*> o .:? "coinbase_transaction_id"
     <*> o .: "coinbase_payment_method_id"
-    <*> (maybe Nothing read <$> o .:? "fee")
-    <*> (maybe Nothing read <$> o .:? "subtotal")
+    <*> (maybe Nothing readMaybe <$> o .:? "fee")
+    <*> (maybe Nothing readMaybe <$> o .:? "subtotal")
 
 
 data WithdrawalRequest = WithdrawalRequest
@@ -110,8 +112,9 @@ instance FromJSON CryptoWithdrawalResponse where
     <$> o .: "id"
     <*> (read <$> o .: "amount")
     <*> o .: "currency"
-    <*> (read <$> o .: "fee")
-    <*> (read <$> o .: "subtotal")
+    <*> ((read <$> o .: "fee") <|> (o .: "fee"))
+    <*> ((read <$> o .: "subtotal") <|> (o .: "subtotal"))
+
 
 
 newtype WithdrawalFeeEstimateResponse = WithdrawalFeeEstimateResponse

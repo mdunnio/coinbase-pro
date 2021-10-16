@@ -15,7 +15,7 @@ module CoinbasePro.Types
     , Size (..)
     , Volume (..)
     , TradeId (..)
-    , Funds
+    , Funds (..)
     , OrderType (..)
     , CreatedAt (..)
     , Candle (..)
