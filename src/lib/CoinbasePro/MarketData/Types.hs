@@ -24,11 +24,10 @@ data Product = Product
     { productId      :: ProductId
     , baseCurrency   :: Text
     , quoteCurrency  :: Text
-    , baseMinSize    :: Double
-    , baseMaxSize    :: Double
+    , baseIncrement  :: Double
     , quoteIncrement :: Double
     , minMarketFunds :: Double
-    , maxMarketFunds :: Double
+    , displayName    :: Text
     } deriving (Eq, Show)
 
 
@@ -37,11 +36,10 @@ instance FromJSON Product where
         <$> o .: "id"
         <*> o .: "base_currency"
         <*> o .: "quote_currency"
-        <*> (read <$> o .: "base_min_size")
-        <*> (read <$> o .: "base_max_size")
+        <*> (read <$> o .: "base_increment")
         <*> (read <$> o .: "quote_increment")
         <*> (read <$> o .: "min_market_funds")
-        <*> (read <$> o .: "max_market_funds")
+        <*> o .: "display_name"
 
 
 instance ToHttpApiData Product where
