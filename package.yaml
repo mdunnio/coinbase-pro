@@ -21,7 +21,7 @@ github: mdunnio/coinbase-pro
 dependencies:
   - base                 >= 4.7   && < 5
   - HsOpenSSL            >= 0.11  && < 0.12
-  - aeson                >= 1.2   && < 1.6
+  - aeson                >= 1.2   && < 2.1
   - aeson-casing         >= 0.1   && < 0.3
   - async                >= 2.1   && < 2.3
   - binary               >= 0.8   && < 0.9
