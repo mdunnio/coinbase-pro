@@ -15,6 +15,7 @@ synopsis:       Client for Coinbase Pro
 extra-source-files:
 - README.md
 - changelog.md
+- src/test/data/*
 
 github: mdunnio/coinbase-pro
 
