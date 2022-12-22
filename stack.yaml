@@ -1,4 +1,4 @@
-resolver: lts-18.6
+resolver: lts-20.4
 
 ghc-options:
   "$locals": -Wall
@@ -7,9 +7,6 @@ packages:
 - .
 
 extra-deps:
-  - base64-bytestring-1.0.0.3@sha256:6c82d900465345e30ff0eeb9a1374fbd2955c8e5ca6206e03669f04575830f88,2242
-  - servant-client-0.18@sha256:3e3b8d145cf811e19849744ad305aa0bd42301d01ff75e1dac169bc9f5d18221,4589
-  - servant-client-core-0.18@sha256:6702f04f3e5ac47abace5b26ab1948480437334747895407f0697502a403b96a,3593
   - unagi-chan-0.4.1.3
   - unagi-streams-0.2.7
 
