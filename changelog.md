@@ -1,3 +1,8 @@
+# Version 0.9.3.1
+
+- Added test data to `extra-source-files` so that `cabal test` can be run straight from the hackage
+  package
+
 # Version 0.9.3.0
 
 - `Order` now has `Maybe Bool` instead of `Bool` for `postOnly`. Required to maintain spec compliance.
