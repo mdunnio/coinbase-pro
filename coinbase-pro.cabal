@@ -5,7 +5,7 @@ cabal-version: 1.12
 -- see: https://github.com/sol/hpack
 
 name:           coinbase-pro
-version:        0.9.3.0
+version:        0.9.3.1
 synopsis:       Client for Coinbase Pro
 description:    Client for Coinbase Pro REST and Websocket APIs
 category:       Web, Finance
@@ -13,7 +13,7 @@ homepage:       https://github.com/mdunnio/coinbase-pro#readme
 bug-reports:    https://github.com/mdunnio/coinbase-pro/issues
 author:         Michael Dunn <michaelsdunn1@gmail.com>
 maintainer:     Michael Dunn <michaelsdunn1@gmail.com>
-copyright:      2021 Michael Dunn <michaelsdunn1@gmail.com>
+copyright:      2022 Michael Dunn <michaelsdunn1@gmail.com>
 license:        MIT
 license-file:   LICENSE
 build-type:     Simple
