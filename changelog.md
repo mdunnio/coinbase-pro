@@ -1,3 +1,7 @@
+# Version 0.9.3.2
+
+- Upgraded to lts-20.4 (ghc 9.2.5)
+
 # Version 0.9.3.1
 
 - Added test data to `extra-source-files` so that `cabal test` can be run straight from the hackage
