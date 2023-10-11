@@ -74,7 +74,7 @@ library
       src/lib/
   build-depends:
       HsOpenSSL ==0.11.*
-    , aeson >=1.2 && <2.1
+    , aeson >=1.2 && <2.2
     , aeson-casing >=0.1 && <0.3
     , async >=2.1 && <2.3
     , base >=4.7 && <5
@@ -91,9 +91,9 @@ library
     , io-streams ==1.5.*
     , memory >=0.14 && <0.18
     , network >=2.6 && <3.2
-    , servant >=0.14 && <0.20
-    , servant-client >=0.14 && <0.20
-    , servant-client-core >=0.14 && <0.20
+    , servant >=0.14 && <0.21
+    , servant-client >=0.14 && <0.21
+    , servant-client-core >=0.14 && <0.21
     , tasty >=1.2.2
     , tasty-hunit >=0.10
     , text ==1.2.*
