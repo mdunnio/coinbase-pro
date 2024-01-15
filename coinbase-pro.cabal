@@ -83,26 +83,26 @@ library
     , containers >=0.5 && <0.7
     , cryptonite >=0.24 && <0.31
     , exceptions >=0.4 && <1.0
-    , http-api-data >=0.3 && <0.5
+    , http-api-data >=0.3 && <0.6
     , http-client >=0.5 && <0.8
     , http-client-tls ==0.3.*
     , http-streams ==0.8.*
     , http-types ==0.12.*
     , io-streams ==1.5.*
-    , memory >=0.14 && <0.18
+    , memory >=0.14 && <0.19
     , network >=2.6 && <3.2
     , servant >=0.14 && <0.21
     , servant-client >=0.14 && <0.21
     , servant-client-core >=0.14 && <0.21
     , tasty >=1.2.2
     , tasty-hunit >=0.10
-    , text ==1.2.*
+    , text ==1.2.* || ==2.0.*
     , time >=1.8 && <2.0
-    , transformers ==0.5.*
+    , transformers >=0.5 && <0.7
     , unagi-streams ==0.2.*
     , unordered-containers ==0.2.*
     , uuid ==1.3.*
-    , vector ==0.12.*
+    , vector >=0.12 && <0.14
     , websockets ==0.12.*
     , wuss >=1.1 && <3
   default-language: Haskell2010
@@ -115,7 +115,7 @@ executable test-request
       src/example/request/
   build-depends:
       HsOpenSSL ==0.11.*
-    , aeson >=1.2 && <2.1
+    , aeson >=1.2 && <2.2
     , aeson-casing >=0.1 && <0.3
     , async >=2.1 && <2.3
     , base >=4.7 && <5
@@ -125,26 +125,26 @@ executable test-request
     , containers >=0.5 && <0.7
     , cryptonite >=0.24 && <0.31
     , exceptions >=0.4 && <1.0
-    , http-api-data >=0.3 && <0.5
+    , http-api-data >=0.3 && <0.6
     , http-client >=0.5 && <0.8
     , http-client-tls ==0.3.*
     , http-streams ==0.8.*
     , http-types ==0.12.*
     , io-streams ==1.5.*
-    , memory >=0.14 && <0.18
+    , memory >=0.14 && <0.19
     , network >=2.6 && <3.2
-    , servant >=0.14 && <0.20
-    , servant-client >=0.14 && <0.20
-    , servant-client-core >=0.14 && <0.20
+    , servant >=0.14 && <0.21
+    , servant-client >=0.14 && <0.21
+    , servant-client-core >=0.14 && <0.21
     , tasty >=1.2.2
     , tasty-hunit >=0.10
-    , text ==1.2.*
+    , text ==1.2.* || ==2.0.*
     , time >=1.8 && <2.0
-    , transformers ==0.5.*
+    , transformers >=0.5 && <0.7
     , unagi-streams ==0.2.*
     , unordered-containers ==0.2.*
     , uuid ==1.3.*
-    , vector ==0.12.*
+    , vector >=0.12 && <0.14
     , websockets ==0.12.*
     , wuss >=1.1 && <3
   default-language: Haskell2010
@@ -157,7 +157,7 @@ executable test-stream
       src/example/stream/
   build-depends:
       HsOpenSSL ==0.11.*
-    , aeson >=1.2 && <2.1
+    , aeson >=1.2 && <2.2
     , aeson-casing >=0.1 && <0.3
     , async >=2.1 && <2.3
     , base >=4.7 && <5
@@ -167,26 +167,26 @@ executable test-stream
     , containers >=0.5 && <0.7
     , cryptonite >=0.24 && <0.31
     , exceptions >=0.4 && <1.0
-    , http-api-data >=0.3 && <0.5
+    , http-api-data >=0.3 && <0.6
     , http-client >=0.5 && <0.8
     , http-client-tls ==0.3.*
     , http-streams ==0.8.*
     , http-types ==0.12.*
     , io-streams ==1.5.*
-    , memory >=0.14 && <0.18
+    , memory >=0.14 && <0.19
     , network >=2.6 && <3.2
-    , servant >=0.14 && <0.20
-    , servant-client >=0.14 && <0.20
-    , servant-client-core >=0.14 && <0.20
+    , servant >=0.14 && <0.21
+    , servant-client >=0.14 && <0.21
+    , servant-client-core >=0.14 && <0.21
     , tasty >=1.2.2
     , tasty-hunit >=0.10
-    , text ==1.2.*
+    , text ==1.2.* || ==2.0.*
     , time >=1.8 && <2.0
-    , transformers ==0.5.*
+    , transformers >=0.5 && <0.7
     , unagi-streams ==0.2.*
     , unordered-containers ==0.2.*
     , uuid ==1.3.*
-    , vector ==0.12.*
+    , vector >=0.12 && <0.14
     , websockets ==0.12.*
     , wuss >=1.1 && <3
   default-language: Haskell2010
@@ -200,7 +200,7 @@ test-suite coinbase-pro-test
       src/test
   build-depends:
       HsOpenSSL ==0.11.*
-    , aeson >=1.2 && <2.1
+    , aeson >=1.2 && <2.2
     , aeson-casing >=0.1 && <0.3
     , async >=2.1 && <2.3
     , base >=4.7 && <5
@@ -210,26 +210,26 @@ test-suite coinbase-pro-test
     , containers >=0.5 && <0.7
     , cryptonite >=0.24 && <0.31
     , exceptions >=0.4 && <1.0
-    , http-api-data >=0.3 && <0.5
+    , http-api-data >=0.3 && <0.6
     , http-client >=0.5 && <0.8
     , http-client-tls ==0.3.*
     , http-streams ==0.8.*
     , http-types ==0.12.*
     , io-streams ==1.5.*
-    , memory >=0.14 && <0.18
+    , memory >=0.14 && <0.19
     , network >=2.6 && <3.2
-    , servant >=0.14 && <0.20
-    , servant-client >=0.14 && <0.20
-    , servant-client-core >=0.14 && <0.20
+    , servant >=0.14 && <0.21
+    , servant-client >=0.14 && <0.21
+    , servant-client-core >=0.14 && <0.21
     , tasty >=1.2.2
     , tasty-hunit >=0.10
-    , text ==1.2.*
+    , text ==1.2.* || ==2.0.*
     , time >=1.8 && <2.0
-    , transformers ==0.5.*
+    , transformers >=0.5 && <0.7
     , unagi-streams ==0.2.*
     , unordered-containers ==0.2.*
     , uuid ==1.3.*
-    , vector ==0.12.*
+    , vector >=0.12 && <0.14
     , websockets ==0.12.*
     , wuss >=1.1 && <3
   default-language: Haskell2010
